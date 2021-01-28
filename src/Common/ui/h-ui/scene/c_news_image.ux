@@ -17,7 +17,7 @@
     <div class="news">
         <swiper loop="false" indicator="false" class="news-swiper">
             <block for="{{data}}">
-                <stack>
+                <stack style="width:100%;height:100%;">
                     <image class="news-swiper-image" src="{{$item.pic}}"></image>
                     <div class="news-swiper-text">
                         <text class="news-swiper-text-index">{{$idx + 1}}/{{data.length}}</text>
@@ -42,7 +42,7 @@
         align-items: center;
         &-swiper {
             width: 750px;
-            height: 1140px;
+            height: 100%;
             &-image {
                 width: 100%;
                 height: 100%;

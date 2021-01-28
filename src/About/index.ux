@@ -47,12 +47,12 @@
 export default {
   protected: {
     name: null,
-    icon: null
+    icon: '../Common/HTMLicon.png'
   },
   private: {
-    desc: '即点即用，让你省去下载安装的步骤，立即使用各类服务',
-    serviceType: '工具类',
-    subjectInfo: 'xxx有限公司',
+    desc: '铸科技之典范、行世间之风采',
+    serviceType: '互联网',
+    subjectInfo: '提灯的小僧',
     copyright: ''
   },
   onInit() {
@@ -81,7 +81,7 @@ export default {
   width: 134px;
   height: 134px;
   border-radius: 10px;
-  border: 1px solid #8d8d8d;
+  /* border: 1px solid #8d8d8d; */
 }
 
 /* 应用名 */

@@ -1,5 +1,6 @@
 <!-- <import name="video-player" src="../Common/ui/h-ui/media/c_video_player"></import> -->
 <import name="news-image" src="../Common/ui/h-ui/scene/c_news_image"></import>
+<import name="drawer" src="../Common/ui/h-ui/navigation/c_drawer"></import>
 <template>
   <div id="Home">
     <div class="item-container">
@@ -21,7 +22,7 @@
               <text class="homeDetails">{{ homeDetails }}</text>
               <div class="AnimationBox">
                 <text class="rightan">滑动查看更多</text>
-                <img src="../Common/xia.png" alt class="xiaImg" />
+                <image src="../Common/xia.png" alt class="xiaImg"></image>
               </div>
             </div>
             <!-- <video-player src="https://ss0.bdstatic.com/-0U0bnSm1A5BphGlnYG/cae-legoup-video-target/93be3d88-9fc2-4fbd-bd14-833bca731ca7.mp4" autoplay="{{autoPlayBln}}" controls="{{showControls}}" orientation="portrait"></video-player> -->
@@ -30,14 +31,19 @@
               autoplay="{{autoPlayBln}}"
               orientation="portrait"
             ></video> -->
-            <img src="../Common/homeBG.jpg" class="bgImg" />
+            <image src="../Common/homeBG.jpg" class="bgImg" ></image>
           </div>
           <div class="Home_Details">
-            <news-image data="{{data}}"></news-image>
+            <news-image data="{{dataImg}}"></news-image>
           </div>
         </swiper>
       </div>
     </div>
+    <!-- 顶部左上角侧边栏点击图标 -->
+    <img src="../Common/fenlei.png" class="fenlei" onclick="clickDrawer" />
+
+    <!-- 侧边栏组件 -->
+    <drawer id="drawer"></drawer>
   </div>
 </template>
 <script>
@@ -57,7 +63,7 @@ export default {
     durationValue: 1000,
     isVertical: true,
     isSwipe: true,
-    data: [
+    dataImg: [
       {
         pic: "https://h-ui.obs.cn-south-1.myhuaweicloud.com/image/news_image.jpg",
         memo: "两姓联姻，一堂缔约，良缘永结，匹配同称。看此日桃花灼灼，宜室宜家，卜他年瓜瓞绵绵，尔昌尔炽。谨以白头之约，书向鸿笺，好将红叶之盟，载明鸳谱，此证。"
@@ -70,6 +76,62 @@ export default {
         pic: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202010%2F05%2F20201005100720_uyWNU.thumb.400_0.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1614394079&t=b5e999b8cf7e4e3bd1fac13970db42e5",
         memo: "十几年相思加两斤黄酒，才把这句喜欢说出口，明日可愿随我柳下走，满头杨花共白首。"
       }
+    ],
+    data: [
+      {
+        icon: 'female',
+        bgColor: 'bg-success',
+        title: '美妆',
+        uri: '/About'
+      },
+      {
+        icon: 'bag',
+        bgColor: 'bg-danger',
+        title: '包包',
+        uri: '/About'
+      },
+      {
+        icon: 'ring',
+        bgColor: 'bg-indigo',
+        title: '戒指',
+        uri: '/About'
+      },
+      {
+        icon: 'necklace',
+        bgColor: 'bg-pink',
+        title: '项链',
+        uri: '/About'
+      },
+      {
+        icon: 'skirt',
+        bgColor: 'bg-orange',
+        title: '连衣裙',
+        uri: '/About'
+      },
+      {
+        icon: 'shoe',
+        bgColor: 'bg-teal',
+        title: '高跟鞋',
+        uri: '/About'
+      },
+      {
+        icon: 't-shirt',
+        bgColor: 'bg-purple',
+        title: 'T恤',
+        uri: '/About'
+      },
+      {
+        icon: 'pants',
+        bgColor: 'bg-cyan',
+        title: '裤子',
+        uri: '/About'
+      },
+      {
+        icon: 'coat',
+        bgColor: 'bg-warning',
+        title: '外套',
+        uri: '/About'
+      }
     ]
   },
   onInit() {
@@ -78,6 +140,12 @@ export default {
   selectSwiperIndex(index) {
     console.log(index)
   },
+  clickDrawer() {
+    console.log(this)
+    this.$child('drawer').showDrawer({
+      data: this.data,
+    });
+  }
 }
 </script>
 <style lang="less">
@@ -88,6 +156,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.fenlei {
+  position: fixed;
+  top: 20px;
+  left: 25px;
+  width: 70px;
+  height: 70px;
 }
 .item-container {
   width: 100%;
@@ -176,10 +251,9 @@ video,
   width: 100%;
   height: 100%;
   flex-direction: column;
-  overflow-y: auto;
   position: relative;
 }
-.news{
+.news {
   position: static;
 }
 </style>

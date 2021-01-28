@@ -29,7 +29,7 @@
                             <text>{{$item.title}}</text>
                         </div>
                         <div class="card-top-extra" onclick="handleClick">
-                            <image class="c-img" src="../../../icons/arrow.png"></image>
+                            <image class="c-img" src="../../../icons/arrow.png" style="width: 20px;"></image>
                         </div>
                     </div>
                 </block>

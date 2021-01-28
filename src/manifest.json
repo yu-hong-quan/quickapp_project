@@ -1,10 +1,10 @@
 {
-  "package": "app_quickApp_project",
+  "package": "app.quickApp.project",
   "name": "提灯的小僧",
   "versionName": "1.0.0",
   "versionCode": 1,
   "minPlatformVersion": 1070,
-  "icon": "/Common/logo.png",
+  "icon": "/Common/HTMLicon.png",
   "features": [
     {
       "name": "system.prompt"
