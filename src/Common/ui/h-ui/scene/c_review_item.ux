@@ -1,0 +1,307 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="like" src="./c_like"></import>
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div class="swipe-item">
+        <div class="card {{status}}" ontouchstart="handleTouchStart" ontouchmove="handleTouchMove">
+            <div class="card-left">
+                <div if="{{compAvatar === ''}}" class="card-left-icon" style="{{randomBgColor}}">
+                    <icon type="user" size="70" color="white"></icon>
+                </div>
+
+                <avatar if="{{compAvatar !== ''}}" src="{{compAvatar}}" size="90" h-style="margin-top:25px;margin-bottom:25px;"></avatar>
+            </div>
+
+
+            <div class="card-right">
+                <div class="card-right-top">
+                    <text class="card-right-top-nickname">{{compNickname}}</text>
+                    <like id="{{id + '_like'}}" heart="{{compLikeHeart}}" value="{{compLikeValue}}" clicked="{{compLikeClicked}}" color="{{compLikeColor}}" bg-color="{{compLikeBgColor}}"></like>
+                </div>
+                <div>
+                    <text class="card-right-memo">{{compMemo}}</text>
+                </div>
+                <div class="card-right-bottom">
+                    <text class="card-right-bottom-date">{{compDate}}</text>
+                    <text class="card-right-bottom-reply"  onclick="handleReply">{{compReplyValue}}回复</text>
+                </div>
+            </div>
+
+            <div class="action">
+                <div class="card-left-icon bg-danger" onclick="handleClick">
+                    <icon type="trash" size="70" color="white"></icon>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .swipe-item{
+        width: 1030px;
+        margin-left: -140px;
+    }
+    .card{;
+        justify-content: space-between;
+        width: 890px;
+        margin-left: 140px;
+        background-color: #ffffff;
+        &-left{
+            width: 140px;
+            height: 140px;
+            padding-left: 33px;
+            align-items: center;
+            justify-content: center;
+            &-icon{
+                width: 90px;
+                height: 90px;
+                border-radius: 45px;
+                align-items: center;
+                justify-content: center;
+                margin: 25px 0;
+            }
+        }
+
+        &-right{
+            width: 557px;
+            flex-direction: column;
+            padding: 25px 0;
+            border-color: #cccccc;
+            border-bottom-width: 0.5px;
+            &-top{
+                width: 100%;
+                align-items: flex-start;
+                justify-content: space-between;
+                &-nickname {
+                    font-size: 31px;
+                    font-weight: bold;
+                }
+            }
+            &-memo{
+                line-height: 40px;
+                margin-top: 15px;
+            }
+            &-bottom{
+                margin-top: 15px;
+                &-date{
+                    font-size: 28px;
+                    margin-right: 20px;
+                }
+                &-reply{
+                    background-color: #f7f2fa;
+                    padding:5px 20px;
+                    font-size: 28px;
+                    border-radius: 19px;
+                }
+            }
+        }
+    }
+    .action{
+         width: 140px;
+         height: 140px;
+         margin-left: 33px;
+         background-color: #eeeeee;
+         align-items: center;
+         justify-content: center;
+     }
+    .show{
+        animation-name: show;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+    .hide{
+        animation-name: hide;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show {
+        from {
+            transform: translateX(0px);
+        }
+        to {
+            transform: translateX(-140px);
+        }
+    }
+
+    @keyframes hide {
+        from {
+            transform: translateX(-140px);
+        }
+        to {
+            transform: translateX(0px);
+        }
+    }
+</style>
+
+<script>
+    import { randomColor } from '../../../utils/string'
+
+    export default {
+        props: {
+            id: {},
+            nickname:{
+                default: ''
+            },
+            avatar: {},
+            date:{
+                default: ''
+            },
+            memo:{
+                default: ''
+            },
+            supportDelete: {
+                default: false
+            },
+            likeHeart: {
+                default: false
+            },
+            likeValue: {
+                default: 0
+            },
+            likeClicked: {
+                default: false
+            },
+            likeColor: {
+                default: 'white'
+            },
+            likeBgColor: {
+                default: 'bg-danger'
+            },
+            replyValue: {
+                default: 0
+            }
+        },
+
+        onInit() {
+            this.$on(this.id + '_like_dispatchEvt',this.dispatchLikeEvt)
+        },
+
+        data() {
+            return {
+                compId: this.id,
+                compNickname: this.nickname,
+                compAvatar: this.avatar,
+                compDate: this.date,
+                compMemo: this.memo,
+                compSupportDelete: this.supportDelete,
+                compLikeHeart: this.likeHeart,
+                compLikeValue: this.likeValue,
+                compLikeClicked: this.likeClicked,
+                compLikeColor: this.likeColor,
+                compLikeBgColor: this.likeBgColor,
+                compReplyValue: this.replyValue,
+                status: '',
+                startX: 0,
+                stop: true
+            }
+        },
+
+        computed: {
+            randomBgColor() {
+                console.info(randomColor(180, 240, 0.9))
+                return 'background-color: ' + randomColor(180, 240, 0.9) + ';'
+            }
+        },
+
+        handleTouchMove(e){
+            if(this.supportDelete) {
+                var endX = e.touches[0].clientX
+
+                if (Math.abs(this.startX - endX) > 70 && !this.stop) {
+                    this.stop = true
+                    var direction = this.startX > endX ? 'left' : 'right'
+
+                    var pId = this.id.substr(0, this.id.lastIndexOf('_'))
+                    var index = this.id.substr(this.id.lastIndexOf('_') + 1, this.id.length)
+
+                    if ((this.status === '' || this.status === 'hide') && direction === 'left') {
+                        this.status = 'show'
+                        this.$dispatch(pId + '_dispatchShowEvt', {
+                            value: index
+                        })
+                    }
+                    if (this.status === 'show' && direction === 'right') {
+                        this.status = 'hide'
+                        this.$dispatch(pId + '_dispatchHideEvt', {
+                            value: index
+                        })
+                    }
+                }
+            }
+        },
+
+        handleTouchStart(e){
+            this.stop = false
+            this.startX = e.touches[0].clientX
+        },
+
+        hideSwipe(options) {
+            const {compId, compNickname = '', compAvatar, compDate = '', compMemo = '', compSupportDelete = false, compLikeHeart = false, compLikeValue = 0, compLikeClicked = false, compLikeColor = 'white', compLikeBgColor = 'bg-danger', compReplyValue = 0} = options;
+            Object.assign(this._data, {
+                ...options,
+                compId: compId,
+                compNickname: compNickname,
+                compAvatar: compAvatar,
+                compDate: compDate,
+                compMemo: compMemo,
+                compSupportDelete: compSupportDelete,
+                compLikeHeart: compLikeHeart,
+                compLikeValue: compLikeValue,
+                compLikeClicked: compLikeClicked,
+                compLikeColor: compLikeColor,
+                compLikeBgColor: compLikeBgColor,
+                compReplyValue: compReplyValue,
+                status: 'hide',
+                startX: 0,
+                stop: true
+            });
+        },
+
+        handleClick(){//监控用户删除评论事件
+            var pId = this.id.substr(0,this.id.lastIndexOf('_'))
+            var index = this.id.substr(this.id.lastIndexOf('_')+1, this.id.length)
+            this.$dispatch(pId + '_dispatchDelEvt', {
+                value: index  //用户删除的数据在列表中的索引
+            })
+        },
+
+        handleReply(){//监控用户回复事件
+            var pId = this.id.substr(0,this.id.lastIndexOf('_'))
+            var index = this.id.substr(this.id.lastIndexOf('_')+1, this.id.length)
+            this.$dispatch(pId + '_dispatchReplyEvt', {
+                value: index  //被用户回复的数据在列表中的索引
+            })
+        },
+
+        dispatchLikeEvt(evt) {//监控用户点赞事件
+            var clicked = evt.detail.value//true=点赞，false=取消点赞
+
+            var pId = this.id.substr(0,this.id.lastIndexOf('_'))
+            var index = this.id.substr(this.id.lastIndexOf('_')+1, this.id.length)
+
+            this.$dispatch(pId + '_dispatchLikeEvt', {
+                value: {index: index, clicked: clicked} //index代表用户点赞的评论在列表中的索引
+            })
+        }
+    }
+</script>

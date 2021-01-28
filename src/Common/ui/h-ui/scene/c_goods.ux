@@ -1,0 +1,264 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="pic" src="../media/c_pic"></import>
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<import name="del" src="../text/c_tag_del"></import>
+<template>
+    <div class="goods" style="{{hStyle}}">
+        <div if="{{!data.hideTitle}}" class="goods-top">
+            <div class="goods-top-title">
+                <text class="goods-top-title-main">{{data.title}}</text>
+                <text class="goods-top-title-sub">{{data.subTitle}}</text>
+            </div>
+            <div class="goods-top-extra" onclick="handleClick">
+                <text class="goods-top-extra-text">{{data.extra}}</text>
+                <image if="{{data.uri !== undefined}}" class="goods-top-extra-arrow" src="../../../icons/arrow.png"></image>
+            </div>
+        </div>
+
+        <flex-row wrap="wrap" justify="between" h-style="margin-top: 20px;">
+            <flex-col width="{{colWidth}}" for="{{data.list}}" h-style="{{colHeight}}">
+                <stack if="{{compMode === 1}}" style="align-items: flex-end;" onclick="handleRouter($item.uri)">
+                    <pic src="{{$item.pic}}" width="{{picWidth}}" height="{{picHeight}}" radius="8" radius-mode="{{imageRadius}}"></pic>
+                    <div class="goods-list-item-text" style="width:{{picWidth}}px;{{textHeight}}">
+                        <text class="goods-list-item-text-main">{{$item.title}}</text>
+                        <text class="goods-list-item-text-sub">{{$item.extra}}</text>
+                    </div>
+                </stack>
+                <div if="{{compMode !== 1}}" class="goods-list-item" onclick="handleRouter($item.uri)">
+                    <pic src="{{$item.pic}}" width="{{picWidth}}" height="{{picHeight}}" radius="8" outline="{{outline}}" radius-mode="{{imageRadius}}"></pic>
+                    <div if="{{compMode < 4 || compMode > 7}}" class="goods-list-item-text" style="{{textHeight}}">
+                        <text class="goods-list-item-text-main">{{$item.title}}</text>
+                        <text class="goods-list-item-text-sub">{{$item.extra}}</text>
+                    </div>
+                    <div if="{{compMode >= 4 && compMode <= 7}}" class="goods-list-item-text2">
+                        <text class="goods-list-item-text2-main">{{$item.title}}</text>
+                        <text class="goods-list-item-text2-sub">{{$item.extra}}</text>
+                        <div>
+                            <text if="{{$item.price !== undefined}}" class="goods-list-item-text2-sub {{$item.price === 0 ? 'success' : 'red'}}">¥ {{$item.price === 0 ? '免费' : $item.price}}</text>
+                            <del if="{{$item.marketPrice !== undefined}}" text="¥{{$item.marketPrice}}" h-style="margin-left:5px;font-size: 25px;"></del>
+                        </div>
+                    </div>
+                </div>
+            </flex-col>
+        </flex-row>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+    .goods{
+        width: 684px;
+        margin: 20px -5px 20px 5px;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        &-top{
+            align-items: flex-end;
+            justify-content: space-between;
+            width: 100%;
+            &-title{
+                flex-direction: column;
+                &-main{
+                    font-size: 31px;
+                    color: @color-title;
+                }
+                &-sub{
+                    font-size: 28px;
+                }
+            }
+            &-extra{
+                align-items: center;
+                &-text{
+                    font-size: 28px;
+                }
+                &-arrow{
+                    width: 20px;
+                    height: 20px;
+                    margin-left: 5px;
+                    margin-right: 10px;
+                }
+            }
+        }
+        &-list{
+            &-item{
+                flex-direction: column;
+                &-text{
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: 10px;
+                    background-color: #f3eff4;
+                    border-bottom-left-radius: 8px;
+                    border-bottom-right-radius: 8px;
+                    &-main{
+                        font-size: 28px;
+                        color: @color-title;
+                        lines:1;
+                        text-overflow: ellipsis;
+                    }
+                    &-sub{
+                        font-size: 25px;
+                        lines:1;
+                        text-overflow: ellipsis;
+                    }
+                }
+                &-text2{
+                        flex-direction: column;
+                        align-items: flex-start;
+                        padding: 10px;
+                    &-main{
+                        font-size: 28px;
+                        color: @color-title;
+                        lines:2;
+                        text-overflow: ellipsis;
+                    }
+                }
+            }
+        }
+    }
+    .red{
+        color: #ff0000;
+    }
+    .success{
+        color: @color-success;
+    }
+</style>
+
+<script>
+    import router from '@system.router';
+
+    export default {
+        props: {
+            data: {},
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                picWidth: 334,
+                picHeight: 334,
+                colWidth: 6,
+                colHeight: '',
+                textHeight: 0,
+                imageRadius: 'all',
+                outline: false
+            }
+        },
+
+        onInit() {
+            var height = 437
+            var textHeight = 103
+            switch (this.compMode){
+                case 1:
+                    this.picWidth = 334
+                    this.picHeight = 273
+                    this.colWidth = 6
+                    height = 273
+                    textHeight = 87
+                    break
+                case 2:
+                    this.picWidth = 220
+                    this.picHeight = 220
+                    this.colWidth = 4
+                    height = 297
+                    textHeight = height - this.picHeight
+                    this.imageRadius = 'top'
+                    break
+                case 3:
+                    this.picWidth = 163
+                    this.picHeight = 163
+                    this.colWidth = 3
+                    height = 250
+                    textHeight = height - this.picHeight
+                    this.imageRadius = 'top'
+                    break
+                case 5:
+                    this.picWidth = 220
+                    this.picHeight = 220
+                    this.colWidth = 4
+                    height = 363
+                    this.outline = this.data.outline !== undefined ? this.data.outline : false
+                    break
+                case 6:
+                    this.picWidth = 674
+                    this.picHeight = 320
+                    this.colWidth = 12
+                    height = 364
+                    textHeight = height - this.picHeight
+                    break
+                case 7:
+                    this.picWidth = 163
+                    this.picHeight = 163
+                    this.colWidth = 3
+                    height = 315
+                    textHeight = height - this.picHeight
+                    this.outline = this.data.outline !== undefined ? this.data.outline : false
+                    break
+                case 8:
+                    this.picWidth = 674
+                    this.picHeight = 320
+                    this.colWidth = 12
+                    height = 364
+                    textHeight = 70
+                    this.imageRadius = 'top'
+                    break
+                case 4:
+                default:
+                    this.picWidth = 334
+                    this.picHeight = 334
+                    this.colWidth = 6
+                    height = 437
+                    textHeight = height - this.picHeight
+                    this.outline = this.data.outline !== undefined ? this.data.outline : false
+                    break
+            }
+
+            this.colHeight = 'height: ' + height + 'px;'
+            this.textHeight = 'height: ' + textHeight + 'px;' + (this.compMode === 8 ? 'margin-bottom: 20px;' : '')
+        },
+
+        computed: {
+            compMode() {
+                var mode = this.data.mode
+                if(mode === undefined){
+                    mode = 4
+                }
+                return mode
+            }
+        },
+
+        handleClick() {
+            if(this.data.uri !== undefined) {
+                //跳转相应页面
+                router.push({
+                    uri: this.data.uri
+                });
+            }
+        },
+
+        handleRouter(uri){
+            if(uri !== undefined) {
+                //跳转相应页面
+                router.push({
+                    uri: uri
+                });
+            }
+        }
+    }
+</script>

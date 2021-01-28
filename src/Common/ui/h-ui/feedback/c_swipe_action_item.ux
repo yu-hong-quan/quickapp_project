@@ -1,0 +1,247 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div class="swipe-item">
+        <div class="card {{status}}" ontouchstart="handleTouchStart" ontouchmove="handleTouchMove">
+            <div class="card-left">
+                <div if="{{compIcon !== undefined}}" class="card-left-icon {{compBgColor}}">
+                    <icon type="{{compIcon}}" size="70" color="white"></icon>
+                </div>
+
+                <avatar if="{{compAvatar !== undefined}}" src="{{compAvatar}}" size="90" class="card-left-avatar"></avatar>
+            </div>
+
+
+            <div class="card-right">
+                <div class="card-right-top">
+                    <text class="card-right-top-title">{{compTitle}}</text>
+                    <text class="card-right-top-extra">{{compExtra}}</text>
+                </div>
+                <div>
+                    <text class="card-right-memo">{{compMemo}}</text>
+                </div>
+            </div>
+
+            <div class="action">
+                <div class="card-left-icon {{compActionColor}}" onclick="handleClick">
+                    <icon type="{{compActionIcon}}" size="70" color="white"></icon>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .swipe-item{
+        width: 1030px;
+        margin-left: -140px;
+    }
+    .card{;
+        justify-content: space-between;
+        width: 890px;
+        margin-left: 140px;
+        height: 140px;
+        background-color: #ffffff;
+        &-left{
+            width: 140px;
+            height: 140px;
+            padding-left: 33px;
+            align-items: center;
+            justify-content: center;
+            &-icon{
+                width: 90px;
+                height: 90px;
+                border-radius: 45px;
+                align-items: center;
+                justify-content: center;
+                margin: 25px 0;
+            }
+            &-avatar{
+                margin: 25px 0;
+            }
+        }
+
+        &-right{
+            width: 557px;
+            flex-direction: column;
+            padding: 25px 0;
+            border-color: #cccccc;
+            border-bottom-width: 0.5px;
+            &-top{
+                width: 100%;
+                justify-content: space-between;
+                &-title{
+                    color: #1a1a1a;
+                    font-size: 34px;
+                    font-weight: bold;
+                }
+                &-extra{
+                    font-size: 28px;
+                }
+            }
+            &-memo{
+                lines: 1;
+                text-overflow: ellipsis;
+                font-size: 28px;
+                margin-top: 15px;
+            }
+        }
+    }
+    .action{
+         width: 140px;
+         height: 140px;
+         margin-left: 33px;
+         background-color: #eeeeee;
+         align-items: center;
+         justify-content: center;
+     }
+    .show{
+        animation-name: show;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+    .hide{
+        animation-name: hide;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show {
+        from {
+            transform: translateX(0px);
+        }
+        to {
+            transform: translateX(-140px);
+        }
+    }
+
+    @keyframes hide {
+        from {
+            transform: translateX(-140px);
+        }
+        to {
+            transform: translateX(0px);
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id: {},
+            title:{
+                default: ''
+            },
+            icon:{},
+            bgColor:{
+                default: 'bg-info'
+            },
+            avatar: {},
+            extra:{
+                default: ''
+            },
+            memo:{
+                default: ''
+            },
+            actionIcon:{
+                default: 'trash'
+            },
+            actionColor:{
+                default: 'bg-danger'
+            }
+        },
+
+        data() {
+            return {
+                compId: this.id,
+                compTitle: this.title,
+                compIcon: this.icon,
+                compBgColor: this.bgColor,
+                compAvatar: this.avatar,
+                compExtra: this.extra,
+                compMemo: this.memo,
+                compActionIcon: this.actionIcon,
+                compActionColor: this.actionColor,
+                status: '',
+                startX: 0,
+                stop: true
+            }
+        },
+
+        handleTouchMove(e){
+            var endX = e.touches[0].clientX
+
+            if (Math.abs(this.startX - endX) > 70 && !this.stop) {
+                this.stop = true
+                var direction = this.startX > endX ? 'left' : 'right'
+
+                var pId = this.id.substr(0,this.id.lastIndexOf('_'))
+                var index = this.id.substr(this.id.lastIndexOf('_')+1, this.id.length)
+
+                if((this.status === '' || this.status === 'hide') && direction === 'left'){
+                    this.status = 'show'
+                    this.$dispatch(pId + '_dispatchShowEvt', {
+                        value: index
+                    })
+                }
+                if(this.status === 'show' && direction === 'right'){
+                    this.status = 'hide'
+                    this.$dispatch(pId + '_dispatchHideEvt', {
+                        value: index
+                    })
+                }
+            }
+        },
+
+        handleTouchStart(e){
+            this.stop = false
+            this.startX = e.touches[0].clientX
+        },
+
+        handleClick(){
+            var pId = this.id.substr(0,this.id.lastIndexOf('_'))
+            var index = this.id.substr(this.id.lastIndexOf('_')+1, this.id.length)
+            this.$dispatch(pId + '_dispatchEvt', {
+                value: index
+            })
+        },
+
+        hideSwipe(options) {
+            const {compId, compTitle = '', compIcon, compBgColor = 'bg-info', compAvatar, compExtra = '', compMemo = '', compActionIcon = 'trash', compActionColor = 'bg-danger'} = options;
+            Object.assign(this._data, {
+                ...options,
+                compId: compId,
+                compTitle: compTitle,
+                compIcon: compIcon,
+                compBgColor: compBgColor,
+                compAvatar: compAvatar,
+                compExtra: compExtra,
+                compMemo: compMemo,
+                compActionIcon: compActionIcon,
+                compActionColor: compActionColor,
+                status: 'hide',
+                startX: 0,
+                stop: true
+            });
+        }
+    }
+</script>

@@ -1,0 +1,88 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <block if="{{formLabelType === 'form-group-label-horizontal'}}">
+                <text class="form-group-label-horizontal"  style="width:35%;">{{title}}：</text>
+            </block>
+            <block if="{{formLabelType === 'form-group-label-default'}}">
+                <text class="form-group-label-default bold">{{title}}</text>
+            </block>
+            
+            <text class="{{formControlType}} {{borderType}} {{alignRight === 'true' ? 'form-group-control-right': ''}} {{compStyle}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">{{compValue}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+    .form-control-disabled{
+        background-color: @color-disabled;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            title: {
+                default: ''
+            },
+            value: {
+                default: ''
+            },
+            formHorizontal: {
+                default: false
+            },
+            noBorder: {
+                default: false
+            },
+            disabled: {
+                default: false
+            },
+            alignRight: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value
+            }
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "form-group-control-horizontal" : "form-group-control-default"
+            },
+            borderType() {
+                return this.noBorder ? '' : 'form-control-border-default'
+            },
+            compStyle() {
+                return this.disabled ? 'form-control-disabled' : ''
+            }
+        }
+    }
+</script>

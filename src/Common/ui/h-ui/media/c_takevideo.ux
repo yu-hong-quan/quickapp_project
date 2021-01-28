@@ -1,0 +1,67 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <text id="{{id}}" class="icon {{color}}" style="{{compSize}}{{hStyle}}" onclick="takeVideo">&#xe81d;</text>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+    }
+</style>
+
+<script>
+    import media from '@system.media'
+    export default {
+        props: {
+            id: {},
+            size: {
+                default: 55
+            },
+            color: {
+                default: 'sub'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compSize() {
+                return 'font-size: ' + this.size + ';'
+            }
+        },
+        takeVideo () {
+            let _this = this
+            media.takeVideo({
+                success: function(data) {
+                    _this.$dispatch(_this.id + '_dispatchEvt',{
+                        videoUrl:data.uri
+                    })
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}`)
+                }
+            })
+        }
+    }
+</script>

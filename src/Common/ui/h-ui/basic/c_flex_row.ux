@@ -1,0 +1,94 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="{{bgColor}}" style="{{compStyle}}{{hStyle}}">
+        <slot></slot>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+</style>
+
+<script>
+    export default {
+        props: {
+            reverse: {
+                default: false        //项目的排列方向。
+            },
+            wrap: {
+                default: 'nowrap'      //换行。支持：nowrap(默认),wrap,wrap-reverse
+            },
+            justify: {
+                default: 'left'        //项目在主轴上的对齐方式。支持：left(默认),center,right,between,around
+            },
+            align: {
+                default: 'stretch'     //项目在交叉轴上如何对齐。支持：stretch(默认),top,middle,bottom,baseline
+            },
+            bgColor: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compStyle() {
+                var style = 'flex-direction: ' + (this.reverse ? 'row-reverse' : 'row') + ';'
+
+                style += 'flex-wrap: ' + this.wrap + ';'
+
+                switch (this.justify) {
+                    case 'right':
+                        style += 'justify-content: flex-end;'
+                        break
+                    case 'center':
+                        style += 'justify-content: center;'
+                        break
+                    case 'between':
+                        style += 'justify-content: space-between;'
+                        break
+                    case 'around':
+                        style += 'justify-content: space-around;'
+                        break
+                    default:
+                        style += 'justify-content: flex-start;'
+                        break
+                }
+
+                switch (this.align) {
+                    case 'top':
+                        style += 'align-items: flex-start;'
+                        break
+                    case 'middle':
+                        style += 'align-items: center;'
+                        break
+                    case 'bottom':
+                        style += 'align-items: flex-end;'
+                        break
+                    case 'baseline':
+                        style += 'align-items: baseline;'
+                        break
+                    default:
+                        style += 'align-items: stretch;'
+                        break
+                }
+
+                return style
+            }
+        }
+    }
+</script>

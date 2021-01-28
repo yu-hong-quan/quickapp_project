@@ -1,0 +1,102 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <tabs onchange="onChangeTabIndex" index="{{current}}" style="{{hStyle}}">
+        <tab-bar class="tab-bar" mode="scrollable">
+            <block for="compData">
+                <div class="tab-item" style="{{compItemWidth}}">
+                    <text class="{{$idx===current ? 'tab-item-text-active' : 'tab-item-text'}}" style="{{$item.textStyle}}">{{$item.text}}</text>
+                    <div class="tab-item-bottom" style="{{$item.bottomStyle}}"></div>
+                </div>
+            </block>
+        </tab-bar>
+
+        <tab-content style="{{compStyle}}">
+            <slot></slot>
+        </tab-content>
+    </tabs>
+</template>
+
+<style lang="less">
+    .tab-item {
+        flex-direction: column;
+        align-items: center;
+        margin-right: 7px;
+        &-text{
+            opacity: 0.5;
+            margin-bottom: 7.8px;
+            font-size: 31.3px;
+            &-active{
+                font-size: 31.3px;
+                margin-bottom: 7.8px;
+                font-weight: bold;
+            }
+        }
+        &-bottom{
+            height: 4px;
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        props: {
+            data: {
+                default: []
+            },
+            current: {
+                default: 0
+            },
+            itemWidth: {
+                default: 100
+            },
+            hexColor: {
+                default: '#ff0000'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        computed: {
+            compItemWidth() {
+                return 'width: ' + Number(this.itemWidth) + 'px;'
+            },
+            compData() {
+                var arr = []
+                for(var i=0;i<this.data.length;i++){
+                    var item = {
+                        text: this.data[i],
+                        textStyle: i===this.current ? 'color: ' + this.hexColor + ';' : 'color: #1c2438;',
+                        bottomStyle: i===this.current ? 'background-color: ' + this.hexColor + ';' : 'background-color: transparent;'
+                    }
+                    arr.push(item)
+                }
+                return arr
+            },
+            compStyle() {//修复快应用联盟加载器错误
+                return (loaderConfig.type.toUpperCase() === 'HUAWEI') ? '' : 'padding-left:33px;'
+            }
+        },
+
+        onChangeTabIndex(evt) {
+            this.current = evt.index;
+        }
+    }
+</script>

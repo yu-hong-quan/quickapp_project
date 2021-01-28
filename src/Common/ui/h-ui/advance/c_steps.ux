@@ -1,0 +1,188 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<import name="icon" src="../basic/c_icon"></import>
+<import name="b" src="../text/c_tag_b"></import>
+<import name="small" src="../text/c_tag_small"></import>
+<template>
+    <flex-row wrap="wrap" align="top" h-style="{{hStyle}}">
+        <stack class="center">
+            <div class="background" style="{{compBgWidth}}"></div>
+            <div>
+                <block for="item in compData">
+                    <flex-col width="{{compColWidth}}" justify="center">
+                        <div class="icon-bg" style="{{item.bgColor}}">
+                            <b if="{{item.type === ''}}" text="{{item.sort}}" font="white"></b>
+                            <icon if="{{item.type !== ''}}" type="{{item.type}}" color="white"></icon>
+                        </div>
+                    </flex-col>
+                </block>
+            </div>
+        </stack>
+
+        <block for="item in compData">
+            <flex-col width="{{compColWidth}}" justify="center">
+                <b text="{{item.title}}"></b>
+            </flex-col>
+        </block>
+
+        <block for="item in compData">
+            <flex-col width="{{compColWidth}}" justify="center">
+                <small text="{{item.content}}" font="sub"></small>
+            </flex-col>
+        </block>
+    </flex-row>
+</template>
+
+<style>
+    .white{
+        color: #ffffff;
+    }
+    .sub {
+        color: #80848f;
+    }
+    .icon-bg{
+        width: 64px;
+        height: 64px;
+        border-radius: 32px;
+        justify-content:center;
+    }
+    .background {
+        margin-top:32px;
+        margin-bottom:31px;
+        height:1px;
+        background-color: #cccccc;
+    }
+    .center {
+        padding:5px;
+        justify-content:center;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            num: {
+                default: 3
+            },
+            data: {},
+            current: {
+                default: 0
+            },
+            status: {
+                default: 'pending'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compNum() {
+                var num = !this.data ? this.num : this.data.length
+                // 最多支持4个步骤节点
+                if(num > 4){
+                    num = 4
+                }
+                return num
+            },
+            compCurrent() {
+                var current = Number(this.current)
+                if(current >= this.compNum){
+                    current = this.compNum - 1
+                }
+                return current
+            },
+            compColWidth() {
+                return 12/this.compNum
+            },
+            compBgWidth(){
+                return 'width:' + ((this.compNum - 1)/this.compNum) * 684 + 'px;'
+            },
+            compData() {
+                var arr = []
+                for(var i=0;i<this.compNum;i++) {
+
+                    var sort = i+1;
+
+                    var title = ''
+                    switch (sort){
+                        case 2:
+                            title = !this.data ? '步骤二' : this.data[i]['title']
+                            break
+                        case 3:
+                            title = !this.data ? '步骤三' : this.data[i]['title']
+                            break
+                        case 4:
+                            title = !this.data ? '步骤四' : this.data[i]['title']
+                            break
+                        default:
+                            title = !this.data ? '步骤一' : this.data[i]['title']
+                            break
+                    }
+
+                    var content = ''
+                    if(!!this.data){
+                        content = !this.data[i]['content']  ? '' : this.data[i]['content']
+                    }
+
+                    var type = ''
+                    if(!!this.data){
+                        if(!this.data[i]['type']){
+                            type = ''
+                        }else {
+                            type = this.data[i]['type']
+                        }
+                    }
+
+                    var bgColor = ''
+                    var current = this.compCurrent
+                    if(i < current){
+                        bgColor = '#67c23a;'
+                        type = 'ok'
+                    }else if(i===current){
+                        switch (this.status){
+                            case 'error':
+                                bgColor = '#f56c6c;'
+                                type = 'remove'
+                                break
+                            case 'success':
+                                bgColor = '#67c23a;'
+                                type = 'ok'
+                                break
+                            default:
+                                bgColor = '#5bc0de;'
+                                break
+                        }
+                    }else{
+                        bgColor = '#e5e5e5;'
+                    }
+                    bgColor = 'background-color: ' + bgColor
+
+                    var item = {
+                        sort: sort,
+                        title: title,
+                        bgColor: bgColor,
+                        type: type,
+                        content: content
+                    }
+                    arr.push(item)
+                }
+                return arr;
+            }
+        }
+    }
+</script>

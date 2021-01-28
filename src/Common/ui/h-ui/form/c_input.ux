@@ -1,0 +1,270 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <div show="{{showTip}}" style="align-items: flex-start;">
+            <icon type="tip" color="warning" h-style="margin-top: 6px;"></icon>
+            <text class="sub small">{{tip}}</text>
+        </div>
+
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <div if="{{formLabelType === 'form-group-label-horizontal'}}"  style="width:35%;">
+                <text if="{{notBlank && title!==''}}" class="red">* </text>
+                <label if="{{!!title}}" target="input" class="form-group-label-horizontal {{validStyle}}">{{title}}：</label>
+            </div>
+            <div if="{{formLabelType === 'form-group-label-default'}}">
+                <text if="{{notBlank && title!==''}}" class="red">* </text>
+                <label if="{{!!title}}" target="input" class="form-group-label-default {{validStyle}}">{{title}}</label>
+            </div>
+            
+            <div class="{{borderType}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <icon if="{{typeIcon!==''}}" type="{{typeIcon}}" h-style="margin-left: 12px;width:36px;"></icon>
+                <text if="{{notBlank && title===''}}" class="red"> * </text>
+                <input type="{{type}}" id="{{id}}" name="{{name}}" class="{{formControlType}} {{alignRight === 'true' ? 'form-group-control-right': ''}}"
+                        maxlength="{{maxlength}}" placeholder="{{placeholder}}" value="{{compValue}}" disabled="{{disabled}}"
+                        onchange="handleChange" onfocus="handleFocus" onblur="handleBlur">
+                </input>
+                <icon if="{{compValidIcon && this.compValid==='has-success'}}" type="ok" color="success" h-style="margin-right: 12px;width:56px;"></icon>
+                <icon if="{{compValidIcon && this.compValid==='has-warning'}}" type="warning" color="warning" h-style="margin-right: 12px;width:56px;"></icon>
+                <icon if="{{compValidIcon && this.compValid==='has-error'}}" type="remove" color="danger" h-style="margin-right: 12px;width:56px;"></icon>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <icon type="remove-sign" color="danger"></icon>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            type: {
+                default: 'text'
+            },
+            typeIcon: {
+                default: ''
+            },
+            noBorder: {
+                default: false
+            },
+            formHorizontal: {
+                default: false
+            },
+            title: {
+                default: ''
+            },
+            name: {
+                default: ''
+            },
+            focus: {
+                default: false
+            },
+            maxlength: {
+                default: -1
+            },
+            placeholder: {
+                default: ''
+            },
+            value: {
+                default: ''
+            },
+            alignRight: {
+                default: false
+            },
+            tip: {
+                default: ''
+            },
+            valid: {
+                default: ''
+            },
+            validIcon: {
+                default: false
+            },
+            notBlank: {
+                default: false
+            },
+            pattern: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            disabled:{
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                compValidIcon: this.validIcon,
+                compNotBlank: this.notBlank,
+                compFocus: this.focus,
+                showTip: false,
+                showRemoteError:true,
+                compInit: true
+            }
+        },
+
+        onReady() {
+            if (!this.compFocus) {return;}
+            this.$element(this.id).focus({focus: this.compFocus});
+        },
+
+        handleChange(e) {
+            this.compValue = e.value
+            this.validData()
+            if(!this.compInit) {
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: this.compValue
+                })
+                this.params[this.id] = this.compValue
+            }
+        },
+
+        handleFocus(e) {
+            this.compFocus = true
+            this.compValid = ""
+            this.showRemoteError=false
+            if(this.tip!==''){
+                this.showTip = true
+            }
+            if(this.compInit){
+                this.compInit = false
+            }
+            this.$dispatch(this.id + '_dispatchFocusEvt', e)
+        },
+
+        handleBlur(e) {
+            this.compFocus = false;
+            this.showTip = false;
+            this.validData();
+            this.$dispatch(this.id + '_dispatchBlurEvt', e)
+        },
+
+        // 数据校验
+        validData() {
+            if (this.compValue === '') {
+                if (this.compNotBlank) {
+                    this.compValid = 'has-error'
+                    this.formError = '该字段不能为空！'
+                } else {
+                    this.compValid = 'has-success'
+                    this.formError = ''
+                }
+            } else {
+                if (this.pattern !== '') {
+                    var patt = new RegExp(this.pattern);
+                    var r = this.compValue.match(patt);
+                    if (r === null) {
+                        this.compValid = 'has-error'
+                        this.formError = '输入的格式不正确！'
+                    } else {
+                        if (!this.showRemoteError) {
+                            this.compValid = 'has-success'
+                            this.formError = ''
+                        }
+                    }
+                } else {
+                    if (!this.showRemoteError) {
+                        this.compValid = 'has-success'
+                        this.formError = ''
+                    }
+                }
+            }
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "form-group-control-horizontal" : "form-group-control-default"
+            },
+            borderType() {
+                if(this.noBorder){
+                    return ''
+                }else{
+                    if(this.compFocus){
+                        return 'form-control-focus'
+                    }
+
+                    if(this.valid === 'none'){
+                        return "form-control-border-default"
+                    }else {
+                        if (this.formError !== '') {
+                            return 'has-error'
+                        } else {
+                            if (this.compValid === 'has-success') {
+                                return 'has-success'
+                            } else if (this.compValid === 'has-warning') {
+                                return 'has-warning'
+                            } else if (this.compValid === 'has-error') {
+                                return 'has-error'
+                            } else {
+                                return "form-control-border-default"
+                            }
+                        }
+                    }
+                }
+            },
+            validStyle() {
+                if(this.valid === 'none'){
+                    return ""
+                }else {
+                    if (this.compValid === 'has-success') {
+                        return "success"
+                    } else if (this.compValid === 'has-warning') {
+                        return "warning"
+                    } else if (this.compValid === 'has-error') {
+                        return "danger"
+                    } else {
+                        return ""
+                    }
+                }
+            }
+        }
+    }
+</script>

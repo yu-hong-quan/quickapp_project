@@ -1,0 +1,42 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="b" src="../text/c_tag_b"></import>
+<import name="abbr" src="./c_abbr"></import>
+<template>
+    <div class="address-container" style="{{hStyle}}">
+        <b text="{{headerText}}" font="{{headerStyles}}"></b>
+        <text class="{{mainStyles}}">{{mainText}}</text>
+        <slot></slot>
+        <div>
+            <abbr text="{{abbrText}}" font="{{abbrStyles}}" title="{{abbrTitle}}"></abbr>
+            <text class="{{footerStyles}}">{{footerText}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/font.less';
+
+    .address-container {
+        flex-direction: column;
+    }
+</style>
+
+<script>
+export default {
+    props: ['headerText', 'headerStyles', 'mainText', 'mainStyles', 'abbrText', 'abbrStyles', 'abbrTitle', 'footerText', 'footerStyles', 'hStyle']
+}
+</script>

@@ -1,0 +1,174 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="./c_icon"></import>
+<template>
+    <div style="{{hStyle}}">
+        <div onclick="handleClick" class="{{compUnderline}}" style="{{compAlign}}">
+            <icon if="{{icon !== ''}}" type="{{icon}}" size="{{size}}" color="{{compColor}}" h-style="margin-left: 10px;margin-right: 10px;"></icon>
+            <text class="{{compColor}}" style="{{fontSize}}">{{text}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+    @import '../../../styles/mixin.less';
+
+    .default-underline{
+        padding-bottom: 3px;
+        border-bottom-width: 1px;
+    }
+    .default-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-black-disabled, 1px)
+    }
+
+    .primary-underline{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-primary, 1px)
+    }
+    .primary-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-primary-disabled, 1px)
+    }
+
+    .success-underline{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-success, 1px)
+    }
+    .success-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-success-disabled, 1px)
+    }
+
+    .warning-underline{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-warning, 1px)
+    }
+    .warning-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-warning-disabled, 1px)
+    }
+
+    .danger-underline{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-danger, 1px)
+    }
+    .danger-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-danger-disabled, 1px)
+    }
+
+    .info-underline{
+         padding-bottom: 3px;
+        .set-border(bottom, @color-info, 1px)
+     }
+    .info-underline-disabled{
+        padding-bottom: 3px;
+        .set-border(bottom, @color-info-disabled, 1px)
+    }
+</style>
+
+<script>
+    import router from '@system.router';
+
+    export default {
+        props: {
+            text: {
+                default: ''
+            },
+            href: {
+                default: ''
+            },
+            type: {
+                default: ''
+            },
+            size: {
+                default: '40'
+            },
+            disabled: {
+                default: false
+            },
+            underline: {
+                default: false
+            },
+            icon: {
+                default: ''
+            },
+            alignRight: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compAlign() {
+                var align = 'align-items: center;'
+
+                if(this.alignRight){
+                    align += 'flex-direction: row-reverse;'
+                }
+                return align
+            },
+            compUnderline() {
+                var style = ''
+                if(this.underline){
+                    switch (this.type){
+                        case 'primary':
+                        case 'success':
+                        case 'warning':
+                        case 'danger':
+                        case 'info':
+                            style = this.disabled ? this.type + '-underline-disabled' : this.type + '-underline'
+                            break
+                        default:
+                            style = this.disabled ? 'default-underline-disabled' : 'default-underline'
+                            break
+                    }
+                }
+                return style
+            },
+            compColor() {
+                var color = ''
+                switch (this.type){
+                    case 'primary':
+                    case 'success':
+                    case 'warning':
+                    case 'danger':
+                    case 'info':
+                        color = this.disabled ? this.type + '-disabled' : this.type
+                        break
+                    default:
+                        color = this.disabled ? 'default-disabled' : 'default'
+                        break
+                }
+                return color
+            },
+            fontSize() {
+                return 'font-size: ' + this.size + ';'
+            }
+        },
+        handleClick() {
+            if(!this.disabled) {
+                //跳转相应页面
+                router.push({
+                    uri: this.href
+                });
+            }
+        }
+    }
+</script>

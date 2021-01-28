@@ -1,0 +1,112 @@
+{
+  "package": "app_quickApp_project",
+  "name": "提灯的小僧",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minPlatformVersion": 1070,
+  "icon": "/Common/logo.png",
+  "features": [
+    {
+      "name": "system.prompt"
+    },
+    {
+      "name": "system.fetch"
+    },
+    {
+      "name": "system.vibrator"
+    },
+    {
+      "name": "system.router"
+    },
+    {
+      "name": "system.clipboard"
+    },
+    {
+      "name": "system.share"
+    },
+    {
+      "name": "system.image"
+    },
+    {
+      "name": "system.media"
+    },
+    {
+      "name": "system.request"
+    },
+    {
+      "name": "system.webview"
+    },
+    {
+      "name": "system.audio"
+    },
+    {
+      "name": "system.barcode"
+    },
+    {
+      "name": "system.wifi"
+    },
+    {
+      "name": "system.ai"
+    },
+    {
+      "name": "system.geolocation"
+    },
+    {
+      "name": "system.brightness"
+    },
+    {
+      "name": "system.volume"
+    },
+    {
+      "name": "system.battery"
+    },
+    {
+      "name": "system.calendar"
+    },
+    {
+      "name": "system.alarm"
+    },
+    {
+      "name": "system.sms"
+    },
+    {
+      "name": "system.shortcut"
+    },
+    {
+      "name": "system.storage"
+    }
+  ],
+  "permissions": [
+    {
+      "origin": "*"
+    }
+  ],
+  "config": {
+    "logLevel": "debug"
+  },
+  "router": {
+    "entry": "Home",
+    "pages": {
+      "About": {
+        "component": "index"
+      },
+      "Home": {
+        "component": "index"
+      }
+    }
+  },
+  "display": {
+    "titleBarBackgroundColor": "#f2f2f2",
+    "titleBarTextColor": "#414141",
+    "menu": true,
+    "pages": {
+      "About": {
+        "menu": false
+      },
+      "Home": {
+        "titleBarText": "首页",
+        "titleBar":false
+      }
+    }
+  }
+}

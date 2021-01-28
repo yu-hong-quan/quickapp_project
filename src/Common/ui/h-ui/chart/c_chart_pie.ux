@@ -1,0 +1,288 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" ontouchstart="handleTouchstart"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        width: 750px;
+        height: 750px;
+    }
+</style>
+
+<script>
+    import prompt from '@system.prompt'
+    import vibrator from '@system.vibrator'
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id :{},
+            data: {},
+            colors: {},
+            current: {
+                default: '999'
+            },
+            right: {
+                default: false
+            },
+            doughnut: {
+                default: false
+            },
+            rose: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                maxValue: 0,
+                compActive: Number(this.current)
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                this.drawChart(this.data)
+            }, 100);
+        },
+
+
+        drawChart(data){
+            // 获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            // 清理画布
+            ctx.clearRect(0, 0, 750, 750)
+
+            const centerY = 375
+            const radius = 250
+
+            var i = 0
+            var len = 0
+
+            // 绘制分类名称
+            var nameY = 20
+            ctx.font = '20px sans-serif'
+            for(i = 0, len = this.data.length; i < len; i++){
+                ctx.beginPath()
+                ctx.fillStyle = this.compData[i]['color']
+                ctx.moveTo(this.compNameX, nameY)
+                ctx.fillRect(this.compNameX, nameY, 20, 20)
+                ctx.closePath()
+                ctx.fillStyle = 'black'
+                ctx.fillText(this.compData[i]['name'], this.compNameX + 30, nameY + 20)
+
+                nameY += 30
+            }
+
+            // 绘制饼状图
+            for(i = 0, len = this.data.length; i < len; i++){
+                if(!this.rose) {
+                    // 饼状图
+                    ctx.beginPath()
+                    ctx.moveTo(this.compCenterX, centerY)
+                    if (this.compActive === i) {
+                        ctx.arc(this.compCenterX, centerY, radius + 20, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                    } else {
+
+                        ctx.arc(this.compCenterX, centerY, radius, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                    }
+                    ctx.closePath()
+                    ctx.fillStyle = this.compData[i]['color']
+                    ctx.fill()
+
+                    // 环形图
+                    if(this.compDoughnut) {
+                        ctx.beginPath()
+                        ctx.moveTo(this.compCenterX, centerY)
+                        if (this.compActive === i) {
+                            ctx.arc(this.compCenterX, centerY, 170, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                        } else {
+
+                            ctx.arc(this.compCenterX, centerY, 150, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                        }
+                        ctx.closePath()
+                        ctx.strokeStyle = 'white'
+                        ctx.stroke()
+                        ctx.fillStyle = 'white'
+                        ctx.fill()
+                    }
+                }else{
+                    ctx.beginPath()
+                    ctx.moveTo(this.compCenterX, centerY)
+                    if (this.compActive === i) {
+                        ctx.arc(this.compCenterX, centerY, (this.compData[i]['value']/this.maxValue) * 220 + 50, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                    } else {
+
+                        ctx.arc(this.compCenterX, centerY, (this.compData[i]['value']/this.maxValue) * 220 + 30, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                    }
+                    ctx.closePath()
+                    ctx.fillStyle = this.compData[i]['color']
+                    ctx.fill()
+
+                    ctx.beginPath()
+                    ctx.moveTo(this.compCenterX, centerY)
+                    ctx.arc(this.compCenterX, centerY, 50, this.compData[i]['startAngle'], this.compData[i]['endAngle'], false)
+                    ctx.closePath()
+                    ctx.strokeStyle = 'white'
+                    ctx.stroke()
+                    ctx.fillStyle = 'white'
+                    ctx.fill()
+                }
+
+
+            }
+        },
+
+        // 触摸提示
+        handleTouchstart(event) {
+            var x = event.touches[0].offsetX
+            var y = event.touches[0].offsetY
+
+            // 直角的边长
+            var x1 = Math.abs(x - this.compCenterX)
+            var y1 = Math.abs(y - 375)
+            // 斜边长
+            var z1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2))
+            // 余弦
+            var cos = y1 / z1
+            // 弧度
+            var radina = Math.acos(cos)
+
+            var angle = 0
+
+            if(x > this.compCenterX){
+                if(y < 375){
+                    angle =  1.5 * Math.PI + radina
+                }else{
+                    angle =  2.5 * Math.PI - radina
+                }
+            }else{
+                if(y > 375){
+                    angle =  2.5 * Math.PI + radina
+                }else{
+                    angle =  3.5 * Math.PI - radina
+                }
+            }
+
+            for(var i = 0, len = this.data.length; i < len; i++){
+                if(angle >= this.compData[i]['startAngle'] && angle <= this.compData[i]['endAngle']){
+                    this.compActive = i
+                    // 手机震动反馈
+                    vibrator.vibrate({ mode: "short" })
+
+                    // 弹窗显示缩略语的详细说明
+                    prompt.showToast({
+                        message: this.compData[i]['name'] + ': ' + this.compData[i]['value'] + ' (' + this.compData[i]['percentage'] + ')',
+                        gravity: 'center'
+                    })
+
+                    break
+                }
+            }
+
+            this.drawChart(this.data)
+        },
+
+        computed: {
+            compColors() {
+                if(!this.colors) {
+                    var arr = [];
+                    arr.push('#b54038')
+                    arr.push('#334552')
+                    arr.push('#6a9fa6')
+                    arr.push('#de9375')
+                    arr.push('#9bc5af')
+                    arr.push('#c2883a')
+                    if (this.data.length > 6) {
+                        for (var i = 6, len = this.data.length; i < len; i++) {
+                            var a = Math.floor(Math.random() * 256)
+                            var b = Math.floor(Math.random() * 256)
+                            var c = Math.floor(Math.random() * 256)
+                            var color = '#' + fill2(a.toString(16)) + fill2(b.toString(16)) + fill2(c.toString(16))
+                            arr.push(color)
+                        }
+                    }
+
+                    return arr
+                }else{
+                    return this.colors
+                }
+            },
+            compData() {
+                var arr = []
+                var sum = 0
+                for(var i = 0, len = this.data.length; i < len; i++){
+
+                    // 用于南丁格尔玫瑰图
+                    if (this.data[i]['value'] > this.maxValue) {
+                        this.maxValue = this.data[i]['value']
+                    }
+
+                    sum += this.data[i]['value']
+                }
+
+                const p = Math.PI
+                var startAngle = 1.5 * p
+                var endAngle = 1.5 * p
+                var percentage = 0
+
+                for(i = 0, len = this.data.length; i < len; i++){
+                    percentage = ((this.data[i]['value'] * 100) / sum).toFixed(2)
+                    if(i<len-1){
+                        endAngle = startAngle + (percentage/100 * 2 * p)
+                    }else{
+                        endAngle = 3.5 * p
+                    }
+
+                    var item = {
+                        name: this.data[i]['name'],
+                        value: this.data[i]['value'],
+                        percentage: percentage.toString() + '%',
+                        startAngle: startAngle,
+                        endAngle: endAngle,
+                        color: this.compColors[i]
+                    }
+                    arr.push(item)
+                    startAngle = endAngle
+                }
+
+                return arr
+            },
+            compCenterX() {
+                return this.right ? 325 : 425
+            },
+            compNameX() {
+                return this.right ? 600 : 33
+            },
+            compDoughnut() {
+                return this.rose ? false : this.doughnut
+            }
+        }
+    }
+</script>

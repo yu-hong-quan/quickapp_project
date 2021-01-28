@@ -1,0 +1,164 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div>
+        <div if="{{compShow}}" class="modal {{compStyle}}">
+            <div class="modal-close" style="{{compAlign}}"  if="{{topButton}}">
+                <text class="icon" onclick="handleClose">&#xe70d;</text>
+            </div>
+            <image src="{{src}}" onclick="handleClick"></image>
+            <div class="modal-close" style="{{compAlign}}"  if="{{!topButton}}">
+                <text class="icon" onclick="handleClose">&#xe70d;</text>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+        font-size: 60px;
+        padding:10px;
+        color:#ffffff;
+    }
+
+    .modal {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.8);
+        &-close{
+            width:684px;
+        }
+    }
+
+    image{
+        width:684px;
+        height:684px;
+        background-size:600px;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .show{
+        animation-name: show;
+        animation-duration: 500ms;
+    }
+
+    .hide{
+        animation-name: hide;
+        animation-duration: 500ms;
+    }
+
+    @keyframes show {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 0.9;
+        }
+    }
+
+    @keyframes hide {
+        from {
+            opacity: 0.9;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+<script>
+    import router from '@system.router';
+
+    export default {
+
+        data() {
+            return {
+                src: '',
+                uri: '',
+                placement: 'top-right',// 关闭按钮的位置，支持top-left,top,top-right,bottom-left,bottom,bottom-right
+                isShow: false
+            }
+        },
+
+        computed: {
+            compAlign() {
+                var style=''
+                switch (this.placement){
+                    case 'top':
+                    case 'bottom':
+                        style = 'justify-content: center;'
+                        break
+                    case 'top-right':
+                    case 'bottom-right':
+                        style = 'justify-content: flex-end;'
+                        break
+                    default:
+                        style = 'justify-content: flex-start;'
+                        break
+                }
+                return style
+            },
+            topButton() {
+                return (this.placement==='top-left' || this.placement==='top' || this.placement==='top-right') ? true : false
+            },
+            compShow() {
+                return this.isShow
+            },
+            compStyle() {
+                return this.isShow ? 'show' : 'hide'
+            }
+        },
+
+        showCurtain(options) {
+            const {src = '', uri = '', placement = 'top-right'} = options;
+            Object.assign(this._data, {
+                ...options,
+                src: src,
+                uri: uri,
+                placement: placement,
+                isShow: true
+            });
+        },
+
+        handleClose() {
+            this.isShow = false
+        },
+
+        handleClick() {
+            if(this.uri !== '') {
+                this.isShow = false
+                //跳转相应页面
+                router.push({
+                    uri: this.uri
+                });
+            }
+        }
+    }
+</script>

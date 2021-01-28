@@ -1,0 +1,57 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="blockquote {{pullTo}}" style="{{hStyle}}">
+        <text class="{{textAlign}} {{font}}">{{text}}</text>
+        <text if="{{source}}" class="muted small i {{textAlign}}">
+            <span if="{{textAlign === 'left'}}">-- </span>
+            <span>{{source}}</span>
+            <span if="{{textAlign === 'right'}}"> --</span>
+        </text>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/font.less';
+
+    .blockquote{
+        flex-direction: column;
+        padding: 10px 20px;
+        margin: 0 0 30px;
+        &-pull-left{
+            border-left-color: #dddddd;
+            border-left-width: 10px;
+        }
+        &-pull-right{
+            border-right-color: #dddddd;
+            border-right-width: 10px;
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: ['text', 'font', 'hStyle', 'source', 'pullRight'],
+        computed: {
+            pullTo() {
+                return this.pullRight==="true" ? "blockquote-pull-right" : "blockquote-pull-left";
+            },
+            textAlign(){
+                return this.pullRight==="true" ? "right" : "left";
+            }
+        }
+  }
+</script>

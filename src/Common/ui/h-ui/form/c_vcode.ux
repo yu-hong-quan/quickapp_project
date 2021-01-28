@@ -1,0 +1,259 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="image-code" src="./c_image_code"></import>
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <div show="{{showTip}}" style="align-items: flex-start;">
+            <text class="icon warning" style="margin-top: 6px;">&#xe7b1;</text>
+            <text class="sub small">{{tip}}</text>
+        </div>
+
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <div if="{{formLabelType === 'form-group-label-horizontal'}}"  style="width:35%;">
+                <text if="{{title!=='none'}}" class="red"> * </text>
+                <label if="{{title!=='none'}}" target="input" class="form-group-label-horizontal {{validStyle}}">{{title}}：</label>
+            </div>
+            <div if="{{formLabelType === 'form-group-label-default'}}">
+                <text if="{{title!=='none'}}" class="red">* </text>
+                <label if="{{title!=='none'}}" target="input" class="form-group-label-default {{validStyle}}">{{title}}</label>
+            </div>
+            
+            <div class="{{borderType}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <text if="{{title==='none'}}" class="red" style="width: 40px;"> * </text>
+                <image-code if="{{alignRight}}" id="{{id + '_vcode'}}" h-style="margin-left: 12px;margin-top: 7px;width:300px;"></image-code>
+                <input id="{{id}}" name="{{name}}" class="{{alignRight === 'true' ? 'form-group-control-right': ''}}"
+                        maxlength="6" placeholder="{{compPlaceholder}}" value="{{compValue}}" style="{{formControlType}}"
+                        onchange="handleChange" onfocus="handleFocus" onblur="handleBlur">
+                </input>
+                <image-code if="{{!alignRight}}" id="{{id + '_vcode'}}" h-style="margin-right: 12px;margin-top: 7px;width:300px;"></image-code>
+                <text if="{{compValidIcon && this.compValid==='has-success'}}" class="icon success" style="margin-right: 12px;width:56px;">&#xe709;</text>
+                <text if="{{compValidIcon && this.compValid==='has-warning'}}" class="icon warning" style="margin-right: 12px;width:56px;">&#xe727;</text>
+                <text if="{{compValidIcon && this.compValid==='has-error'}}" class="icon danger" style="margin-right: 12px;width:56px;">&#xe706;</text>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon{
+        font-family: hui;
+        font-size: 33px;
+    }
+    input {
+        height: @font-size-base * 2.5;
+        padding: 12px;
+        font-size: @font-size-base;
+        line-height: @font-size-base * 1.42857143;
+    }
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            noBorder: {
+                default: false
+            },
+            formHorizontal: {
+                default: false
+            },
+            title: {
+                default: '验证码'
+            },
+            name: {
+                default: ''
+            },
+            focus: {
+                default: false
+            },
+            placeholder: {
+                default: '请输入验证码'
+            },
+            value: {
+                default: ''
+            },
+            alignRight: {
+                default: false
+            },
+            tip: {
+                default: '验证码忽略大小写，点击验证码可刷新。'
+            },
+            valid: {
+                default: ''
+            },
+            validIcon: {
+                default: false
+            },
+            formError: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                compValidIcon: this.validIcon,
+                compNotBlank: true,
+                codeValue: '',
+                compFocus: this.focus,
+                showTip: false,
+                showRemoteError:true,
+                compInit: true
+            }
+        },
+
+        onInit() {
+            this.$on(this.id + '_vcode_dispatchEvt',this.dispatchEvt)
+        },
+
+        onReady() {
+            if (!this.compFocus) {return;}
+            this.$element(this.id).focus({focus: this.compFocus})
+        },
+
+        dispatchEvt(evt) {
+            this.codeValue = evt.detail.value
+            if(!this.compInit) {
+                this.validData()
+            }
+        },
+
+        handleChange(e) {
+            this.compValue = e.value
+            this.validData()
+            if(!this.compInit) {
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: this.compValue
+                })
+                this.params[this.id] = this.compValue
+            }
+        },
+
+        handleFocus(e) {
+            this.compFocus = true
+            this.compValid = ""
+            this.showRemoteError=false
+            if(this.tip!==''){
+                this.showTip = true
+            }
+            if(this.compInit){
+                this.compInit = false
+            }
+            this.$dispatch(this.id + '_dispatchFocusEvt', e)
+        },
+
+        handleBlur(e) {
+            this.compFocus = false
+            this.showTip = false
+            this.validData()
+            this.$dispatch(this.id + '_dispatchBlurEvt', e)
+        },
+
+        // 数据校验
+        validData() {
+            if(this.compValue===''){
+                this.compValid = 'has-error'
+                this.formError = '该字段不能为空！'
+            }else{
+                if(this.codeValue.toUpperCase()!==this.compValue.toUpperCase()){
+                    this.compValid = 'has-error'
+                    this.formError = '验证码不正确！'
+                }else{
+                    this.compValid = 'has-success'
+                    this.formError = ''
+                }
+            }
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "width:300px;" : "width:100%;"
+            },
+            compPlaceholder() {
+                return this.placeholder==='none' ? "" : this.placeholder
+            },
+            borderType() {
+                if(this.noBorder){
+                    return ''
+                }else{
+                    if(this.compFocus){
+                        return 'form-control-focus'
+                    }
+
+                    if(this.formError!==''){
+                        return 'has-error'
+                    }else{
+                        if(this.compValid==='has-success'){
+                            return 'has-success'
+                        }else if(this.compValid==='has-warning') {
+                            return 'has-warning'
+                        }else if(this.compValid==='has-error') {
+                            return 'has-error'
+                        }else{
+                            return "form-control-border-default"
+                        }
+                    }
+                }
+            },
+            validStyle() {
+                if(this.compValid==='has-success'){
+                    return "success"
+                }else if (this.compValid==='has-warning') {
+                    return "warning"
+                } else if(this.compValid==='has-error') {
+                    return "danger"
+                } else {
+                    return ""
+                }
+            }
+        }
+    }
+</script>

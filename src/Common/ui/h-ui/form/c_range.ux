@@ -1,0 +1,319 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="form-group" id="{{id}}" style="{{hStyle}}">
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <block if="{{formLabelType === 'form-group-label-horizontal'}}">
+                <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                <text class="form-group-label-horizontal {{validStyle}}"  style="width:35%;">{{compTitle}}：{{!compInit ? compValue : ''}}</text>
+            </block>
+            <block if="{{formLabelType === 'form-group-label-default'}}">
+                <div>
+                    <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                    <text class="form-group-label-default {{validStyle}}">{{compTitle}} {{!compInit ? compValue : ''}}</text>
+                </div>
+            </block>
+
+            <div class="{{compAlign}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <stack class="range">
+                    <div class="range-bg"></div>
+                    <div class="range-select" style="{{compSelect}}{{compColor}}"></div>
+                    <div class="range-block" style="{{compStart}}{{compColor}}" ontouchmove="handelTouchmoveStart"></div>
+                    <div class="range-block" style="{{compEnd}}{{compColor}}" ontouchmove="handelTouchmoveEnd"></div>
+                </stack>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon{
+        font-family: hui;
+        font-size: 33px;
+    }
+
+    .range{
+        width: 100%;
+        height: 60px;
+        &-bg{
+            margin-top:32px;
+            width: 100%;
+            height: 8px;
+            background-color: #ebeef4;
+            border-radius: 4px;
+        }
+        &-select{
+            margin-top:32px;
+            height: 8px;
+            border-radius: 4px;
+        }
+        &-block{
+            margin-top: 20px;
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+        }
+    }
+
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            title: {
+                default: '数值范围'
+            },
+            formHorizontal: {
+                default: false
+            },
+            noBorder: {
+                default: false
+            },
+            notBlank: {
+                default: ''
+            },
+            disabled:{
+                default: false
+            },
+            min:{
+                default: 0
+            },
+            max:{
+                default: 100
+            },
+            startValue:{
+                default: 20
+            },
+            endValue:{
+                default: 60
+            },
+            type:{
+                default: 'info'
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compStartValue: this.startValue,
+                compEndValue: this.endValue,
+                compValue: [this.startValue, this.endValue],
+                compValid: this.valid,
+                compInit: true
+            }
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "form-group-control-horizontal" : "form-group-control-default"
+            },
+            borderType() {
+                return this.noBorder ? '' : 'form-control-border-default'
+            },
+            compTitle() {
+                return this.title==='none' ? "" : this.title
+            },
+            compNotBlank() {
+                return (this.disabled || this.notBlank==='false') ? false : true
+            },
+            compWidth() {
+                return this.formHorizontal ? 432 : 684
+            },
+            compColor() {
+                var color = ''
+                switch (this.type){
+                    case 'info':
+                        color = '#5bc0de'
+                        break
+                    case 'primary':
+                        color = '#337ab7'
+                        break
+                    case 'warning':
+                        color = '#e6a23c'
+                        break
+                    case 'danger':
+                        color = '#f56c6c'
+                        break
+                    case 'success':
+                        color = '#67c23a'
+                        break
+                    default:
+                        color = '#000000'
+                        break
+                }
+                return 'background-color: ' + color +';'
+            },
+            compSelect() {
+                var x1 = ((this.compStartValue - this.min)/(this.max - this.min)) * this.compWidth
+                var x2 = ((this.compEndValue - this.min)/(this.max - this.min)) * this.compWidth
+                return 'margin-left: ' + (x1 < x2 ? x1+16 : x2+16) + 'px;width: ' + Math.abs(x2 - x1) + 'px;'
+            },
+            compStart() {
+                var x = ((this.compStartValue - this.min)/(this.max - this.min)) * this.compWidth
+                if(x < 0){
+                    x = 0
+                }
+                if(x > this.compWidth - 32){
+                    x = this.compWidth - 32
+                }
+                return 'margin-left: ' + x + 'px;'
+            },
+            compEnd() {
+                var x = ((this.compEndValue - this.min)/(this.max - this.min)) * this.compWidth
+                if(x < 0){
+                    x = 0
+                }
+                if(x > this.compWidth - 32){
+                    x = this.compWidth - 32
+                }
+                return 'margin-left: ' + x + 'px;'
+            },
+            validStyle() {
+                if (this.compValid === 'has-success') {
+                    return "success"
+                } else if (this.compValid === 'has-warning') {
+                    return "warning"
+                } else if (this.compValid === 'has-error') {
+                    return "danger"
+                } else {
+                    return (this.compInit || this.disabled || this.valid === 'none') ? "" : "success"
+                }
+            }
+        },
+
+        handelTouchmoveStart(e){
+            if(!this.disabled) {
+                this.compInit = false
+                this.compValid = ""
+                this.formError = ""
+
+                var x = e.touches[0].clientX
+                if (this.formHorizontal) {
+                    x -= 273
+                } else {
+                    x -= 33
+                }
+                var start = Math.floor((x / this.compWidth) * this.max)
+                if (start < this.min) {
+                    start = this.min
+                }
+                if (start > this.max) {
+                    start = this.max
+                }
+
+                this.compStartValue = start
+
+                var arr = []
+                if (start <= this.compEndValue) {
+                    arr.push(start)
+                    arr.push(this.compEndValue)
+                } else {
+                    arr.push(this.compEndValue)
+                    arr.push(start)
+                }
+
+                this.compValue = arr
+
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: arr
+                })
+
+                this.params[this.id] = this.compValue
+            }
+        },
+
+        handelTouchmoveEnd(e){
+            if(!this.disabled) {
+                this.compInit = false
+                this.compValid = ""
+                this.formError = ""
+
+                var x = e.touches[0].clientX
+                if (this.formHorizontal) {
+                    x -= 273
+                } else {
+                    x -= 33
+                }
+                var end = Math.floor((x / this.compWidth) * this.max)
+                if (end < this.min) {
+                    end = this.min
+                }
+                if (end > this.max) {
+                    end = this.max
+                }
+
+                this.compEndValue = end
+
+                var arr = []
+                if (end <= this.compStartValue) {
+                    arr.push(end)
+                    arr.push(this.compStartValue)
+                } else {
+                    arr.push(this.compStartValue)
+                    arr.push(end)
+                }
+
+                this.compValue = arr
+
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: arr
+                })
+            }
+
+            this.params[this.id] = this.compValue
+        }
+    }
+</script>

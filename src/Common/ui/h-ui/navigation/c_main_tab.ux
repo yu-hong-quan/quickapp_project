@@ -1,0 +1,119 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <tabs onchange="onChangeTabIndex" index="{{current}}">
+        <tab-content style="{{compStyle}}">
+            <slot></slot>
+        </tab-content>
+
+        <tab-bar class="tab-bar {{bgColor}}" style="{{compHeight}}">
+            <block for="{{compData}}">
+                <div class="tab-bar-item">
+                    <icon if="{{$item.icon !== undefined}}" type="{{$item.icon}}" size="{{size * 1.2}}" color="{{$item.color}}" opacity="{{$idx === current ? '1' : '0.5'}}"></icon>
+                    <image if="{{$item.pic !== undefined}}" src="{{$item.pic}}" style="{{$item.picStyle}}"></image>
+                    <text class="tab-bar-item-text {{$item.color}}" style="{{$item.opacity}}">{{$item.text}}</text>
+                </div>
+            </block>
+        </tab-bar>
+    </tabs>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+    @import '../../../styles/bg-color.less';
+
+    .tab-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        &-item{
+            flex-direction: column;
+            align-items: center;
+            padding-top: 25px;
+            padding-bottom: 15px;
+            width: 150px;
+            &-text{
+                font-size: 24px;
+                margin-top: 10px;
+            }
+        }
+    }
+</style>
+
+<script>
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        props: {
+            data: {
+                default: []
+            },
+            current: {
+                default: 0
+            },
+            size: {
+                default: 65
+            },
+            color: {
+                default: 'white'
+            },
+            activeColor: {
+                default: 'info'
+            },
+            bgColor: {
+                default: 'bg-default'
+            }
+        },
+
+        computed: {
+            compData() {
+                var arr = []
+                for(var i=0;i<this.data.length;i++){
+                    var item = {
+                        icon: this.data[i].icon,
+                        color: i===this.current ? this.activeColor : this.color,
+                        pic: i===this.current ? this.data[i].activePic : this.data[i].pic,
+                        picStyle: i===this.current ? ('width: ' + this.size + 'px;height: ' + this.size + 'px;resize-mode: contain;opacity: 1;') : ('width: ' + this.size + 'px;height: ' + this.size + 'px;resize-mode: contain;opacity: 0.5;'),
+                        text: this.data[i].text,
+                        opacity: i===this.current ? 'opacity: 1;' : 'opacity: 0.5;'
+                    }
+                    arr.push(item)
+                }
+                return arr
+            },
+            compHeight() {
+                return 'height: ' + (Number(this.size) + 65) + 'px;'
+            },
+            compStyle() {//修复快应用联盟加载器错误
+                return (loaderConfig.type.toUpperCase() === 'HUAWEI') ? '' : 'padding-left:33px;'
+            }
+        },
+
+        onChangeTabIndex(evt) {
+            this.current = evt.index;
+            this.$dispatch('mainTab_dispatchEvt', {
+                value: evt.index
+            })
+        }
+    }
+</script>

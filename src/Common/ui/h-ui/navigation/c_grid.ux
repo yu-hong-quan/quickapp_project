@@ -1,0 +1,141 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <flex-row wrap="wrap" h-style="{{hStyle}}">
+        <block for="{{item in compData}}">
+            <div style="{{compStyle}}" class="{{item.borderRight}} {{item.borderBottom}}" onclick="{{handleClick(item.uri)}}">
+                <div if="{{item.icon !== ''}}" class="{{item.bgColor}}" style="{{item.iconStyle}}">
+                    <icon type="{{item.icon}}" size="{{avatarSize * 0.8}}" color="white"></icon>
+                </div>
+                <avatar if="{{item.image !== ''}}" src="{{item.image}}" size="{{avatarSize}}"></avatar>
+                <text if="{{item.text !== ''}}" style="{{textStyle}}">{{item.text}}</text>
+            </div>
+        </block>
+    </flex-row>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .borderRight{
+        border-right: 1px solid #d8e4ee;
+    }
+    .borderBottom{
+        border-bottom: 1px solid #d8e4ee;
+    }
+</style>
+
+<script>
+    import router from '@system.router';
+
+    export default {
+        props: {
+            data: {},
+            mode: {
+                // 布局模式,支持 square和rect
+                default: 'square'
+            },
+            columnNum: {
+                // 每一列有多少个
+                default: 3
+            },
+            noBorder: {
+                // 是否有边框
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compData() {
+                var arr = []
+                for(var i=0,len=this.data.length;i<len;i++){
+
+                    var icon = !this.data[i]['icon'] ? '' : this.data[i]['icon']
+                    var bgColor = !this.data[i]['bgColor'] ? '' : this.data[i]['bgColor']
+                    var text = !this.data[i]['text'] ? '' : this.data[i]['text']
+                    var image = !this.data[i]['image'] ? '' : this.data[i]['image']
+                    var uri = !this.data[i]['uri'] ? '' : this.data[i]['uri']
+
+                    var borderRight = this.noBorder ?  '' : ((i+1) % this.columnNum === 0 ? '' : 'borderRight')
+                    var borderBottom = this.noBorder ? '' : (Math.ceil((i+1)/this.columnNum) === Math.ceil(len/this.columnNum) ? '' : 'borderBottom')
+
+                    var item = {
+                        icon: icon,
+                        bgColor: bgColor,
+                        iconStyle: 'width:'+this.avatarSize+'px;' + 'height:'+this.avatarSize+'px;' + 'border-radius:'+(this.avatarSize/2)+'px;justify-content:center;',
+                        text: text,
+                        image: image,
+                        uri: uri,
+                        borderRight: borderRight,
+                        borderBottom: borderBottom
+                    }
+                    arr.push(item)
+                }
+
+                return arr
+            },
+            colWidth() {
+                return 684/this.columnNum
+            },
+            colHeight() {
+                return this.mode==='square' ? 684/this.columnNum : 120
+            },
+            compStyle() {
+                var style = 'align-items:center;align-content:center;justify-content:center;'
+
+                if(this.columnNum > 3){
+                    style += 'flex-direction: column;'
+                }else{
+                    if(this.mode === 'square'){
+                        style += 'flex-direction: column;'
+                    }
+                }
+
+                style += 'width: ' + this.colWidth + 'px;'
+                style += 'height:' + this.colHeight + 'px;'
+
+                return style
+            },
+            avatarSize(){
+                if(this.columnNum > 3){
+                    return 46
+                }else{
+                    if(this.mode === 'square'){
+                        return 86
+                    }else{
+                        return 46
+                    }
+                }
+            },
+            textStyle () {
+                return (this.columnNum <= 3 && this.mode === 'rect') ? 'margin-left:10px;' : ''
+            }
+        },
+        handleClick(uri) {
+            if(!!uri) {
+                //跳转相应页面
+                router.push({
+                    uri: uri
+                });
+            }
+        }
+    }
+</script>

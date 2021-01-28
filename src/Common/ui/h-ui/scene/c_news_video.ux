@@ -1,0 +1,86 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="h5" src="../text/c_h5"></import>
+<template>
+    <div class="news" style="{{hStyle}}">
+        <video class="news-video" src="{{data.src}}" poster="{{data.poster}}"></video>
+        <div class="news-info">
+            <h5 h-style="margin-top:30px;margin-bottom:10px;color:#1a1a1a;" text="{{data.title}}"></h5>
+            <div>
+                <text class="news-info-source">{{data.source}}</text>
+                <text class="news-info-source">{{data.date}}</text>
+                <text class="news-info-source">{{compNum}}次播放</text>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .news{
+        width: 750px;
+        flex-direction: column;
+        margin-bottom:10px;
+        &-video{
+            width: 100%;
+            height: 420px;
+        }
+        &-info{
+            margin-left: 33px;
+            margin-right: 33px;
+            width: 684px;
+            flex-direction: column;
+            &-source{
+                font-size: 28px;
+                color: @color-sub;
+                margin-right: 20px;
+            }
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            data: {},
+            hStyle:{
+                default: ''
+            }
+        },
+
+        computed: {
+            compNum() {
+                var count = this.data.playCount
+                if(count < 0){
+                    count = 0
+                }
+
+                if(count < 10000){
+                    return count
+                }else if(count >= 10000 && count < 99999){
+                    return (count / 10000).toFixed(1) + '万'
+                }else if(count === 99999){
+                    return '9.9万+'
+                }else if(count === 100000){
+                    return '10万'
+                }else{
+                    return '10万+'
+                }
+            }
+        },
+    }
+</script>

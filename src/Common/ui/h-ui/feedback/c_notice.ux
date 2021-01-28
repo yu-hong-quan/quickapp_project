@@ -1,0 +1,129 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div>
+        <div if="{{compShow}}" class="notice" style="{{hStyle}}">
+            <div if="{{close}}" class="notice-close">
+                <text onclick="handleClose" class="notice-close-icon">&#xe706;</text>
+            </div>
+            <div class="notice-content">
+                <text if="{{!marquee}}" style="{{compStyle}}" onclick="handleMore">
+                    <span if="{{icon}}" class="notice-content-icon">&#xe84a; </span>
+                    <span class="notice-content-text">{{text}}</span>
+                    <span if="{{!marquee && more && compMulti}}" class="notice-content-up"> &#xe70f;</span>
+                </text>
+                <text if="{{!marquee && more && !compMulti}}" class="notice-content-down" onclick="handleMore">&#xe70b;</text>
+
+                <text if="{{marquee && icon}}" class="notice-content-icon" onclick="handleMore">&#xe84a;</text>
+                <marquee if="{{marquee}}" class="notice-content-text">{{text}}</marquee>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .notice{
+        width:684px;
+        padding: 17px;
+        background-color: #fbf6ee;
+        margin-bottom:20px;
+        &-close{
+            width:60px;
+            &-icon{
+                 font-family: hui;
+                 font-size: 50px;
+                 padding-right:10px;
+                 color:#cccccc;
+             }
+         }
+        &-content{
+            align-items:flex-start;
+
+            &-icon{
+                 font-family: hui;
+                 font-size: 33px;
+                 padding-right: 17px;
+                 padding-top: 5px;
+                 color:#d48f38;
+             }
+            &-down, &-up{
+                 font-family: hui;
+                 font-size: 33px;
+                 padding-left: 17px;
+                 padding: 5px;
+             }
+            &-text{
+                 color:#d48f38;
+                 font-size: 28px;
+             }
+         }
+    }
+</style>
+
+<script>
+  export default {
+      props: {
+          text:{},
+          multi: {
+              default: false
+          },
+          icon: {
+              default: false
+          },
+          marquee: {
+              default: false
+          },
+          more: {
+              default: false
+          },
+          close:{
+              default: false
+          },
+          hStyle:{
+              default: ''
+          }
+      },
+      data() {
+          return {
+              compMulti: this.multi,
+              compMore: this.more,
+              compShow: true
+          }
+      },
+      computed: {
+          compStyle() {
+              return this.compMulti ? 'lines:-1;' : 'lines:1;text-overflow: ellipsis;'
+          }
+      },
+      handleClose() {
+          this.compShow = false
+      },
+      handleMore() {
+          if(this.more) {
+              this.compMore = !this.compMore
+              this.compMulti = this.compMore
+          }
+      }
+
+  }
+</script>

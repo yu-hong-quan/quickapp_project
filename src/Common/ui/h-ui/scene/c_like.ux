@@ -1,0 +1,132 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="btn {{compBgColor}}" style="{{hStyle}}" onclick="handleClick">
+        <div if="{{heart}}">
+            <text if="{{!compClicked }}" class="icon">&#xe800;</text>
+            <text if="{{compClicked}}" class="icon {{color}}">&#xe80b;</text>
+        </div>
+        <text if="{{!heart}}" class="icon {{compColor}}">&#xe807;</text>
+        <text class="num {{compColor}}">{{compNum}}</text>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+    @import '../../../styles/bg-color.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+        font-size: 33px;
+        margin-right: 5px;
+    }
+
+    .num{
+        font-size: 20px;
+    }
+
+    .btn{
+        margin: 12px 0;
+        padding: 6px 12px;
+        width:130px;
+        font-weight: 100;
+        justify-content: center;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+    }
+
+</style>
+
+<script>
+  export default {
+      props: {
+          id: {},
+          heart: {
+              default: false
+          },
+          value: {
+              default: 0
+          },
+          clicked: {
+              default: false
+          },
+          color: {
+              default: 'white'
+          },
+          bgColor: {
+              default: 'bg-red'
+          },
+          hStyle:{
+              default: ''
+          }
+      },
+
+      data() {
+          return {
+              compValue: Number(this.value),
+              compClicked: this.clicked
+          }
+      },
+
+      computed: {
+          compColor() {
+              return this.compClicked ? this.color : 'content'
+          },
+          compBgColor() {
+              return this.compClicked ? this.bgColor : 'bg-white'
+          },
+          compNum() {
+              if(this.compValue < 0){
+                  this.compValue = 0
+              }
+
+              if(this.compValue < 10000){
+                  return this.compValue
+              }else if(this.compValue >= 10000 && this.compValue < 99999){
+                  return (this.compValue / 10000).toFixed(1) + '万'
+              }else if(this.compValue === 99999){
+                  return '9.9万+'
+              }else if(this.compValue === 100000){
+                  return '10万'
+              }else{
+                  return '10万+'
+              }
+          }
+      },
+
+      handleClick() {
+          if(this.compClicked){
+              this.compValue--
+              this.$dispatch(this.id + '_dispatchEvt', {
+                  value: false
+              })
+          }else{
+              this.compValue++
+              this.$dispatch(this.id + '_dispatchEvt', {
+                  value: true
+              })
+          }
+
+          this.compClicked = !this.compClicked
+      }
+  }
+</script>

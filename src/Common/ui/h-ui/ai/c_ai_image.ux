@@ -1,0 +1,490 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="toast" src="../feedback/c_toast"></import>
+<import name="modal" src="../feedback/c_modal"></import>
+<import name="pickimage" src="../media/c_pickimage"></import>
+<import name="takephoto" src="../media/c_takephoto"></import>
+<import name="h5" src="../text/c_h5"></import>
+<template>
+    <div>
+        <text if="{{supportAI}}" class="icon {{color}}" style="{{compSize}}" onclick="handleShow">&#xe7c3;</text>
+        <div if="{{isShow}}" class="mask" style="{{maskHeight}}">
+            <div class="mask-top {{bgColor}}">
+                <div>
+                    <pickimage id="pick" size="85" color="white" h-style="padding:10px;"></pickimage>
+                    <takephoto id="takephoto" size="75" color="white" h-style="padding:10px;"></takephoto>
+                </div>
+                <div>
+                    <text id="editImage" class="icon icon-tool white" onclick="handleEditImage">&#xe7c7;</text>
+                    <text id="score" class="icon icon-tool white" onclick="handleScore">&#xe808;</text>
+                    <text id="superimage" class="icon icon-tool white" onclick="handleSuperImage">&#xe7a1;</text>
+                    <text id="supertextimage" class="icon icon-tool white" onclick="handleSuperTextImage">&#xe768;</text>
+                    <text id="segmentation" class="icon icon-normal white" onclick="handleSegmentation">&#xe7c6;</text>
+                </div>
+                <div>
+                    <text if="{{showUndo}}" id="undo" class="icon icon-tool white" onclick="handleUndo">&#xe761;</text>
+                    <text id="save" class="icon icon-normal white" onclick="handleSave">&#xe7b7;</text>
+                </div>
+            </div>
+            <div class="mask-image">
+                <image src="{{photoUri}}"></image>
+            </div>
+            <div if="{{photoUri === ''}}" class="mask-tip">
+                <h5 text="使用小贴士："></h5>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe813;</text>
+                    <text>从手机相册中选取图片。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe84b;</text>
+                    <text>调用相机即时拍摄。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe7c7;</text>
+                    <text>图片编辑，可对图片进行裁剪、旋转操作。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe808;</text>
+                    <text>美学评分，从多维度判断图像质量，为图像打分。不仅能对图像的失焦、抖动等技术因素进行评价，还可以从歪斜、色彩、构图等角度评判主观“美”的感受。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe7a1;</text>
+                    <text>图像超分辨率，给定单一一张图片，使用智能方法将其放大，令其分辨率更高，获得更加锐利、干净的图片。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe768;</text>
+                    <text>文字图像超分辨率，对包含文字内容的图像进行放大，同时显著增强图像中文字的清晰度。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-normal warning">&#xe7c6;</text>
+                    <text>图像语义分割，当前支持3类物体的识别和分割，人、天空、绿植（包括草地、树）。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-tool warning">&#xe761;</text>
+                    <text>撤退你的操作，撤退后不能重做。</text>
+                </div>
+                <div class="mask-tip-item">
+                    <text class="icon icon-normal warning">&#xe7b7;</text>
+                    <text>保存图片。</text>
+                </div>
+            </div>
+            <div if="{{!hideBottom}}" class="mask-bottom" onclick="handleShow">
+                <text class="icon icon-tool white">&#xe6ec;</text>
+            </div>
+        </div>
+        <toast id="toast"></toast>
+        <modal id="modal"></modal>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+    @import '../../../styles/bg-color.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .mask{
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.8);
+        &-top{
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 0 21px;
+            justify-content: space-between;
+            height:120px;
+        }
+        &-image{
+            width: 100%;
+            height: 100%;
+            padding: 0 33px;
+            align-items: center;
+            justify-content: center;
+        }
+        &-tip{
+            position: fixed;
+            top:240px;
+            bottom: 240px;
+            left:33px;
+            right:33px;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            flex-direction: column;
+            background-color: #ffffff;
+            border-width: 2px;
+            border-radius: 8px;
+            border-color: @color-border;
+            &-item{
+                align-items: center;
+                margin-bottom: 15px;
+            }
+        }
+        &-bottom{
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            height: 120px;
+            justify-content: center;
+        }
+    }
+
+    .icon{
+        font-family: hui;
+        padding: 12px;
+        &-tool{
+            font-size: 55px;
+        }
+        &-normal{
+            font-size: 45px;
+        }
+    }
+
+    image {
+        width: 100%;
+        border-radius: 8px;
+    }
+</style>
+
+<script>
+    import ai from '@system.ai'
+    import image from '@system.image'
+    import media from '@system.media'
+    import request from '@system.request'
+
+    export default {
+        props: {
+            targetId:{},
+            size: {
+                default: '45'
+            },
+            color: {
+                default: 'sub'
+            },
+            bgColor: {
+              default: 'bg-content'
+            },
+            uri: {
+                default: ''
+            },
+            scale:{
+                default: 1.0
+            },
+            show:{
+                default: false
+            },
+            hideBottom:{
+                default: false
+            }
+        },
+
+        data() {
+            return {
+                supportAI: false,
+                isShow: this.show,
+                photoUri: this.uri,
+                oldUris: [],
+                tip: false,
+                compScale: Number(this.scale) === 1.0 ? 1.0 : 3.0  //超分倍数，可选值为1.0或3.0，默认值为1.0 。
+            }
+        },
+
+        onInit(){
+            let _this = this
+            ai.canIUse({
+                success: function (data) {
+                    if(!data.canUse){
+                        _this.$child('toast').showToast({
+                            text: '您的设备不支持AI',
+                            icon: 'warning'
+                        })
+                    }else{
+                        _this.supportAI = true
+                    }
+                },
+                fail: function (data, code) {
+                    console.log("handling fail, code: " + code)
+                },
+                complete: function () {
+                    console.log("handling complete")
+                }
+            })
+
+            //如果是远程图片，则先保存到本地
+            if(_this.uri.startsWith('http')){
+                request.download({
+                    url: _this.uri,
+                    success:function(data){
+                        // 下载文件，存储在本地
+                        request.onDownloadComplete({
+                            token:data.token,
+                            success: function (ret) {
+                                _this.photoUri = ret.uri
+                            },
+                            fail: function () {
+                                _this.$child('toast').showToast({
+                                    text: '图片下载失败',
+                                    icon: 'warning'
+                                })
+                            }
+                        })
+                    },
+                    fail: function() {
+                        _this.$child('toast').showToast({
+                            text: '图片下载失败',
+                            icon: 'warning'
+                        })
+                    }
+                })
+            }
+
+            _this.$on('pick_dispatchEvt',_this.dispatchPickEvt)
+            _this.$on('takephoto_dispatchEvt',_this.dispatchTakePhotoEvt)
+            _this.$on('modal_dispatchEvt',this.dispatchModalEvt)
+        },
+        dispatchPickEvt(evt) {
+            this.photoUri = evt.detail.pictureUrl
+            this.oldUris.push(this.photoUri)
+        },
+        dispatchTakePhotoEvt(evt) {
+            this.photoUri = evt.detail.photoUrl
+            this.oldUris.push(this.photoUri)
+        },
+
+        computed: {
+            compSize() {
+                return 'font-size: ' + this.size + ';'
+            },
+            showUndo() {
+                return this.oldUris.length >= 2
+            },
+            maskHeight() {
+                return this.hideBottom ? 'bottom:130px;' : 'bottom:0;'
+            }
+        },
+
+        handleShow() {
+            this.isShow = !this.isShow
+        },
+
+        //图片裁剪
+        handleEditImage(){
+            let _this = this
+            image.editImage({
+                uri: _this.photoUri,
+                success: function(data) {
+                    _this.photoUri = data.uri
+                    _this.oldUris.push(_this.photoUri)
+                    _this.$child('toast').showToast({
+                        text: '文档已裁剪',
+                        icon: 'ok'
+                    })
+                },
+                fail: function(data, code) {
+                    _this.$child('toast').showToast({
+                        text: '文档裁剪失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //美学评分
+        handleScore() {
+            let _this = this
+            _this.$child('toast').showToast({
+                text: '正在评分...',
+                loading: true
+            })
+            ai.detectAestheticsScore ({
+                uri: _this.photoUri,
+                success: function (data) {
+                    _this.$child('toast').showToast({
+                        text: '得分：' + data.score.toFixed(2),
+                        icon: data.score > 80 ? 'ok' : 'face-sad'
+                    })
+
+                    if(_this.targetId !== undefined){
+                        _this.$dispatch('aiDetectAestheticsScore_dispatchEvt', {
+                            value: {
+                                targetId: _this.targetId,
+                                score: data.score
+                            }
+                        })
+                    }
+                },
+                fail: function () {
+                    _this.$child('toast').showToast({
+                        text: '美学评分失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //图像超分辨率
+        handleSuperImage() {
+            let _this = this
+            _this.$child('toast').showToast({
+                text: '正在优化...',
+                loading: true
+            })
+
+            ai.superImageResolution ({
+                uri: _this.photoUri,
+                scale: _this.compScale,
+                success: function (data) {
+                    _this.photoUri = data.uri
+                    _this.oldUris.push(_this.photoUri)
+
+                    _this.$child('toast').showToast({
+                        text: '分辨率已提升',
+                        icon: 'ok'
+                    })
+                },
+                fail: function () {
+                    _this.$child('toast').showToast({
+                        text: '提升失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //文字图像超分辨率
+        handleSuperTextImage() {
+            let _this = this
+            _this.$child('toast').showToast({
+                text: '正在优化...',
+                loading: true
+            })
+
+            ai.superTextImageResolution ({
+                uri: _this.photoUri,
+                scale: _this.compScale,
+                success: function (data) {
+                    _this.photoUri = data.uri
+                    _this.oldUris.push(_this.photoUri)
+
+                    _this.$child('toast').showToast({
+                        text: '分辨率已提升',
+                        icon: 'ok'
+                    })
+                },
+                fail: function () {
+                    _this.$child('toast').showToast({
+                        text: '提升失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        // 图像语义分割
+        handleSegmentation() {
+            let _this = this
+            _this.$child('toast').showToast({
+                text: '正在分割...',
+                loading: true
+            })
+
+            ai.imageSegmentation ({
+                uri: _this.photoUri,
+                type: 1,
+                success: function (data) {
+                    _this.photoUri = data.uri
+                    _this.oldUris.push(_this.photoUri)
+
+                    _this.$child('toast').showToast({
+                        text: '图像分割成功',
+                        icon: 'ok'
+                    })
+                },
+                fail: function () {
+                    _this.$child('toast').showToast({
+                        text: '图像分割失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //撤退
+        handleUndo() {
+            if(!this.tip){//仅第一次撤退时提示
+                this.$child('modal').showModal({
+                    text: '撤退动作不可恢复，您确定撤退吗?',
+                    title: 'none',
+                    id: 'modal'
+                });
+                this.tip = true
+            }else{
+                if(this.oldUris.length >= 2) {
+                    this.photoUri = this.oldUris[this.oldUris.length - 2]
+                    this.oldUris.pop()
+                }
+            }
+        },
+
+        //首次确认撤退
+        dispatchModalEvt() {
+            if(this.oldUris.length >= 2) {
+                this.photoUri = this.oldUris[this.oldUris.length - 2]
+                this.oldUris.pop()
+            }
+        },
+
+        //图片保存到本地
+        handleSave() {
+            let _this = this
+            media.saveToPhotosAlbum({
+                uri: _this.photoUri,
+                success: function() {
+                    _this.$child('toast').showToast({
+                        text: '图片保存成功',
+                        icon: 'ok'
+                    })
+
+                    if(_this.targetId !== undefined){
+                        _this.$dispatch('aiImageSave_dispatchEvt', {
+                            value: {
+                                targetId: _this.targetId,
+                                uri: _this.photoUri
+                            }
+                        })
+                    }
+
+                    _this.isShow = false
+                },
+                fail: function(data, code) {
+                    _this.$child('toast').showToast({
+                        text: '图片保存失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        }
+    }
+</script>

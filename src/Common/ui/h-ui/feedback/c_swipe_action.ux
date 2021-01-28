@@ -1,0 +1,90 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="swipe-action-item" src="./c_swipe_action_item"></import>
+<template>
+    <div class="swipe" style="{{hStyle}}">
+        <div class="swipe-slot">
+            <slot name="top"></slot>
+        </div>
+
+        <block for="{{data}}">
+            <swipe-action-item id="{{id + '_' + $idx}}" title="{{$item.title}}" icon="{{$item.icon}}" bg-color="{{$item.bgColor}}"
+                               avatar="{{$item.avatar}}" extra="{{$item.extra}}" memo="{{$item.memo}}"
+                               action-icon="{{$item.actionIcon}}" action-color="{{$item.actionColor}}">
+            </swipe-action-item>
+        </block>
+
+        <div class="swipe-slot">
+            <slot name="bottom"></slot>
+        </div>
+    </div>
+
+</template>
+
+<style lang="less">
+    .swipe{
+        flex-direction: column;
+        width: 1030px;
+        &-slot{
+            margin: 20px 0;
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            data: {},
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                showIndex: ''
+            }
+        },
+
+        onInit() {
+            this.$on(this.id + '_dispatchShowEvt',this.dispatchShowEvt)
+            this.$on(this.id + '_dispatchHideEvt',this.dispatchHideEvt)
+        },
+
+        dispatchShowEvt(evt) {//监控手指左滑动
+            if(this.showIndex !== ''){
+                this.$child(this.id + '_' + this.showIndex).hideSwipe({
+                    compId: this.id + '_' + this.showIndex,
+                    compTitle: this.data[this.showIndex].title,
+                    compIcon: this.data[this.showIndex].icon,
+                    compBgColor: this.data[this.showIndex].bgColor,
+                    compAvatar: this.data[this.showIndex].avatar,
+                    compExtra: this.data[this.showIndex].extra,
+                    compMemo: this.data[this.showIndex].memo,
+                    compActionIcon: this.data[this.showIndex].actionIcon,
+                    compActionColor: this.data[this.showIndex].actionColor
+                });
+            }
+
+            this.showIndex = evt.detail.value
+        },
+
+        dispatchHideEvt(evt) {////监控手指右滑动
+            this.showIndex = ''
+        }
+    }
+</script>

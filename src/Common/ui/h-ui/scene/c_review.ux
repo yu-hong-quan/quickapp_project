@@ -1,0 +1,91 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="review-item" src="./c_review_item"></import>
+<template>
+    <div class="swipe">
+        <slot></slot>
+
+        <block for="{{data}}">
+            <review-item id="{{id + '_' + $idx}}" nickname="{{$item.nickname}}" avatar="{{$item.avatar}}" date="{{$item.date}}" memo="{{$item.memo}}"
+                         support-delete = {{$item.supportDelete}} like-heart="{{likeHeart}}" like-value="{{$item.likeValue === undefined ? 0 : $item.likeValue}}"
+                         like-clicked="{{$item.likeClicked}}" like-color="{{likeColor}}" like-bg-color="{{likeBgColor}}"
+                         reply-value="{{$item.replyValue === undefined ? 0 : $item.replyValue}}">
+            </review-item>
+        </block>
+    </div>
+
+</template>
+
+<style lang="less">
+    .swipe{
+        flex-direction: column;
+        width: 1030px;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            data: {},
+            likeHeart: {
+                default: false
+            },
+            likeColor: {
+                default: 'white'
+            },
+            likeBgColor: {
+                default: 'bg-red'
+            }
+        },
+
+        data() {
+            return {
+                showIndex: ''
+            }
+        },
+
+        onInit() {
+            this.$on(this.id + '_dispatchShowEvt',this.dispatchShowEvt)
+            this.$on(this.id + '_dispatchHideEvt',this.dispatchHideEvt)
+        },
+
+        dispatchShowEvt(evt) {//监控手指左滑动
+            if(this.showIndex !== ''){
+                this.$child(this.id + '_' + this.showIndex).hideSwipe({
+                    compId: this.id + '_' + this.showIndex,
+                    compNickname: this.data[this.showIndex].nickname,
+                    compAvatar: this.data[this.showIndex].avatar,
+                    compDate: this.data[this.showIndex].date,
+                    compMemo: this.data[this.showIndex].memo,
+                    compSupportDelete: this.data[this.showIndex].supportDelete,
+                    compLikeHeart: this.likeHeart,
+                    compLikeValue: this.data[this.showIndex].likeValue,
+                    compLikeClicked: this.data[this.showIndex].likeClicked,
+                    compLikeColor: this.likeColor,
+                    compLikeBgColor: this.likeBgColor,
+                    compReplyValue: this.data[this.showIndex].replyValue,
+                });
+            }
+
+            this.showIndex = evt.detail.value
+        },
+
+        dispatchHideEvt(evt) {////监控手指右滑动
+            this.showIndex = ''
+        }
+    }
+</script>

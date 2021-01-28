@@ -1,0 +1,300 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" ontouchstart="handleTouchstart"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        width: 750px;
+        height: 750px;
+    }
+</style>
+
+<script>
+    import prompt from '@system.prompt'
+    import vibrator from '@system.vibrator'
+    import { getStepValue } from '../../../utils/chart'
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id :{},
+            data: {},
+            colors: {},
+            right: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                maxValue: 0
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                this.drawChart()
+            }, 100);
+        },
+
+        drawChart(){
+            // 获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            // 清理画布
+            ctx.clearRect(0, 0, 750, 750)
+
+            const centerY = 375
+            const p = Math.PI
+            var angle = 0
+            var x = 0
+            var y = 0
+            var i = 0
+            var j = 0
+
+            // 绘制分类名称
+            var nameY = 20
+            ctx.font = '20px sans-serif'
+            for(i = 0; i < this.data.length; i++){
+                ctx.beginPath()
+                ctx.fillStyle = this.compColors[i]
+                ctx.moveTo(this.compNameX, nameY)
+                ctx.fillRect(this.compNameX, nameY, 20, 20)
+                ctx.closePath()
+                ctx.fillStyle = 'black'
+                ctx.fillText(this.data[i]['name'], this.compNameX + 30, nameY + 20)
+
+                nameY += 30
+            }
+
+            //绘制雷达文字
+            for (j = 0; j < this.compStructure.length - 1; j++) {
+                angle = (p / 180) * (360 / (this.compStructure.length - 1) * j) + p
+                x = Math.sin(angle) * 300
+                y = Math.cos(angle) * 300
+
+                x =  x + this.compCenterX
+                y += centerY
+
+                ctx.textAlign = 'center'
+                ctx.fillText(this.compStructure[j+1], x, y)
+            }
+
+            ctx.translate(this.compCenterX,centerY)
+            ctx.rotate(p)
+            // 绘制雷达底图
+            for(i=5;i>0;i--) {
+                ctx.beginPath()
+                for (j = 0; j < this.compStructure.length - 1; j++) {
+
+                    angle = (p / 180) * (360 / (this.compStructure.length - 1) * j)
+                    x = Math.sin(angle) * 50 * i
+                    y = Math.cos(angle) * 50 * i
+                    if (j === 0) {
+                        ctx.moveTo(x, y)
+                    } else {
+                        ctx.lineTo(x, y)
+                    }
+                }
+
+                ctx.closePath()
+                ctx.strokeStyle = '#999999'
+                ctx.stroke()
+                ctx.fillStyle = i % 2 === 0 ? '#e7e7e7' : 'white'
+                ctx.fill()
+            }
+
+            ctx.rotate(0.5 * p)
+
+            ctx.beginPath()
+            for(i=0;i<this.compStructure.length - 1;i++){
+
+                ctx.moveTo(0 , 0)
+                ctx.lineTo(250 , 0)
+                ctx.strokeStyle = '#999999'
+                ctx.stroke()
+                ctx.rotate((p / 180) * (360 / (this.compStructure.length - 1)))
+            }
+            ctx.closePath()
+
+            ctx.rotate(1.5 * p)
+
+            // 绘制动态数据
+            for(i = 0; i < this.data.length; i++){
+                ctx.beginPath()
+
+                for(var key in this.data[i]) {
+                    if (key !== 'name') {
+                        for(var item in this.compMaxValue){
+                            if(key === this.compMaxValue[item]['key']){
+                                angle = (p / 180) * (360 / (this.compStructure.length - 1) * this.compMaxValue[item]['index'])
+                                x = Math.sin(angle) * 250 * (this.data[i][key]/this.compMaxValue[item]['maxValue'])
+                                y = Math.cos(angle) * 250 * (this.data[i][key]/this.compMaxValue[item]['maxValue'])
+
+                                if (this.compMaxValue[item]['index'] === 0) {
+                                    ctx.moveTo(x, y)
+                                } else {
+                                    ctx.lineTo(x, y)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ctx.closePath()
+                ctx.lineWidth = 3
+                ctx.strokeStyle = this.compColors[i]
+                ctx.stroke()
+            }
+        },
+
+        // 触摸提示
+        handleTouchstart(event) {
+            var x = event.touches[0].offsetX
+            var y = event.touches[0].offsetY
+
+
+
+
+            for(var i = 0, len = this.compTouchArea.length; i < len; i++){
+                if(x >= this.compTouchArea[i]['startX'] && x <= this.compTouchArea[i]['endX'] && y >= this.compTouchArea[i]['startY'] && y <= this.compTouchArea[i]['endY']){
+                    // 手机震动反馈
+                    vibrator.vibrate({ mode: "short" })
+
+                    var message = ''
+                    var item = this.data[this.compTouchArea[i]['index']]
+
+                    for(var key in item){
+                        message += key==='name' ? item[key] + '\n' : key + ': ' + item[key] + '\n'
+                    }
+
+                    // 弹窗显示缩略语的详细说明
+                    prompt.showToast({
+                        message: message,
+                        gravity: 'center'
+                    })
+
+                    break
+                }
+            }
+        },
+
+        computed: {
+            compStructure(){
+                var arr = []
+                for(var key in this.data[0]){
+                    arr.push(key)
+                }
+                return arr
+            },
+            compMaxValue() {
+                var maxArr = []
+                var item
+                var index = 0
+                for(var i=0,len=this.compStructure.length;i<len;i++){
+                    if(this.compStructure[i] !== 'name'){
+                        item = {
+                            index: index,
+                            key: this.compStructure[i],
+                            maxValue: 0
+                        }
+                        maxArr.push(item)
+                        index++
+                    }
+                }
+
+                for(i=0,len=this.data.length;i<len;i++){
+                    for(var key in this.data[i]){
+                        if(key !== 'name'){
+                            for(item in maxArr){
+                                if(key === maxArr[item]['key'] && this.data[i][key] > maxArr[item]['maxValue']){
+                                    maxArr[item]['maxValue'] = this.data[i][key]
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for(item in maxArr){
+                    maxArr[item]['maxValue'] = getStepValue(maxArr[item]['maxValue'])*5.3
+                }
+
+                return maxArr
+            },
+            compColors() {
+                if(!this.colors) {
+                    var arr = [];
+                    arr.push('#b54038')
+                    arr.push('#334552')
+                    arr.push('#6a9fa6')
+                    arr.push('#de9375')
+                    arr.push('#9bc5af')
+                    arr.push('#c2883a')
+                    if (this.data.length > 6) {
+                        for (var i = 6, len = this.data.length; i < len; i++) {
+                            var a = Math.floor(Math.random() * 256)
+                            var b = Math.floor(Math.random() * 256)
+                            var c = Math.floor(Math.random() * 256)
+                            var color = '#' + fill2(a.toString(16)) + fill2(b.toString(16)) + fill2(c.toString(16))
+                            arr.push(color)
+                        }
+                    }
+
+                    return arr
+                }else{
+                    return this.colors
+                }
+            },
+
+            compCenterX() {
+                return this.right ? 325 : 425
+            },
+            compNameX() {
+                return this.right ? 600 : 33
+            },
+            compTouchArea() {
+                var nameY = 20
+                var arr = []
+
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    var item = {
+                        index: i,
+                        startX: this.compNameX,
+                        endX: this.compNameX + 30 + this.data[i]['name'].length * 20,
+                        startY: nameY,
+                        endY: nameY + 20
+                    }
+                    nameY += 30
+                    arr.push(item)
+                }
+
+                return arr
+            }
+        }
+    }
+</script>

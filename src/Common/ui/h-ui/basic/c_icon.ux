@@ -1,0 +1,456 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div style="{{hStyle}}">
+        <!-- 日期时间 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'date'}}">&#xe85a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'time'}}">&#xe859;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'hourglass'}}">&#xe858;</text>
+
+        <!-- 地点 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'compass'}}">&#xe857;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'globe'}}">&#xe853;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'globe-alt'}}">&#xe854;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'location'}}">&#xe852;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'location-alt'}}">&#xe851;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'map-marker'}}">&#xe856;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'road-sign'}}">&#xe855;</text>
+
+        <!-- 天气 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sunny-day'}}">&#xe860;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cloud'}}">&#xe85f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'partly-cloudy'}}">&#xe85d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'rain'}}">&#xe85e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'flash'}}">&#xe85c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'temperature'}}">&#xe85b;</text>
+
+        <!-- 社交 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chat'}}">&#xe80f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chat-alt'}}">&#xe80e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'comment'}}">&#xe80d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'telephone'}}">&#xe811;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'earphone'}}">&#xe810;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'earphone-sign'}}">&#xe801;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'envelope'}}">&#xe812;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'email'}}">&#xe802;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'eye-open'}}">&#xe80c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'eye-close'}}">&#xe7fe;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'face-happy'}}">&#xe80a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'face-sad'}}">&#xe809;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'thumbs-up'}}">&#xe807;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'thumbs-down'}}">&#xe806;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'heart'}}">&#xe80b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'heart-alt'}}">&#xe800;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'heart-half'}}">&#xe7fc;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'heart-dislike'}}">&#xe7fb;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'star'}}">&#xe808;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'star-alt'}}">&#xe7ff;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'star-half'}}">&#xe7fd;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'link'}}">&#xe805;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'friend-link'}}">&#xe803;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'follow'}}">&#xe804;</text>
+
+        <!-- 媒体 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'play'}}">&#xe83a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'play-sign'}}">&#xe83f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'play-circle'}}">&#xe840;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pause'}}">&#xe83d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pause-sign'}}">&#xe836;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pause-circle'}}">&#xe835;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'stop'}}">&#xe83e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'stop-sign'}}">&#xe83c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'stop-circle'}}">&#xe83b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'forward'}}">&#xe830;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'forward-sign'}}">&#xe832;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'forward-circle'}}">&#xe834;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'backward'}}">&#xe831;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'backward-sign'}}">&#xe831;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'backward-circle'}}">&#xe833;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-forward'}}">&#xe82e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-forward-sign'}}">&#xe82c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-forward-circle'}}">&#xe82a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-backward'}}">&#xe82d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-backward-sign'}}">&#xe82b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'step-backward-circle'}}">&#xe829;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-forward'}}">&#xe828;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-forward-sign'}}">&#xe827;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-forward-circle'}}">&#xe824;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-backward'}}">&#xe825;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-backward-sign'}}">&#xe826;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fast-backward-circle'}}">&#xe823;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'record'}}">&#xe839;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'record-sign'}}">&#xe838;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'record-circle'}}">&#xe837;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'eject'}}">&#xe81f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'eject-sign'}}">&#xe820;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'eject-circle'}}">&#xe81e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cd'}}">&#xe844;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cd-alt'}}">&#xe846;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'volume-up'}}">&#xe84a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'volume-down'}}">&#xe821;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'volume-off'}}">&#xe849;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound'}}">&#xe843;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-alt'}}">&#xe845;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-stereo'}}">&#xe81b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-dolby'}}">&#xe817;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-5-1'}}">&#xe816;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-6-1'}}">&#xe815;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sound-7-1'}}">&#xe814;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'headphones'}}">&#xe841;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'listen'}}">&#xe848;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'microphone'}}">&#xe842;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'mike'}}">&#xe84c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'mixing'}}">&#xe84e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'music'}}">&#xe84d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'piano'}}">&#xe84f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'camera'}}">&#xe84b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'picture'}}">&#xe81c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pictures'}}">&#xe813;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'video'}}">&#xe81d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'film'}}">&#xe850;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'filming'}}">&#xe847;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'hd-video'}}">&#xe819;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sd-video'}}">&#xe81a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'subtitles'}}">&#xe818;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sunglasses'}}">&#xe822;</text>
+
+        <!-- 办公 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'folder'}}">&#xe7ad;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'level-up'}}">&#xe75b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'file-path'}}">&#xe7a6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'category'}}">&#xe7a9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'category-alt'}}">&#xe776;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'book'}}">&#xe7a8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'books'}}">&#xe7a7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'briefcase'}}">&#xe7b3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'file'}}">&#xe7ac;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'file-alt'}}">&#xe7be;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'duplicate'}}">&#xe7bc;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'copy'}}">&#xe79c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'paste'}}">&#xe79b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'open-file'}}">&#xe7bf;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'save-file'}}">&#xe7bd;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'file-delete'}}">&#xe7ae;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'file-delete-alt'}}">&#xe7ab;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'floppy-disk'}}">&#xe7b7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'floppy-open'}}">&#xe783;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'floppy-save'}}">&#xe784;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'floppy-saved'}}">&#xe77f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'floppy-remove'}}">&#xe787;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'report'}}">&#xe7aa;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pdf'}}">&#xe7bb;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'import'}}">&#xe788;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'export'}}">&#xe786;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'open'}}">&#xe78b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'save'}}">&#xe78a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'saved'}}">&#xe789;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'edit'}}">&#xe793;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'undo'}}">&#xe761;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'send'}}">&#xe775;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'share'}}">&#xe78c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'share-alt'}}">&#xe78d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cloud-download'}}">&#xe7b5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cloud-upload'}}">&#xe7b6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pencil'}}">&#xe7ca;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pen'}}">&#xe7c5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'paperclip'}}">&#xe7cc;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pushpin'}}">&#xe75e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ruler'}}">&#xe7cb;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'triangle-ruler'}}">&#xe7c8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'square-ruler'}}">&#xe7c9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'scissors'}}">&#xe7c7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'straw'}}">&#xe7c6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tint'}}">&#xe76b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'erase'}}">&#xe799;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'brush'}}">&#xe7c2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'compasses'}}">&#xe7c4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'color'}}">&#xe7c3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'print'}}">&#xe7ba;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'trash'}}">&#xe7b8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'lock'}}">&#xe7b2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'unlock'}}">&#xe7b0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'compressed'}}">&#xe762;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'filter'}}">&#xe75c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'flag'}}">&#xe7a3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'flag-alt'}}">&#xe7a5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'align-left'}}">&#xe770;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'align-right'}}">&#xe76f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'align-center'}}">&#xe771;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'align-justify'}}">&#xe777;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'indent-left'}}">&#xe779;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'indent-right'}}">&#xe77e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-bottom'}}">&#xe772;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-top'}}">&#xe767;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-left'}}">&#xe765;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-right'}}">&#xe764;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-horizontal'}}">&#xe760;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'object-align-vertical'}}">&#xe766;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'menu-hamburger'}}">&#xe78e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'list'}}">&#xe773;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'th'}}">&#xe79d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'th-list'}}">&#xe79f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'th-large'}}">&#xe7a0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'option-horizontal'}}">&#xe791;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'option-vertical'}}">&#xe790;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort'}}">&#xe780;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-attributes'}}">&#xe77c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-attributes-alt'}}">&#xe778;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-alphabet'}}">&#xe77a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-alphabet-alt'}}">&#xe77b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-order'}}">&#xe782;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sort-by-order-alt'}}">&#xe781;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'screenshot'}}">&#xe76e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'search'}}">&#xe7b4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'zoom-in'}}">&#xe7a1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'zoom-out'}}">&#xe7a2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'font'}}">&#xe7a4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'text-color'}}">&#xe769;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'text-background'}}">&#xe76a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bold'}}">&#xe798;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'italic'}}">&#xe79a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'text-size'}}">&#xe768;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'text-width'}}">&#xe76c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'text-height'}}">&#xe76d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'superscript'}}">&#xe75f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'subscript'}}">&#xe763;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'header'}}">&#xe77d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'unchecked'}}">&#xe79e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'check'}}">&#xe794;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'lamp'}}">&#xe7af;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tip'}}">&#xe7b1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'transfer'}}">&#xe785;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cycle'}}">&#xe7b9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'expand'}}">&#xe796;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'collapse-up'}}">&#xe792;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'collapse-down'}}">&#xe795;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'move'}}">&#xe797;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'new-window'}}">&#xe78f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'modal-window'}}">&#xe75a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'wrench'}}">&#xe7c0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tool'}}">&#xe7c1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'stats'}}">&#xe774;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bug'}}">&#xe75d;</text>
+
+        <!-- 购物 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'shopping-cart'}}">&#xe737;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'shopping-cart-alt'}}">&#xe733;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tag'}}">&#xe74f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tag-alt'}}">&#xe74c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tags'}}">&#xe738;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bell'}}">&#xe749;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bell-alt'}}">&#xe735;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bell-off'}}">&#xe736;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bullhorn'}}">&#xe748;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bookmark'}}">&#xe750;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bookmark-alt'}}">&#xe751;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'reward'}}">&#xe74b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'gift'}}">&#xe758;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'indicator'}}">&#xe753;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'promotion-page'}}">&#xe755;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'new'}}">&#xe73a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sale'}}">&#xe74d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'barcode'}}">&#xe752;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'qrcode'}}">&#xe74e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'qr-scanner'}}">&#xe73c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'finger-print'}}">&#xe73e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tower'}}">&#xe734;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'shop'}}">&#xe756;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'mall'}}">&#xe757;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'usd'}}">&#xe739;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'euro'}}">&#xe73b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'yen'}}">&#xe73d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'female'}}">&#xe747;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bag'}}">&#xe745;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'purse'}}">&#xe746;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'basket'}}">&#xe754;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ring'}}">&#xe73f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'necklace'}}">&#xe740;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'skirt'}}">&#xe74a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'model'}}">&#xe741;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'shoe'}}">&#xe742;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 't-shirt'}}">&#xe743;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pants'}}">&#xe759;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'coat'}}">&#xe744;</text>
+
+        <!-- 休闲 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tea'}}">&#xe7fa;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cofee'}}">&#xe7f9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'glass'}}">&#xe7f7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'apple'}}">&#xe7f8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'hamburger'}}">&#xe7f6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cutlery'}}">&#xe7f5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sofa'}}">&#xe7f3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chair'}}">&#xe7f4;</text>
+
+        <!-- 账户 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'user'}}">&#xe7f2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'user-female'}}">&#xe7f1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'people'}}">&#xe7df;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'credit-card'}}">&#xe7ec;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'money'}}">&#xe7ed;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'dib'}}">&#xe7ee;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'piggy-bank'}}">&#xe7f0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'calendar'}}">&#xe7eb;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'cog'}}">&#xe7ef;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'log-in'}}">&#xe7de;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'log-out'}}">&#xe7e0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'house'}}">&#xe7ea;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'home'}}">&#xe7e9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'home-alt'}}">&#xe7e8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'truck'}}">&#xe7e2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'plane'}}">&#xe7e1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'protection'}}">&#xe7e3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'sos'}}">&#xe7e4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'contrast'}}">&#xe7e7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'trend'}}">&#xe7e5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pie'}}">&#xe7e6;</text>
+
+        <!-- 数码 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'router'}}">&#xe7dc;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'wifi-signal'}}">&#xe7dd;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'wifi'}}">&#xe7db;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'signal'}}">&#xe7d1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'bluetooth'}}">&#xe7ce;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'battery-high'}}">&#xe7d4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'battery-low'}}">&#xe7d3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'battery-charge'}}">&#xe7d5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'phone'}}">&#xe7d8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'pc'}}">&#xe7da;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'notebook'}}">&#xe7d9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'hdd'}}">&#xe7d0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'u-disk'}}">&#xe7d7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'mouse'}}">&#xe7d6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'off'}}">&#xe7d2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'flash-off'}}">&#xe7cf;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'flashlight'}}">&#xe7cd;</text>
+
+        <!-- 符号 -->
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-left'}}">&#xe71e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-left-sign'}}">&#xe72b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-left-circle'}}">&#xe714;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-right'}}">&#xe724;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-right-sign'}}">&#xe722;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-right-circle'}}">&#xe707;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-up'}}">&#xe71c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-up-sign'}}">&#xe71b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-up-circle'}}">&#xe70c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-down'}}">&#xe716;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-down-sign'}}">&#xe72f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'arrow-down-circle'}}">&#xe711;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-left'}}">&#xe703;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-left-sign'}}">&#xe72d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-left-circle'}}">&#xe71a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-right'}}">&#xe702;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-right-sign'}}">&#xe71d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-right-circle'}}">&#xe70a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-up'}}">&#xe70f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-up-sign'}}">&#xe710;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-up-circle'}}">&#xe704;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-down'}}">&#xe70b;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-down-sign'}}">&#xe705;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'chevron-down-circle'}}">&#xe700;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'plus'}}">&#xe718;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'plus-sign'}}">&#xe71f;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'plus-circle'}}">&#xe721;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'minus'}}">&#xe713;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'minus-sign'}}">&#xe720;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'minus-circle'}}">&#xe712;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ok'}}">&#xe709;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ok-sign'}}">&#xe717;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ok-circle'}}">&#xe70e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'remove'}}">&#xe706;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'remove-sign'}}">&#xe719;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'remove-circle'}}">&#xe70d;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'info'}}">&#xe725;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'info-sign'}}">&#xe72c;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'info-circle'}}">&#xe726;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'question'}}">&#xe72e;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'question-sign'}}">&#xe723;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'question-circle'}}">&#xe715;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'menu-left'}}">&#xe6f4;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'menu-right'}}">&#xe6f3;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'menu-up'}}">&#xe6ec;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'menu-down'}}">&#xe6f1;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'triangle-left'}}">&#xe6f6;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'triangle-right'}}">&#xe6f7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'triangle-top'}}">&#xe6f5;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'triangle-bottom'}}">&#xe6f2;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fullscreen'}}">&#xe708;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'resize-full'}}">&#xe6fe;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'resize-small'}}">&#xe6fd;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'resize-horizontal'}}">&#xe6fb;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'resize-vertical'}}">&#xe6fa;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'ban'}}">&#xe732;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'danger'}}">&#xe728;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'warning'}}">&#xe727;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'adjust'}}">&#xe730;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'hui'}}">&#xe6e7;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'registration-mark'}}">&#xe6ff;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'copyright-mark'}}">&#xe701;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'dashboard'}}">&#xe6e9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'brightness'}}">&#xe729;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'asterisk'}}">&#xe6f8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'refresh'}}">&#xe6f9;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'repeat'}}">&#xe731;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'retweet'}}">&#xe6ef;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'random'}}">&#xe6ee;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'tasks'}}">&#xe6f0;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'magnet'}}">&#xe6fc;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'fire'}}">&#xe6ea;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'key'}}">&#xe6e8;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'education'}}">&#xe6ed;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'percent'}}">&#xe72a;</text>
+        <text class="icon {{color}}" style="{{compStyle}}" if="{{type === 'console'}}">&#xe6eb;</text>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            type: {},
+            size: {
+                default: '45'
+            },
+            color: {
+                default: 'sub'
+            },
+            opacity: {
+                default: 1
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compStyle() {
+                return 'font-size: ' + this.size + ';opacity: ' + this.opacity + ';'
+            }
+        }
+    }
+</script>

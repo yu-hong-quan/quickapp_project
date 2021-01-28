@@ -1,0 +1,722 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div>
+        <div if="{{maskShow}}" class="modal" onclick="handleClick">
+            <div class="card {{compStyle}}">
+                <div class="card-top">
+                    <div class="card-top-title">
+                        <text style="font-weight: bolder;">{{duration}}秒后自动关闭</text>
+                    </div>
+                </div>
+
+                <block for="{{data}}">
+                    <div class="card-top" onclick="detail($idx, $item.disabled, $item.uri)">
+                        <div class="card-top-title">
+                            <text class="{{!!$item.color ? $item.color : ''}}" style="{{!!$item.disabled ? 'color:#d0d1d4;' : ''}}">{{$item.title}}</text>
+                            <icon if="{{!!$item.icon}}" h-style="margin-left:10px;" type="{{$item.icon}}" size="60" color="default" opacity="0.7"></icon>
+                            <avatar if="{{!!$item.avatar}}" src="{{$item.avatar}}" size="50" h-style="margin-left:10px;"></avatar>
+                        </div>
+                    </div>
+                </block>
+
+                <div class="card-top" style="margin-top: 20px;" onclick="handleClick">
+                    <div class="card-top-title">
+                        <text>取消</text>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/color.less';
+
+    .modal {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+
+    .card {
+        flex-direction: column;
+        width: 100%;
+        margin: 10px 0;
+        &-top {
+            align-items: center;
+            justify-content: center;
+            border-color: #cccccc;
+            border-bottom-width: 0.5px;
+            background-color: #ffffff;
+            &-title {
+                line-height: @font-size-base *2.5;
+                align-items: center;
+                justify-content: center;
+                padding: 30px;
+                & text {
+                    font-size: 31px;
+                }
+            }
+        }
+    }
+
+    .nav1{
+        position: fixed;
+        bottom:-320px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:320px;
+    }
+
+    .show1{
+        animation-name: show1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide1{
+        animation-name: hwhide1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide1{
+        animation-name: hide1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show1 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-320px);
+        }
+    }
+
+    @keyframes hwhide1 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(520px);
+        }
+    }
+
+    @keyframes hide1 {
+        from {
+            transform: translateY(-320px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav2{
+        position: fixed;
+        bottom:-420px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:420px;
+    }
+
+    .show2{
+        animation-name: show2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide2{
+        animation-name: hwhide2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide2{
+        animation-name: hide2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show2 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-420px);
+        }
+    }
+
+    @keyframes hwhide2 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(620px);
+        }
+    }
+
+    @keyframes hide2 {
+        from {
+            transform: translateY(-420px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav3{
+        position: fixed;
+        bottom:-520px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:520px;
+    }
+
+    .show3{
+        animation-name: show3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide3{
+        animation-name: hwhide3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide3{
+        animation-name: hide3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show3 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-520px);
+        }
+    }
+
+    @keyframes hwhide3 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(720px);
+        }
+    }
+
+    @keyframes hide3 {
+        from {
+            transform: translateY(-520px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav4{
+        position: fixed;
+        bottom:-620px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:620px;
+    }
+
+    .show4{
+        animation-name: show4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide4{
+        animation-name: hwhide4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide4{
+        animation-name: hide4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show4 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-620px);
+        }
+    }
+
+    @keyframes hwhide4 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(820px);
+        }
+    }
+
+    @keyframes hide4 {
+        from {
+            transform: translateY(-620px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav5{
+        position: fixed;
+        bottom:-720px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:720px;
+    }
+
+    .show5{
+        animation-name: show5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide5{
+        animation-name: hwhide5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide5{
+        animation-name: hide5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show5 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-720px);
+        }
+    }
+
+    @keyframes hwhide5 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(920px);
+        }
+    }
+
+    @keyframes hide5 {
+        from {
+            transform: translateY(-720px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav6{
+        position: fixed;
+        bottom:-820px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:820px;
+    }
+
+    .show6{
+        animation-name: show6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide6{
+        animation-name: hwhide6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide6{
+        animation-name: hide6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show6 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-820px);
+        }
+    }
+
+    @keyframes hwhide6 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1020px);
+        }
+    }
+
+    @keyframes hide6 {
+        from {
+            transform: translateY(-820px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav7{
+        position: fixed;
+        bottom:-920px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:920px;
+    }
+
+    .show7{
+        animation-name: show7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide7{
+        animation-name: hwhide7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide7{
+        animation-name: hide7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show7 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-920px);
+        }
+    }
+
+    @keyframes hwhide7 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1120px);
+        }
+    }
+
+    @keyframes hide7 {
+        from {
+            transform: translateY(-920px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav8{
+        position: fixed;
+        bottom:-1020px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:1020px;
+    }
+
+    .show8{
+        animation-name: show8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide8{
+        animation-name: hwhide8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide8{
+        animation-name: hide8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show8 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-1020px);
+        }
+    }
+
+    @keyframes hwhide8 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1220px);
+        }
+    }
+
+    @keyframes hide8 {
+        from {
+            transform: translateY(-1020px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav9{
+        position: fixed;
+        bottom:-1120px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:1120px;
+    }
+
+    .show9{
+        animation-name: show9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide9{
+        animation-name: hwhide9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide9{
+        animation-name: hide9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show9 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-1120px);
+        }
+    }
+
+    @keyframes hwhide9 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1320px);
+        }
+    }
+
+    @keyframes hide9 {
+        from {
+            transform: translateY(-1120px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav10{
+        position: fixed;
+        bottom:-1220px;
+        left: 20px;
+        right: 20px;
+        width: 100%;
+        height:1220px;
+    }
+
+    .show10{
+        animation-name: show10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide10{
+        animation-name: hwhide10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide10{
+        animation-name: hide10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show10 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-1220px);
+        }
+    }
+
+    @keyframes hwhide10 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1420px);
+        }
+    }
+
+    @keyframes hide10 {
+        from {
+            transform: translateY(-1220px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+</style>
+
+<script>
+    import router from "@system.router";
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        data() {
+            return {
+                id: '',
+                data:[],
+                duration: 3,
+                isShow: false,
+                maskShow: false
+            }
+        },
+        computed: {
+            compStyle() {
+                var len = this.data.length
+                if(len === 0){
+                    len = 1
+                }
+                if(len > 10){
+                    len = 10
+                }
+
+                return this.isShow ? ('nav' + len + ' show' + len) : ('nav' + len + ' ' + ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'hide' + len)
+            }
+        },
+
+        showActionSheet(options) {
+            const {id, data, duration = 3} = options;
+            Object.assign(this._data, {
+                ...options,
+                id: id,
+                data: data,
+                duration: duration,
+                isShow: true,
+                maskShow: true
+            });
+
+            setTimeout(() => {
+                this.isShow = false
+                setTimeout(() => {
+                    this.maskShow = false
+                }, 500);
+            }, duration * 1000);
+        },
+
+        handleClick() {
+            this.isShow = false
+            setTimeout(() => {
+                this.maskShow = false
+            }, 500);
+        },
+
+        detail: function(index,disabled, uri) {
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: index
+            })
+
+            if(uri !== undefined && !disabled) {
+                //跳转相应页面
+                router.push({
+                    uri: uri
+                });
+            }
+        }
+    }
+</script>

@@ -1,0 +1,222 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="toast" src="../feedback/c_toast"></import>
+<template>
+    <div class="volume" style="{{hStyle}}">
+        <text if="{{status === 'volume-up'}}" class="icon">&#xe84a;</text>
+        <text if="{{status === 'volume-down'}}" class="icon">&#xe821;</text>
+        <text if="{{status === 'volume-off'}}" class="icon">&#xe849;</text>
+        <slider id="{{id}}" class="volume-slider {{type}}" min="0" max="100" value="{{compValue}}" onchange="getValue('compValue')"></slider>
+        <text class="slider-text">{{compValue}}%</text>
+        <toast id="{{id + '_toast'}}"></toast>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+    }
+
+    .volume{
+        width: 684px;
+        margin: 10px 0;
+        align-items: center;
+        justify-content: space-between;
+        &-slider{
+            flex: 1;
+            width:500px;
+            margin: 0 5px;
+        }
+    }
+
+    .default{
+        selected-color: @color-black;
+        block-color: @color-black;
+    }
+    .primary{
+        selected-color: @color-primary;
+        block-color: @color-primary;
+    }
+    .info{
+        selected-color: @color-info;
+        block-color: @color-info;
+    }
+    .warning{
+        selected-color: @color-warning;
+        block-color: @color-warning;
+    }
+    .danger{
+        selected-color: @color-danger;
+        block-color: @color-danger;
+    }
+    .success{
+        selected-color: @color-success;
+        block-color: @color-success;
+    }
+</style>
+
+<script>
+    import volume from '@system.volume'
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        props: {
+            id: {},
+            type: {
+                default: 'info'
+            },
+            showToast: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data: {
+            status: '',
+            compValue: 0
+        },
+
+        onInit() {
+            let _this = this
+            volume.getMediaValue({
+                success: function(data) {
+                    var value = Math.ceil(data.value * 100)
+                    if(value < 0){
+                        value = 0
+                    }
+                    if(value > 100){
+                        value = 100
+                    }
+                    _this.compValue = value
+
+                    if(_this.showToast){
+                        if(value === 0){
+                            _this.$child(_this.id + '_toast').showToast({
+                                text: '当前为静音',
+                                icon: 'volume-off'
+                            })
+                        }else if(value >0 && value < 50){
+                            _this.$child(_this.id + '_toast').showToast({
+                                text: '当前音量:' + _this.compValue + '%',
+                                icon: 'volume-down'
+                            })
+                        }else{
+                            _this.$child(_this.id + '_toast').showToast({
+                                text: '当前音量:' + _this.compValue + '%',
+                                icon: 'volume-up'
+                            })
+                        }
+                    }
+
+                    if(value === 0){
+                        _this.status = 'volume-off'
+                    }else if(value >0 && value < 50){
+                        _this.status = 'volume-down'
+                    }else{
+                        _this.status = 'volume-up'
+                    }
+
+                    _this.$dispatch(_this.id + '_dispatchEvt', {
+                        value: _this.compValue
+                    })
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}`)
+                }
+            })
+        },
+
+        getValue (name, evt) {
+            let _this = this
+            _this[name] = evt.progress
+
+            if(loaderConfig.type.toUpperCase() === 'HUAWEI'){
+                volume.setMediaValue({
+                    volume: _this.compValue/100,//
+                    success: function() {
+                        _this.doSuccess()
+                    },
+                    fail: function(data, code) {
+                        _this.$child(_this.id + '_toast').showToast({
+                            text: '设置音量失败',
+                            icon: 'warning'
+                        })
+                        console.log(`handling fail, code = ${code}`)
+                    }
+                })
+            }else {
+                volume.setMediaValue({
+                    value: _this.compValue/100,//非手机
+                    success: function() {
+                        _this.doSuccess()
+                    },
+                    fail: function(data, code) {
+                        _this.$child(_this.id + '_toast').showToast({
+                            text: '设置音量失败',
+                            icon: 'warning'
+                        })
+                        console.log(`handling fail, code = ${code}`)
+                    }
+                })
+            }
+        },
+
+        doSuccess() {
+            if(this.showToast){
+                if(this.compValue === 0){
+                    this.status = 'volume-off'
+                    this.$child(this.id + '_toast').showToast({
+                        text: '当前为静音',
+                        icon: 'volume-off'
+                    })
+                }else if(this.compValue >0 && this.compValue < 50){
+                    this.status = 'volume-down'
+                    this.$child(this.id + '_toast').showToast({
+                        text: '当前音量:' + this.compValue + '%',
+                        icon: 'volume-down'
+                    })
+                }else{
+                    this.status = 'volume-up'
+                    this.$child(this.id + '_toast').showToast({
+                        text: '当前音量:' + this.compValue + '%',
+                        icon: 'volume-up'
+                    })
+                }
+            }
+
+            if(this.compValue === 0){
+                this.status = 'volume-off'
+            }else if(this.compValue >0 && this.compValue < 50){
+                this.status = 'volume-down'
+            }else{
+                this.status = 'volume-up'
+            }
+
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compValue
+            })
+        }
+    }
+</script>

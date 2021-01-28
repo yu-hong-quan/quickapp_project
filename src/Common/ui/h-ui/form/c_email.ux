@@ -1,0 +1,99 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="h-input" src="./c_input"></import>
+<template>
+    <h-input id="{{id}}" params="{{params}}" type="email" type-icon="envelope" no-border="{{noBorder}}" form-horizontal="{{compFormHorizontal}}"
+              title="{{compTitle}}" name="{{name}}" focus="{{focus}}" maxlength="{{maxlength}}" 
+              placeholder="{{compPlaceholder}}" value="{{value}}" align-right="{{alignRight}}" tip="{{tip}}" 
+              valid="{{valid}}" valid-icon="{{compValidIcon}}" not-blank="{{compNotBlank}}" disabled="{{disabled}}"
+              pattern="^([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|_|.]?)*[a-zA-Z0-9]+.[a-zA-Z]{2,3}$"
+              form-error="{{formError}}" h-style="{{hStyle}}">
+    </h-input>
+</template>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            noBorder: {
+                default: false
+            },
+            formHorizontal: {
+                default: false
+            },
+            title: {
+                default: '邮箱地址'
+            },
+            name: {
+                default: ''
+            },
+            focus: {
+                default: false
+            },
+            maxlength: {
+                default: 255
+            },
+            placeholder: {
+                default: '请输入您的邮箱地址'
+            },
+            value: {
+                default: ''
+            },
+            alignRight: {
+                default: false
+            },
+            tip: {
+                default: ''
+            },
+            valid: {
+                default: ''
+            },
+            validIcon: {
+                default: ''
+            },
+            notBlank: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            disabled:{
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compTitle() {
+                return this.title==='none' ? "" : this.title
+            },
+            compPlaceholder() {
+                return this.placeholder==='none' ? "" : this.placeholder
+            },
+            compFormHorizontal() {
+                return this.noBorder ? true : this.formHorizontal
+            },
+            compNotBlank() {
+                return this.disabled ? false : (this.notBlank==='false' ? false : true)
+            },
+            compValidIcon() {
+                return this.validIcon==='none' ? false : true
+            }
+        }
+    }
+</script>

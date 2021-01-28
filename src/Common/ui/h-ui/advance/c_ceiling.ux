@@ -1,0 +1,77 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="ceiling" style="{{hStyle}}">
+        <list class="ceiling-list">
+            <list-item type="top" ondisappear="handleDisappear" onappear="handleAppear">
+                <slot name="top"></slot>
+            </list-item>
+            <!-- 列表中的吸顶元素 -->
+            <list-item type="ceiling">
+                <slot name="mask"></slot>
+            </list-item>
+            <!-- 普通列表元素 -->
+            <list-item type="common">
+                <slot name="main"></slot>
+            </list-item>
+        </list>
+
+        <!-- 列表中的吸顶元素对应的Mask -->
+        <div class="mask" show="{{showMask}}">
+            <slot name="mask"></slot>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    .ceiling {
+        flex-direction: column;
+        width: 750px;
+    }
+    .mask{
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 750px;
+    }
+</style>
+
+<script>
+  export default {
+      props: {
+          hStyle:{
+              default: ''
+          }
+      },
+      data: {
+          showMask: false,
+          appearCount: 0
+      },
+
+      handleDisappear () {
+          this.showMask = true
+      },
+      handleAppear () {
+          // 加载页面时，所有元素的appear事件都会被触发一次。因此，需要过滤第一次的appear事件
+          if (this.appearCount) {
+              this.showMask = false
+          } else {
+              ++this.appearCount
+          }
+      }
+  }
+</script>

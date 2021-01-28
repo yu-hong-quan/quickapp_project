@@ -1,0 +1,107 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<import name="icon" src="../basic/c_icon"></import>
+<import name="small" src="../text/c_tag_small"></import>
+<template>
+    <flex-row h-style="margin-bottom: 20px;{{compStyle}}{{hStyle}}">
+        <flex-col if="{{isShow}}" width="11" h-style="flex-direction:column;padding:20px;">
+            <div>
+                <icon  type="{{compIconType}}" color="white" h-style="margin-right: 10px;"></icon>
+                <text style="color:#ffffff;">{{title}}</text>
+            </div>
+            <small if="{{!!content}}" text="{{content}}" font="white"></small>
+        </flex-col>
+        <flex-col if="{{isShow}}" width="1">
+            <icon if="{{remove}}" type="remove" color="white" onclick="handleClick"></icon>
+        </flex-col>
+    </flex-row>
+</template>
+
+<script>
+  export default {
+      props: {
+          type:{
+              default: 'info'
+          },
+          title:{},
+          content: {},
+          remove:{
+              default: false
+          },
+          hStyle:{
+              default: ''
+          }
+      },
+      data() {
+          return {
+              isShow: true
+          }
+      },
+      computed: {
+          compType() {
+              var type = ''
+              switch (this.type){
+                  case 'warning':
+                  case 'danger':
+                  case 'success':
+                      type = this.type
+                      break
+                  default:
+                      type = 'info'
+                      break
+              }
+              return type
+          },
+          compIconType() {
+              var icon = ''
+              switch (this.compType){
+                  case 'info':
+                  case 'danger':
+                  case 'warning':
+                      icon = this.compType
+                      break
+                  default:
+                      icon = 'ok'
+                      break
+              }
+              return icon
+          },
+          compStyle() {
+              var style = ''
+              switch (this.type){
+                  case 'warning':
+                      style = 'background-color: #e6a23c;'
+                      break
+                  case 'danger':
+                      style = 'background-color: #f56c6c;'
+                      break
+                  case 'success':
+                      style = 'background-color: #67c23a;'
+                      break
+                  default:
+                      style = 'background-color: #5bc0de;'
+                      break
+              }
+              return style
+          }
+      },
+      handleClick(){
+          this.isShow = false
+      }
+  }
+</script>

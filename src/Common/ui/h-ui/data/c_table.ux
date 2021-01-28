@@ -1,0 +1,470 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<import name="dl" src="./c_list_dl"></import>
+<import name="dt" src="./c_list_dt"></import>
+<import name="dd" src="./c_list_dd"></import>
+<import name="modal" src="../feedback/c_modal"></import>
+<import name="b" src="../text/c_tag_b"></import>
+<template>
+    <div class="table {{borderless ? '' : (bordered ? 'table-border' : '')}}" style="{{hStyle}}">
+        <modal if="{{id !== undefined}}" id="{{id + '_modal'}}"></modal>
+        <flex-row h-style="{{borderless ? '' : (bordered ? 'border-top-color:#dddddd;border-top-width:2px;' : 'border-bottom-color:#dddddd;border-bottom-width:2px;')}}" if="{{data !== undefined}}">
+            <flex-col h-style="{{compTheadThFirstStyle}}" width="1">
+                <b text="#" h-style="{{compTheadTextStyle}}"></b>
+            </flex-col>
+            <block for="{{data.thead}}">
+                <flex-col h-style="{{compTheadThStyle}}" width="{{$item.width}}">
+                    <b text="{{ $t('message.' + $item.key) }}" h-style="{{compTheadTextStyle}}"></b>
+                </flex-col>
+            </block>
+        </flex-row>
+
+        <block for="{{compData}}">
+            <!--数据概要-->
+            <div onclick="handleClick($idx)">
+                <flex-row h-style="{{borderless ? '' : (bordered ? 'border-top-color:#dddddd;border-top-width:2px;' : 'border-bottom-color:#dddddd;border-bottom-width:2px;')}}">
+                    <flex-col h-style="{{$item.thStyle}}" width="1">
+                        <b text="{{$idx + 1}}" h-style="{{$item.textStyle}}"></b>
+                    </flex-col>
+                    <block for="{{tdData in $item.data}}">
+                        <flex-col if="{{tdData.show}}" h-style="{{$item.tdStyle}}" width="{{tdData.width}}">
+                            <text style="{{$item.textStyle}}">{{tdData.value}}</text>
+                        </flex-col>
+                    </block>
+                </flex-row>
+            </div>
+
+            <!--数据详情-->
+            <div class="memo" if="{{$item.open}}" onclick="handleClick($idx)">
+                <dl h-style="margin-top:10px;margin-bottom:10px;">
+                    <block for="{{tdData in $item.data}}">
+                        <div class="memo-item">
+                            <dt width="3" text="{{ $t('message.' + tdData.key) }}:"></dt>
+                            <dd width="9" text="{{tdData.value}}"></dd>
+                        </div>
+                    </block>
+                </dl>
+
+                <div class="memo-operate">
+                    <div if="{{showDelete || showEdit}}" class="memo-operate-left">
+                        <div if="{{showDelete}}" onclick="handleDelete($idx)" style="margin-right: 30px;">
+                            <text class="icon memo-operate-left-delete">&#xe7b8;</text>
+                            <text class="memo-operate-left-delete">{{ $t('message.delete') }}</text>
+                        </div>
+                        <div if="{{showEdit}}" onclick="handleEdit($idx)">
+                            <text class="icon">&#xe793;</text>
+                            <text>{{ $t('message.edit') }}</text>
+                        </div>
+                    </div>
+                    <div class="{{showDelete || showEdit ? 'memo-operate-right' : 'memo-operate-center'}}">
+                        <text class="icon icon-lg">&#xe70f;</text>
+                    </div>
+                </div>
+            </div>
+        </block>
+
+        <slot></slot>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+        &-lg {
+            font-size: 46px;
+        }
+    }
+
+    .table{
+        width: 100%;
+        flex-direction: column;
+        &-border{
+            border-bottom-color: @color-border;
+            border-bottom-width: 2px;
+        }
+    }
+
+
+    .memo{
+        width: 100%;
+        flex-direction: column;
+        margin: 10px 0;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+        background-color: @color-light;
+        &-item{
+            padding: 10px 0;
+        }
+        &-operate{
+            justify-content: space-between;
+            margin: 0 33px;
+            padding: 20px 0;
+            border-top-color: @color-border;
+            border-top-width: 0.5px;
+            &-left{
+                width: 342px;
+                &-delete{
+                    color: @color-danger;
+                }
+            }
+            &-right{
+                width: 114px;
+                justify-content: flex-end;
+            }
+            &-center{
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id: {},
+            data: {},
+            showEdit: {
+                default: false
+            },
+            showDelete: {
+                default: false
+            },
+            current: {
+                default: -1
+            },
+            accordion: {
+                default: false
+            },
+            dark: {//暗黑模式
+                default: false
+            },
+            thead:{//head头
+                default: '' //支持light和dark样式
+            },
+            striped: {//条纹状表格
+                default: false
+            },
+            bordered: {//表格边框
+                default: false
+            },
+            borderless:{//无边框
+                default: false
+            },
+            sm: {//紧缩表格
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compData: [],
+                active: [Number(this.current)],
+                deleteIndex: -1,
+                theadType: ''
+            }
+        },
+
+        computed: {
+            compTheadThFirstStyle() {
+                var style = 'justify-content:center;'
+                style += this.sm ? 'padding-top:10px;padding-bottom:10px;' : 'padding-top:20px;padding-bottom:20px;'
+
+                if(this.theadType !== ''){
+                    style += this.compTypeStyle(this.theadType)
+                }
+
+                if(!this.borderless){
+                    if(this.bordered){
+                        style += 'border-left-width: 1px;border-right-width: 1px;border-color: #dddddd;'
+                    }
+                }
+
+                return style
+            },
+            compTheadThStyle() {
+                var style = 'justify-content:center;'
+                style += this.sm ? 'padding-top:10px;padding-right:5px;padding-bottom:10px;padding-left:5px;' : 'padding-top:20px;padding-right:5px;padding-bottom:20px;padding-left:5px;'
+
+                if(this.theadType !== ''){
+                    style += this.compTypeStyle(this.theadType)
+                }
+
+                if(!this.borderless){
+                    if(this.bordered){
+                        style += 'border-right-width: 1px;border-color: #dddddd;'
+                    }
+                }
+
+                return style
+            },
+            compTheadTextStyle() {
+                var style = ''
+                if(this.theadType !== ''){
+                    style = this.compTypeTextStyle(this.theadType)
+                }
+
+                return style
+            }
+        },
+
+        compTypeStyle(type) {
+            var style = ''
+            switch (type){
+                case 'dark':
+                    style = 'background-color: #222529;'
+                    break
+                case 'dark-striped':
+                    style = 'background-color: #2c2f33;'
+                    break
+                case 'light':
+                    style = 'background-color: #e9ecef;'
+                    break
+                case 'striped':
+                    style = 'background-color: #f3f3f3;'
+                    break
+                case 'primary':
+                    style = 'background-color: #337ab7;'
+                    break
+                case 'success':
+                    style = 'background-color: #67c23a;'
+                    break
+                case 'warning':
+                    style = 'background-color: #e6a23c;'
+                    break
+                case 'danger':
+                    style = 'background-color: #f56c6c;'
+                    break
+                case 'info':
+                    style = 'background-color: #5bc0de;'
+                    break
+                case 'default':
+                default:
+                    style = 'background-color: #ffffff;'
+                    break
+
+            }
+            return style
+        },
+
+        compTypeTextStyle(type) {
+            var style = ''
+            switch (type){
+                case 'dark':
+                case 'dark-striped':
+                case 'primary':
+                case 'success':
+                case 'warning':
+                case 'danger':
+                case 'info':
+                    style = 'color: #ffffff;'
+                    break
+                case 'light':
+                    style = 'color: #4a5056;'
+                    break
+                case 'striped':
+                    style = 'color: #323539;'
+                    break
+                case 'default':
+                default:
+                    break
+
+            }
+            return style
+        },
+
+        onInit() {
+            //监控模态
+            this.$on(this.id + '_modal_dispatchEvt',this.dispatchEvt)
+            this.refresh()
+        },
+
+        dispatchEvt() {
+            console.info(this.deleteIndex)
+            //删除操作被确认，通知上级可以执行远程删除等操作了
+            this.$dispatch(this.id + '_dispatchDeleteEvt', {
+                value: this.deleteIndex
+            })
+        },
+
+        refresh() {
+            var arr = []
+            if(this.data !== undefined){
+                var thead = this.data.thead
+                var tbody = this.data.tbody
+
+                if(tbody !== undefined){
+                    for (var  i = 0; i < tbody.length; i++) {
+                        var itemData = []
+                        for(let v in tbody[i]) {
+                            var key = v
+                            var value = tbody[i][v]
+                            var show = false
+                            var width = 0
+
+                            if(thead !== undefined){
+                                for(var j=0; j< thead.length; j++){
+                                    if(thead[j].key === v){
+                                        show = true
+                                        width = thead[j].width
+                                    }
+                                }
+                            }
+
+                            itemData.push({
+                                key: key,
+                                value: value,
+                                show: show,
+                                width: width
+                            })
+                        }
+
+                        //暗黑模式
+                        var type = this.dark ? 'dark' : ''
+
+                        if(this.striped){//条纹状表格
+                            if(type === 'dark'){//暗黑模式
+                                if(i % 2 === 0){//奇数行
+                                    type = 'dark-striped'
+                                }else{//偶数行
+                                    type = 'dark'
+                                }
+                            }else{//普通模式
+                                if(i % 2 === 0){//奇数行
+                                    type = 'striped'
+                                }else{//偶数行
+                                    type = ''
+                                }
+                            }
+                        }
+
+                        //语义状态化
+                        if(this.data.type !== undefined){
+                            if(this.data.type[i] !== undefined){
+                                if(this.data.type[i] !== '') {
+                                    type = this.data.type[i]
+                                }
+                            }
+                        }
+
+                        //表头样式
+                        this.theadType = this.thead === '' ? '' : this.thead
+                        if(this.dark){
+                            this.theadType = 'dark'
+                        }
+
+                        //样式处理
+                        var thStyle = 'justify-content:center;'
+                        thStyle += this.sm ? 'padding-top:10px;padding-bottom:10px;' : 'padding-top:20px;padding-bottom:20px;'
+
+                        if(type !== ''){
+                            thStyle += this.compTypeStyle(type)
+                        }
+
+                        if(!this.borderless){
+                            if(this.bordered){
+                                thStyle += 'border-left-width: 1px;border-right-width: 1px;border-color: #dddddd;'
+                            }
+                        }
+
+                        var tdStyle = 'justify-content:center;'
+                        tdStyle += this.sm ? 'padding-top:10px;padding-right:5px;padding-bottom:10px;padding-left:5px;' : 'padding-top:20px;padding-right:5px;padding-bottom:20px;padding-left:5px;'
+
+                        if(type !== ''){
+                            tdStyle += this.compTypeStyle(type)
+                        }
+
+                        if(!this.borderless){
+                            if(this.bordered){
+                                tdStyle += 'border-right-width: 1px;border-color: #dddddd;'
+                            }
+                        }
+
+                        var textStyle = this.compTypeTextStyle(type)
+
+                        var item = {
+                            open: this.active.indexOf(i) !== -1,
+                            type: type,
+                            thStyle: thStyle,
+                            tdStyle: tdStyle,
+                            textStyle: textStyle,
+                            data: itemData
+                        }
+
+                        arr.push(item)
+                    }
+                }
+            }
+            this.compData = arr
+        },
+
+        handleClick(index){
+            if(this.accordion){//手风琴模式
+                if(this.active.indexOf(index) !== -1) {
+                    this.active = []
+                }else{
+                    var arr = []
+                    arr.push(index)
+                    this.active = arr
+                }
+            }else{//非手风琴模式
+                if(this.active.indexOf(index) !== -1) {
+                    for(var i=0;i<this.active.length;i++){
+                        if(index === this.active[i]){
+                            this.active.splice(i, 1)
+                            break
+                        }
+                    }
+                }else{
+                    this.active.push(index)
+                }
+            }
+
+            this.refresh()
+        },
+
+        handleDelete(index, evt){
+            evt.stopPropagation()
+
+            this.deleteIndex = index
+
+            this.$child(this.id + '_modal').showModal({
+                text: '您确定删除这条数据吗?',
+                title: '删除确认',
+                id: this.id + '_modal'
+            });
+        },
+        handleEdit(index, evt){
+            evt.stopPropagation()
+            this.$dispatch(this.id + '_dispatchEditEvt', {
+                value: index
+            })
+        }
+    };
+</script>

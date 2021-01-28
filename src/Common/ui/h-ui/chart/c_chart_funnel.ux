@@ -1,0 +1,424 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" ontouchstart="handleTouchstart"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        width: 750px;
+        height: 750px;
+    }
+</style>
+
+<script>
+    import prompt from '@system.prompt'
+    import vibrator from '@system.vibrator'
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id :{},
+            data: {},
+            colors: {},
+            pyramid: {
+                // 金字塔
+                default: false
+            },
+            chartAlign: {
+                // 对齐方式，支持：left,center,right
+                default: 'center'
+            },
+            double: {
+                // 双图
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                align: this.chartAlign,
+                maxValue: 0,
+                len: this.data.length
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                this.drawChart()
+            }, 100);
+        },
+
+        drawChart(){
+            // 获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            // 绘制分类名称
+            var nameY = this.compNameY
+            ctx.font = '20px sans-serif'
+            if(this.pyramid) {
+                for (var i = 0; i < this.len; i++) {
+                    ctx.beginPath()
+                    ctx.fillStyle = this.compData[i]['color']
+                    ctx.moveTo(this.compNameX, nameY)
+                    ctx.fillRect(this.compNameX, nameY, 20, 20)
+                    ctx.closePath()
+                    ctx.fillStyle = 'black'
+                    ctx.fillText(this.compData[i]['name'], this.compNameX + 30, nameY + 20)
+                    nameY += 30
+                }
+            }else{
+                for (var j = this.len-1; j >= 0; j--) {
+                    ctx.beginPath()
+                    ctx.fillStyle = this.compData[j]['color']
+                    ctx.moveTo(this.compNameX, nameY)
+                    ctx.fillRect(this.compNameX, nameY, 20, 20)
+                    ctx.closePath()
+                    ctx.fillStyle = 'black'
+                    ctx.fillText(this.compData[j]['name'], this.compNameX + 30, nameY + 20)
+                    nameY += 30
+                }
+            }
+
+            // 绘制漏斗图
+            var firstStartX = 0
+            var firstEndX = 0
+            var firstY = 0
+            var nextStartX = 0
+            var nextEndX = 0
+            var nextY = 0
+            var nextWidth = 0
+
+            if(this.len > 0) {
+                if (this.len === 1) {
+                    // 仅有一个数据
+                    if (this.double) {
+                        if (this.pyramid) {
+                            ctx.beginPath()
+                            ctx.moveTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop)
+                            ctx.lineTo(this.compLeft, this.compTop + 350)
+                            ctx.lineTo(this.compLeft + 350, this.compTop + 350)
+                            ctx.closePath()
+                            ctx.fillStyle = this.compData[0]['color']
+                            ctx.fill()
+
+                            ctx.beginPath()
+                            ctx.moveTo(this.compLeft, this.compTop + 350)
+                            ctx.lineTo(this.compLeft + 350, this.compTop + 350)
+                            ctx.lineTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop + 700)
+                            ctx.closePath()
+                            ctx.fillStyle = this.compData[0]['color']
+                            ctx.fill()
+                        } else {
+                            ctx.beginPath()
+                            ctx.moveTo(this.compLeft, this.compTop)
+                            ctx.lineTo(this.compLeft + 350, this.compTop)
+                            ctx.lineTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop + 350)
+                            ctx.closePath()
+                            ctx.fillStyle = this.compData[0]['color']
+                            ctx.fill()
+
+                            ctx.beginPath()
+                            ctx.moveTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop + 350)
+                            ctx.lineTo(this.compLeft, this.compTop + 700)
+                            ctx.lineTo(this.compLeft + 350, this.compTop + 700)
+                            ctx.closePath()
+                            ctx.fillStyle = this.compData[0]['color']
+                            ctx.fill()
+                        }
+                    } else {
+                        ctx.beginPath()
+                        if (this.pyramid) {
+                            ctx.moveTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop)
+                            ctx.lineTo(this.compLeft, this.compTop + 600)
+                            ctx.lineTo(this.compLeft + 600, this.compTop + 600)
+                        } else {
+                            ctx.moveTo(this.compLeft, this.compTop)
+                            ctx.lineTo(this.compLeft + 600, this.compTop)
+                            ctx.lineTo(this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight), this.compTop + 600)
+                        }
+                        ctx.closePath()
+                        ctx.fillStyle = this.compData[0]['color']
+                        ctx.fill()
+                    }
+                } else {
+                    // 多条数据
+                    var lineArr = []
+
+                    if (this.double) {
+                        if (this.pyramid) {
+                            // 金字塔 + 漏斗
+
+                            // 金字塔
+                            this.drawPyramid(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,true,false)
+
+                            // 漏斗
+                            this.drawFunnel(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,true,true)
+                        } else {
+                            // 漏斗 + 金字塔
+
+                            // 漏斗
+                            this.drawFunnel(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,true,false)
+
+                            // 金字塔
+                            this.drawPyramid(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,true,true)
+                        }
+                    } else {
+                        if (this.pyramid) {
+                            // 金字塔
+                            this.drawPyramid(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,false,false)
+                        } else {
+                            // 漏斗
+                            this.drawFunnel(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,false,false)
+                        }
+                    }
+                    // 分割线
+                    ctx.beginPath()
+                    for(var k = 0; k < lineArr.length; k++) {
+                        ctx.moveTo(lineArr[k]['startX'], lineArr[k]['y'])
+                        ctx.lineTo(lineArr[k]['endX'], lineArr[k]['y'])
+                    }
+                    ctx.lineWidth = 3
+                    ctx.closePath()
+                    ctx.strokeStyle = '#ffffff'
+                    ctx.stroke()
+                }
+            }
+        },
+
+        // 绘制金字塔
+        drawPyramid(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,double,second) {
+            for(var i = 0; i < this.len; i++) {
+                if (i === 0) {
+                    // 第一个图形
+                    firstStartX = this.align === 'center' ? 375 : (this.align === 'left' ? this.compLeft : this.compRight)
+                    firstEndX = firstStartX
+                    firstY = this.compTop + (second ? 350 : 0)
+                } else {
+                    // 中间图形
+                    firstStartX = nextStartX
+                    firstEndX = nextEndX
+                    firstY = nextY
+
+                }
+
+                nextWidth = (this.compData[i]['value'] / this.compData[this.len - 1]['value']) * (double ? 350 :600)
+                nextStartX = this.align === 'center' ? (375 - nextWidth / 2) : (this.align === 'left' ? this.compLeft : this.compRight - nextWidth)
+                nextEndX = this.align === 'center' ? (375 + nextWidth / 2) : (this.align === 'left' ? this.compLeft + nextWidth : this.compRight)
+                nextY = firstY + this.compStep
+
+                var item = {
+                    startX: nextStartX,
+                    endX: nextEndX,
+                    y: nextY
+                }
+                if(i < this.len){
+                    lineArr.push(item)
+                }
+
+                ctx.beginPath()
+                ctx.moveTo(firstStartX, firstY)
+                ctx.lineTo(firstEndX, firstY)
+                ctx.lineTo(nextEndX, nextY)
+                ctx.lineTo(nextStartX, nextY)
+                ctx.closePath()
+                ctx.fillStyle = this.compData[i]['color']
+                ctx.fill()
+            }
+        },
+
+        // 绘制漏斗
+        drawFunnel(ctx,firstStartX,firstEndX,firstY,nextWidth,nextStartX,nextEndX,nextY,lineArr,double,second) {
+            for(var i = this.len-1; i >= 0; i--) {
+                if (i === this.len - 1) {
+                    // 第一个图形
+                    firstStartX = this.compLeft
+                    firstEndX = firstStartX + (double ? 350 :600)
+                    firstY = this.compTop + (second ? 350 : 0)
+                } else {
+                    // 中间图形
+                    firstStartX = nextStartX
+                    firstEndX = nextEndX
+                    firstY = nextY
+
+                }
+
+                nextWidth = (i === 0) ? 0 : (this.compData[i - 1]['value'] / this.compData[this.len - 1]['value']) * (double ? 350 :600)
+                nextStartX =this.align === 'center' ? (375 - nextWidth / 2) : (this.align === 'left' ? this.compLeft : this.compRight - nextWidth)
+                nextEndX = this.align === 'center' ? (375 + nextWidth / 2) : (this.align === 'left' ? this.compLeft + nextWidth : this.compRight)
+                nextY = firstY + this.compStep
+
+                var item = {
+                    startX: nextStartX,
+                    endX: nextEndX,
+                    y: nextY
+                }
+                if(i > 0){
+                    lineArr.push(item)
+                }
+
+                ctx.beginPath()
+                ctx.moveTo(firstStartX, firstY)
+                ctx.lineTo(firstEndX, firstY)
+                ctx.lineTo(nextEndX, nextY)
+                ctx.lineTo(nextStartX, nextY)
+                ctx.closePath()
+                ctx.fillStyle = this.compData[i]['color']
+                ctx.fill()
+            }
+        },
+
+        // 触摸提示
+        handleTouchstart(event) {
+            var y = event.touches[0].offsetY
+            var i = 999
+
+            // 手机震动反馈
+            vibrator.vibrate({mode: "short"})
+
+            if (this.double) {
+                i = Math.ceil((y-this.compTop) / this.compStep)
+                if (this.pyramid) {
+                    if(i <= this.len){
+                        i--
+                    }else{
+                        i = 2 * this.len - i
+                    }
+                }else{
+                    if(i <= this.len){
+                        i = this.len - i
+                    }else{
+                        i = i - this.len - 1
+                    }
+                }
+            } else {
+                if (this.pyramid) {
+                    i = Math.ceil(((y-this.compTop) * this.len) / 600) - 1
+                } else {
+                    i = this.len - Math.ceil(((y-this.compTop) * this.len) / 600)
+                }
+            }
+
+            if(i < 0){
+                i = 0
+            }
+            if(i > this.len-1){
+                i = this.len-1
+            }
+            // 弹窗显示缩略语的详细说明
+            prompt.showToast({
+                message: this.compData[i]['name'] + ': ' + this.compData[i]['value'],
+                gravity: 'center'
+            })
+        },
+        computed: {
+            compColors() {
+                if(!this.colors) {
+                    var arr = [];
+
+                    if (this.data.length > 5) {
+                        for (var i = 5, len = this.data.length; i < len; i++) {
+                            var a = Math.floor(Math.random() * 256)
+                            var b = Math.floor(Math.random() * 256)
+                            var c = Math.floor(Math.random() * 256)
+                            var color = '#' + fill2(a.toString(16)) + fill2(b.toString(16)) + fill2(c.toString(16))
+                            arr.push(color)
+                        }
+                    }
+
+                    arr.push('#6e9fa6')
+                    arr.push('#334552')
+                    arr.push('#b54038')
+                    arr.push('#ca856b')
+                    arr.push('#9bc5af')
+
+                    return arr
+                }else{
+                    return this.colors
+                }
+            },
+            compData() {
+                // 排序对象数组
+                var arr = []
+
+                this.data.sort(function(a, b){return a.value - b.value})
+                this.maxValue = this.data[this.data.length - 1]['value']
+
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    var item = {
+                        name: this.data[i]['name'],
+                        value: this.data[i]['value'],
+                        color: this.compColors[i]
+                    }
+                    arr.push(item)
+                }
+
+                return arr
+            },
+            compLeft() {
+                if(this.align === 'left'){
+                    return this.double ? 25 : 33
+                }else if(this.align === 'right'){
+                    return this.double ? 375 : 117
+                }else {
+                    return this.double ? 200 : 75
+                }
+            },
+            compRight() {
+                if(this.align === 'left'){
+                    return this.double ? 375 : 633
+                }else if(this.align === 'right'){
+                    return this.double ? 725 : 717
+                }else {
+                    return this.double ? 550 : 675
+                }
+            },
+            compTop() {
+                return this.double ? 25 : (this.pyramid ? 117 : 33)
+            },
+            compBottom() {
+                return this.double ? 725 : (this.pyramid ? 717 : 633)
+            },
+            compNameX() {
+                if(this.align === 'left'){
+                    return this.double ? 600 : 592
+                }else {
+                    return this.double ? 25 : 33
+                }
+            },
+            compNameY() {
+                return this.double ? 25 : (this.pyramid ? 33 : (717 - this.data.length * 30))
+            },
+            compStep() {
+                if(this.double){
+                    return 700 / (this.len * 2)
+                }else{
+                    return 600 / this.len
+                }
+            }
+        }
+    }
+</script>

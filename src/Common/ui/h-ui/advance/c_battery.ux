@@ -1,0 +1,114 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="toast" src="../feedback/c_toast"></import>
+<template>
+    <div style="{{hStyle}}">
+        <text if="{{status === 'battery-high'}}" class="icon">&#xe7d4;</text>
+        <text if="{{status === 'battery-normal'}}" class="icon">&#xe7d3;</text>
+        <text if="{{status === 'battery-low'}}" class="icon warning">&#xe7d3;</text>
+        <text if="{{status === 'battery-charge'}}" class="icon success">&#xe7d5;</text>
+        <text>{{value}}</text>
+        <toast id="{{id + '_toast'}}"></toast>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .success{
+        color: @color-success;
+    }
+</style>
+
+<script>
+    import battery from '@system.battery'
+
+    export default {
+        props: {
+            id: {},
+            showToast: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data: {
+            status: '',
+            value: ''
+        },
+
+        onInit() {
+            let _this = this
+
+            battery.getStatus({
+                success: function(data) {
+                    _this.value = Math.ceil(data.level * 100) + '%'
+                    if(data.charging){
+                        _this.status = 'battery-charge'
+                    }else {
+                        if(data.level <= 0.1){
+                            _this.status = 'battery-low'
+                        }else if(data.level > 0.1 && data.level < 0.5){
+                            _this.status = 'battery-normal'
+                        }else{
+                            _this.status = 'battery-high'
+                        }
+                    }
+
+                    if(_this.showToast){
+                        if(data.charging){
+                            _this.$child(_this.id + '_toast').showToast({
+                                text: '当前电量:' + _this.value,
+                                icon: 'flash'
+                            })
+                        }else {
+                            if(data.level <= 0.1){
+                                _this.$child(_this.id + '_toast').showToast({
+                                    text: '电量仅剩' + _this.value,
+                                    icon: 'warning'
+                                })
+                            }else{
+                                _this.$child(_this.id + '_toast').showToast({
+                                    text: '还有' + _this.value + '电量'
+                                })
+                            }
+                        }
+                    }
+
+                    _this.$dispatch(_this.id + '_dispatchEvt', {
+                        value: data
+                    })
+                },
+                fail: function(data, code) {
+                    console.log(`handling fail, code = ${code}`)
+                }
+            })
+        }
+    }
+</script>

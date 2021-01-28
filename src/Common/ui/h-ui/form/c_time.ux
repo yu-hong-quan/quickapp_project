@@ -1,0 +1,178 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <block if="{{formLabelType === 'form-group-label-horizontal'}}">
+                <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                <text class="form-group-label-horizontal {{validStyle}}"  style="width:35%;">{{compTitle}}：</text>
+            </block>
+            <block if="{{formLabelType === 'form-group-label-default'}}">
+                <div>
+                    <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                    <text class="form-group-label-default {{validStyle}}">{{compTitle}}</text>
+                </div>
+            </block>
+
+            <div class="{{compAlign}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <text if="{{!noIcon}}" class="icon">&#xe859; </text>
+                <picker id="{{id}}" type="time" value="{{compValue}}" disabled="{{disabled}}" onchange="handleChange"></picker>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon{
+        font-family: hui;
+        font-size: 33px;
+    }
+    .align-right{
+        justify-content: flex-end;
+    }
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id:{},
+            params: {},
+            title: {
+                default: '时间'
+            },
+            value: {
+                default: ''
+            },
+            formHorizontal: {
+                default: false
+            },
+            noBorder: {
+                default: false
+            },
+            alignRight: {
+                default: false
+            },
+            notBlank: {
+                default: ''
+            },
+            noIcon:{
+                default: false
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            disabled:{
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                compInit: true
+            }
+        },
+
+        onInit () {
+            if(this.compValue === '') {
+                const date = new Date()
+                const H = date.getHours()
+                const m = date.getMinutes()
+                this.compValue = fill2(H.toString()) + ':' + fill2(m.toString())
+            }
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "form-group-control-horizontal" : "form-group-control-default"
+            },
+            borderType() {
+                return this.noBorder ? '' : 'form-control-border-default'
+            },
+            compTitle() {
+                return this.title==='none' ? "" : this.title
+            },
+            compAlign(){
+                return this.alignRight ? 'align-right' : ''
+            },
+            compNotBlank() {
+                return (this.disabled || this.notBlank==='false') ? false : true
+            },
+            validStyle() {
+                if (this.compValid === 'has-success') {
+                    return "success"
+                } else if (this.compValid === 'has-warning') {
+                    return "warning"
+                } else if (this.compValid === 'has-error') {
+                    return "danger"
+                } else {
+                    return (this.compInit || this.valid === 'none') ? "" : "success"
+                }
+            }
+        },
+
+        handleChange (e) {
+            this.compValid = ""
+            this.formError = ""
+            this.compInit = false
+
+            this.compValue = fill2(e.hour.toString()) + ':' + fill2(e.minute.toString())
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compValue
+            })
+            this.params[this.id] = this.compValue
+        }
+    }
+</script>

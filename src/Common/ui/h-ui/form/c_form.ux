@@ -1,0 +1,172 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="message" src="../feedback/c_message"></import>
+<import name="abbr" src="../advance/c_abbr"></import>
+<template>
+    <div class="form" style="{{hStyle}}">
+        <slot></slot>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+            <abbr text="[ 详情 ]" title="{{errMsg}}"></abbr>
+        </div>
+
+        <message id="{{id + '_message'}}"></message>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+    .icon {
+        font-family: hui;
+        font-size: 33px;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .form{
+        flex-direction: column;
+        width: 684px;
+    }
+</style>
+
+<script>
+    import fetch from '@system.fetch'
+    import { gatewayConfig } from '../../../utils/config'
+
+    export default {
+        props: {
+            id:{},
+            action:{
+                default: ''
+            },
+            params: {},
+            header: {},
+            method: {
+                default: 'POST'
+            },
+            responseType: {
+                default: 'json'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                formError: '',
+                errMsg: ''
+            }
+        },
+
+        async submit () {
+            try {
+                this.$child(this.id + '_message').showMessage({
+                    text: '表单提交中，请稍候....',
+                    type: 'warning'
+                });
+                const response = await fetch.fetch({
+                    url: gatewayConfig.BaseApi + this.action,
+                    data: this.params,
+                    header: this.header,
+                    method: this.method,
+                    responseType: this.responseType
+                })
+
+                if(response.data.data.code !== undefined){ //服务端返回代码处理
+                    var apiCode = response.data.data.code
+                    switch(apiCode){
+                        case '0': //返回正确结果
+                            this.formError = ''
+                            this.errMsg = ''
+
+                            this.$child(this.id + '_message').showMessage({
+                                text: '表单提交成功。',
+                                type: 'success'
+                            });
+                            break
+                        case '-1': //服务端表单基本校验未通过
+                            this.formError = '服务端表单校验未通过。'
+                            this.errMsg = response.data.data.data
+
+                            this.$child(this.id + '_message').showMessage({
+                                text: '表单提交失败。',
+                                type: 'danger'
+                            });
+                            break
+                        default://服务端业务校验未通过
+                            this.formError = '服务端业务校验未通过。'
+                            this.errMsg = '错误编码：' + apiCode + ' 错误原因：' + response.data.data.data
+
+                            this.$child(this.id + '_message').showMessage({
+                                text: '表单提交失败。',
+                                type: 'danger'
+                            });
+                            break
+                    }
+                }else {
+                    console.log(JSON.stringify(response.data))
+                    this.formError = response.data.code + '错误'
+                    this.errMsg = JSON.stringify(response.data.data)
+
+                    this.$child(this.id + '_message').showMessage({
+                        text: '表单提交失败。',
+                        type: 'danger'
+                    });
+                }
+
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: response.data
+                })
+            } catch(err) {
+                var error = ''
+                switch (err.code) {
+                    case 201:
+                        error = '表单提交失败，原因：用户拒绝。'
+                        break
+                    case 202:
+                        error = '表单提交失败，原因：参数非法。'
+                        break
+                    case 202:
+                        error = '表单提交失败，原因：服务不可用。'
+                        break
+                    case 202:
+                        error = '表单提交失败，原因：请求超时。'
+                        break
+                    case 200:
+                    default:
+                        error = '表单提交失败。'
+                        break
+                }
+
+                this.formError = error
+                this.errMsg = err.data
+
+                this.$child(this.id + '_message').showMessage({
+                    text: error,
+                    type: 'danger'
+                });
+            }
+        }
+    }
+</script>

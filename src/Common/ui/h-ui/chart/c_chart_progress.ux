@@ -1,0 +1,177 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" style="{{compStyle}}"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id :{},
+            data: {},
+            type: {
+                // line/circle/gauge
+                default: 'line'
+            },
+            strokeWidth: {
+                default: ''
+            },
+            textInside: {
+                // 进度条显示文字内置在进度条内（只在 type=line 时可用）
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                this.drawChart()
+            }, 100);
+        },
+
+        drawChart(){
+            // 获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            const p = Math.PI
+            var i = 0
+            ctx.lineWidth = this.compWidth
+
+            if(this.type === 'line'){
+                var y = (60 + this.compWidth)/2
+
+                ctx.lineCap = 'round'
+                ctx.font = '20px sans-serif'
+                for(i=0;i<this.data.length;i++){
+                    ctx.beginPath()
+                    ctx.moveTo(this.compWidth , y)
+                    ctx.lineTo(684 - this.compWidth , y)
+                    ctx.strokeStyle = '#ebeef4'
+                    ctx.stroke()
+                    ctx.closePath()
+
+                    ctx.beginPath()
+                    ctx.moveTo(this.compWidth , y)
+                    ctx.lineTo(this.compWidth + (684 - 2 * this.compWidth) * (this.data[i]['value']/100) , y)
+                    ctx.strokeStyle = this.lineColor(this.data[i]['value'])
+                    ctx.stroke()
+                    ctx.closePath()
+
+                    var textX = this.compWidth + (684 - 2 * this.compWidth) * (this.data[i]['value']/100)
+
+                    if(textX - this.data[i]['name'].length * 20 < 10){
+                        textX = this.compWidth
+                        ctx.textAlign = 'left'
+                    }else{
+                        ctx.textAlign = 'right'
+                    }
+
+                    if(this.textInside){
+                        ctx.textBaseline = 'middle'
+                        ctx.fillStyle = this.data[i]['value'] <=0 ? 'black' : 'white'
+                    }else{
+                        ctx.textBaseline = 'alphabetic'
+                        ctx.fillStyle = 'black'
+                    }
+
+                    ctx.fillText(this.data[i]['name'] + ' ' + this.data[i]['value'] + '%', textX, this.textInside ? y : y+(this.compWidth/2)+24)
+
+                    y += 60 + this.compWidth
+                }
+            }else{
+                var centerX = 171
+                var centerY = 171
+                ctx.font = '30px sans-serif'
+                ctx.textAlign = 'center'
+                ctx.lineCap = 'round'
+                for(i=0;i<this.data.length;i++){
+                    centerX = (i % 2 === 0) ? 171 : 513
+                    ctx.beginPath()
+                    if(this.type === 'circle'){
+                        ctx.arc(centerX, centerY, 150, 0,p * 2, false)
+                    }else{
+                        ctx.arc(centerX, centerY, 150, 0.75 * p,2.25 * p, false)
+                    }
+
+                    ctx.strokeStyle = '#ebeef4'
+                    ctx.stroke()
+                    ctx.closePath()
+
+                    ctx.beginPath()
+                    if(this.type === 'circle') {
+                        ctx.arc(centerX, centerY, 150, 1.5 * p, 1.5 * p + (p * this.data[i]['value']) / 50, false)
+                    }else{
+                        ctx.arc(centerX, centerY, 150, 0.75 * p,0.75 * p + ((this.data[i]['value'] <=0) ? 0.01*p : (3 * p * this.data[i]['value'])/200), false)
+                    }
+                    ctx.strokeStyle = (this.data[i]['value'] <=0) ? '#ebeef4' : this.lineColor(this.data[i]['value'])
+                    ctx.stroke()
+                    ctx.closePath()
+
+                    ctx.fillText(this.data[i]['name'] + ' ' + this.data[i]['value'] + '%', centerX, centerY)
+
+                    if(i % 2 === 1){
+                        centerY += 342
+                    }
+                }
+            }
+        },
+
+        lineColor(value){
+          if(value<=0){
+              return '#ebeef4'
+          }else if(value > 0 && value<=25) {
+              return '#f56c6c'
+          }else if(value > 25 && value <= 50) {
+              return '#e6a23c'
+          }else if(value > 50 && value < 100) {
+              return '#5bc0de'
+          }else{
+              return '#67c23a'
+          }
+        },
+        computed: {
+            compStyle() {
+                var width = 0
+                var height = 0
+
+                if(this.type === 'line'){
+                    width = 684
+                    height = (this.compWidth+60) * this.data.length
+                }else{
+                    width = 684
+                    height = 342 * Math.ceil(this.data.length/2)
+                }
+
+                return 'width:' + width + 'px;height:' + height + 'px;'
+            },
+            compWidth() {
+                return this.strokeWidth==='' ? 12 : Number(this.strokeWidth)
+            }
+        }
+    }
+</script>

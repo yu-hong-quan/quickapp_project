@@ -1,0 +1,314 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <div if="{{formLabelType === 'form-group-label-horizontal'}}"  style="width:35%;">
+                <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                <label if="{{compTitle!==''}}" target="input" class="form-group-label-horizontal {{validStyle}}">{{compTitle}}：</label>
+            </div>
+            <div if="{{formLabelType === 'form-group-label-default'}}">
+                <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                <label if="{{compTitle!==''}}" target="input" class="form-group-label-default {{validStyle}}">{{compTitle}}</label>
+            </div>
+
+            <div class="{{borderType}} picker" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <div>
+                    <text if="{{compNotBlank && compTitle===''}}" class="red"> * </text>
+                    <text class="icon" style="color:{{compValue}};">&#xe83e;</text>
+                    <text>{{compValue}}</text>
+                </div>
+                <div>
+                    <text show="{{showPanel}}" class="icon" onclick="handelRevert">&#xe731; </text>
+                    <text show="{{showPanel}}" class="icon" onclick="handleChange"> &#xe709;</text>
+                    <text show="{{!showPanel}}" class="icon" onclick="handleClick">&#xe7c3;</text>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-panel" show="{{showPanel}}">
+            <stack>
+                <div class="color-panel-picker" style="{{compColor}}"></div>
+                <div class="color-panel-value"></div>
+                <div class="color-panel-saturation" ontouchmove="handlePickermove">
+                    <div class="color-panel-icon" style="{{compPickerIcon}}"></div>
+                </div>
+            </stack>
+            <div class="color-panel-slider"  ontouchmove="handleTouchmove">
+                <text class="icon content" style="{{sliderIcon}}">&#xe6f2;</text>
+                <div class="color-panel-slider-bg"></div>
+                <text class="icon content" style="{{sliderIcon}}">&#xe6f5;</text>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .picker{
+        padding: 12px;
+        justify-content: space-between;
+    }
+    .icon{
+        font-family: hui;
+        font-size: 33px;
+    }
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+    .color-panel{
+        margin-top:20px;
+        flex-direction: column;
+        align-items: center;
+        &-picker{
+            width: 600px;
+            height: 600px;
+        }
+        &-saturation{
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(to top, #000000, rgba(0, 0, 0, 0))
+        }
+        &-value{
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(120deg, #FFFFFF 0, rgba(255, 255, 255, 0.9) 15%,  rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 0))
+        }
+        &-icon{
+            width: 20px;
+            height: 20px;
+            border-color: #ffffff;
+            border-width: 2px;
+            border-radius: 10px;
+         }
+        &-slider{
+            flex-direction: column;
+            width:634px;
+            &-bg{
+                 width:600px;
+                 height:40px;
+                 margin-left: 17px;
+                 background: linear-gradient(90deg, #FF0000 0, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #FF0000);
+             }
+        }
+    }
+</style>
+
+<script>
+    import { rgbTohsv, hsvToHexColor } from '../../../utils/color'
+
+    export default {
+        props: {
+            id:{},
+            params: {},
+            title: {
+                default: '选择颜色'
+            },
+            value: {
+                default: '#ff0000'
+            },
+            formHorizontal: {
+                default: false
+            },
+            noBorder: {
+                default: false
+            },
+            notBlank: {
+                default: ''
+            },
+            disabled:{
+                default: false
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                compH: 0,
+                compS: 1,
+                compV: 1,
+                compOldValue: this.value,
+                compOldH:0,
+                compOldS:1,
+                compOldV:1,
+                sliderIcon: '',
+                pickerBg: this.value,
+                showPanel: false,
+                compInit: true
+            }
+        },
+
+        onInit() {
+            this.compH = rgbTohsv(this.compValue)
+            this.sliderIcon = 'margin-left: ' + (this.compH/360)*600 + 'px;'
+            this.pickerBg = hsvToHexColor(this.compH, 1, 1)
+        },
+
+        computed: {
+            formHorizontalType() {
+                return this.formHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.formHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.formHorizontal ? "form-group-control-horizontal" : "form-group-control-default"
+            },
+            borderType() {
+                return this.noBorder ? '' : 'form-control-border-default'
+            },
+            compTitle() {
+                return this.title==='none' ? "" : this.title
+            },
+            compNotBlank() {
+                return (this.disabled || this.notBlank==='false') ? false : true
+            },
+            compColor() {
+                return 'background-color: ' + this.pickerBg + ';'
+            },
+            compPickerIcon() {
+                var left = this.compS * 600
+                if(left > 580){
+                    left = 580
+                }
+                var top = (1 - this.compV) * 600
+                if(top > 580){
+                    top = 580
+                }
+                return 'margin-left: ' + left + 'px;margin-top: ' + top + 'px;'
+            },
+            validStyle() {
+                if (this.compValid === 'has-success') {
+                    return "success"
+                } else if (this.compValid === 'has-warning') {
+                    return "warning"
+                } else if (this.compValid === 'has-error') {
+                    return "danger"
+                } else {
+                    return (this.compInit || this.valid === 'none') ? "" : "success"
+                }
+            }
+        },
+
+        handleTouchmove(e) {
+            var x = e.touches[0].clientX - 75
+
+            if(x < 0){
+                x = 0
+            }
+
+            if(x > 600){
+                x = 600
+            }
+
+            this.compH = (x / 600) * 360
+            this.sliderIcon = 'margin-left: ' + x + 'px;'
+            this.pickerBg = hsvToHexColor((x / 600) * 360, 1, 1)
+            this.compValue = hsvToHexColor(this.compH, this.compS, this.compV)
+        },
+
+        handlePickermove(e){
+            var x = e.touches[0].offsetX
+            if(x < 0){
+                x = 0
+            }
+
+            if(x > 600){
+                x = 600
+            }
+            var y = 600 - e.touches[0].offsetY
+            if(y < 0){
+                y = 0
+            }
+
+            if(y > 600){
+                y = 600
+            }
+            this.compS = x/600
+            this.compV = y/600
+            this.compValue = hsvToHexColor(this.compH, this.compS, this.compV)
+        },
+
+        handleClick(){
+            if(!this.disabled && !this.showPanel){
+                this.showPanel = true
+                this.compOldValue = this.compValue
+                this.compOldH = this.compH
+                this.compOldS = this.compS
+                this.compOldV = this.compV
+            }
+        },
+
+        // 还原
+        handelRevert(e){
+            this.compValue = this.compOldValue
+            this.compH = this.compOldH
+            this.compS = this.compOldS
+            this.compV = this.compOldV
+            this.showPanel = false
+            this.sliderIcon = 'margin-left: ' + (this.compH/360)*600 + 'px;'
+            this.pickerBg = hsvToHexColor(this.compH, 1, 1)
+        },
+
+        // 确定
+        handleChange (e) {
+            this.compValid = ""
+            this.formError = ""
+            this.compInit = false
+
+            this.compOldValue = this.compValue
+            this.compOldH = this.compH
+            this.compOldS = this.compS
+            this.compOldV = this.compV
+            this.showPanel = false
+
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compValue
+            })
+            this.params[this.id] = this.compValue
+        }
+    }
+</script>

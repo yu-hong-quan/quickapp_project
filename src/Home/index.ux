@@ -1,0 +1,185 @@
+<!-- <import name="video-player" src="../Common/ui/h-ui/media/c_video_player"></import> -->
+<import name="news-image" src="../Common/ui/h-ui/scene/c_news_image"></import>
+<template>
+  <div id="Home">
+    <div class="item-container">
+      <div class="swiper-container">
+        <swiper
+          class="swiper swiper-animation"
+          autoplay="{{autoPlay}}"
+          interval="{{sliderValue}}"
+          indicator="{{indicator}}"
+          duration="{{durationValue}}"
+          vertical="{{isVertical}}"
+          loop="{{loopPlay}}"
+          enableswipe="{{isSwipe}}"
+          onchange="selectSwiperIndex"
+        >
+          <div class="Home_Contaner" enablevideofullscreencontainer="{{true}}">
+            <div class="Home_TextInfo">
+              <text class="homeTitle">{{ homeTitle }}</text>
+              <text class="homeDetails">{{ homeDetails }}</text>
+              <div class="AnimationBox">
+                <text class="rightan">滑动查看更多</text>
+                <img src="../Common/xia.png" alt class="xiaImg" />
+              </div>
+            </div>
+            <!-- <video-player src="https://ss0.bdstatic.com/-0U0bnSm1A5BphGlnYG/cae-legoup-video-target/93be3d88-9fc2-4fbd-bd14-833bca731ca7.mp4" autoplay="{{autoPlayBln}}" controls="{{showControls}}" orientation="portrait"></video-player> -->
+            <!-- <video
+              src="https://cdn.qinxiaozhan.com/ad_device/0101000016/0/middle_videos/0.mp4"
+              autoplay="{{autoPlayBln}}"
+              orientation="portrait"
+            ></video> -->
+            <img src="../Common/homeBG.jpg" class="bgImg" />
+          </div>
+          <div class="Home_Details">
+            <news-image data="{{data}}"></news-image>
+          </div>
+        </swiper>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import router from '@system.router'
+import prompt from '@system.prompt'
+export default {
+  private: {
+    homeTitle: '铸科技之典范、行世间之风采',
+    homeDetails: '《用 “科技” 创造未来》',
+    showControls: false,
+    autoPlayBln: true,
+    videoUrl: '../Common/触摸灯.mp4',
+    autoPlay: false,
+    indicator: false,
+    loopPlay: false,
+    sliderValue: 1000,
+    durationValue: 1000,
+    isVertical: true,
+    isSwipe: true,
+    data: [
+      {
+        pic: "https://h-ui.obs.cn-south-1.myhuaweicloud.com/image/news_image.jpg",
+        memo: "两姓联姻，一堂缔约，良缘永结，匹配同称。看此日桃花灼灼，宜室宜家，卜他年瓜瓞绵绵，尔昌尔炽。谨以白头之约，书向鸿笺，好将红叶之盟，载明鸳谱，此证。"
+      },
+      {
+        pic: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fattachments.gfan.com%2Fforum%2F201501%2F15%2F105418z33cyjacahzodgc3.jpg&refer=http%3A%2F%2Fattachments.gfan.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1614393559&t=6d3bbaffc2f0b900cc9386debc7df12a",
+        memo: "生活总是让我们遍体鳞伤，但请相信，你今天受的苦，吃的亏，担的责，扛的罪，忍的痛，到最后都会变成光，照亮你的路。"
+      },
+      {
+        pic: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fc-ssl.duitang.com%2Fuploads%2Fblog%2F202010%2F05%2F20201005100720_uyWNU.thumb.400_0.jpeg&refer=http%3A%2F%2Fc-ssl.duitang.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1614394079&t=b5e999b8cf7e4e3bd1fac13970db42e5",
+        memo: "十几年相思加两斤黄酒，才把这句喜欢说出口，明日可愿随我柳下走，满头杨花共白首。"
+      }
+    ]
+  },
+  onInit() {
+
+  },
+  selectSwiperIndex(index) {
+    console.log(index)
+  },
+}
+</script>
+<style lang="less">
+@import '../Common/styles/container.less';
+#Home {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.item-container {
+  width: 100%;
+  height: 100%;
+}
+.swiper-container {
+  flex-direction: column;
+}
+.swiper {
+  width: 100%;
+  flex-direction: column;
+  height: 100%;
+}
+.Home_Contaner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* background-color: rgba(0, 0, 0, 0.6); */
+}
+.Home_TextInfo {
+  z-index: 99;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.homeTitle {
+  color: #fff;
+  font-size: 50px;
+  margin-bottom: 10px;
+}
+.homeDetails {
+  color: #fff;
+  font-size: 40px;
+}
+video,
+.bgImg {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+.AnimationBox {
+  animation-name: rightan;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  top: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+}
+.rightan {
+  margin-bottom: 10px;
+  display: flex;
+  width: 180px;
+  font-size: 30px;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.884);
+}
+.xiaImg {
+  width: 50px;
+  height: 50px;
+}
+
+/*箭头动画*/
+@keyframes rightan {
+  from {
+    bottom: 50px;
+    opacity: 0;
+  }
+  to {
+    bottom: 0px;
+    opacity: 1;
+  }
+}
+
+.Home_Details {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow-y: auto;
+  position: relative;
+}
+.news{
+  position: static;
+}
+</style>

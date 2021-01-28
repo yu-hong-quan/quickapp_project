@@ -1,0 +1,164 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div class="c-container" style="{{hStyle}}">
+        <block for="{{compData}}">
+            <div class="collapse">
+                <div class="collapse-top" onclick="handleClick($idx)">
+                    <div class="collapse-top-title">
+                        <div if="{{$item.icon !== ''}}" class="collapse-top-title-icon {{$item.bgColor}}">
+                            <icon type="{{$item.icon}}" size="36" color="white"></icon>
+                        </div>
+                        <avatar if="{{$item.image !== ''}}" src="{{$item.image}}" size="46" h-style="margin-right:10px;"></avatar>
+                        <text if="{{$item.title !== ''}}">{{$item.title}}</text>
+                    </div>
+                    <div class="collapse-top-button">
+                        <icon if="{{!$item.open}}" type="chevron-down" size="46"></icon>
+                        <icon if="{{$item.open}}" type="chevron-up" size="46"></icon>
+                    </div>
+                </div>
+
+                <div show="{{$item.open}}" class="collapse-memo">
+                    <text if="{{$item.memo !== ''}}">{{$item.memo}}</text>
+                </div>
+            </div>
+        </block>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .c-container{
+        flex-direction: column;
+        width: 100%;
+    }
+    .collapse {
+        flex-direction: column;
+        width: 100%;
+        border-color: #cccccc;
+        border-bottom-width: 0.5px;
+        &-top{
+            justify-content: space-between;
+            &-title{
+                line-height: @font-size-base * 1.8;
+                align-items: center;
+                & text{
+                    padding-top: 29px;
+                    padding-bottom: 29px;
+                    color: #1a1a1a;
+                    font-size: 31px;
+                    font-weight: bolder;
+                }
+                &-icon{
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 23px;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right:10px;
+                }
+            }
+            &-button{
+                width: 60px;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        &-memo{
+            padding: 10px;
+        }
+    }
+    
+</style>
+
+<script>
+    export default {
+        props: {
+            data: {},
+            current: {
+                default: 999
+            },
+            accordion: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                active: [Number(this.current)]
+            }
+        },
+
+        computed: {
+            compData() {
+                var arr = []
+                for (var i = 0, len = this.data.length; i < len; i++) {
+
+                    var title = !this.data[i]['title'] ? '' : this.data[i]['title']
+                    var memo = !this.data[i]['memo'] ? '' : this.data[i]['memo']
+                    var icon = !this.data[i]['icon'] ? '' : this.data[i]['icon']
+                    var bgColor = !this.data[i]['bgColor'] ? 'bg-info' : this.data[i]['bgColor']
+                    var image = !this.data[i]['image'] ? '' : this.data[i]['image']
+                    var open= false
+                    if(this.active.indexOf(i) !== -1){
+                        open = true
+                    }
+
+                    var item = {
+                        title: title,
+                        memo: memo,
+                        icon: icon,
+                        bgColor: bgColor,
+                        image: image,
+                        open: open
+                    }
+                    arr.push(item)
+                }
+
+                return arr
+            }
+        },
+
+        handleClick(index){
+            if(this.accordion){//手风琴模式
+                if(this.active.indexOf(index) !== -1) {
+                    this.active = []
+                }else{
+                    var arr = []
+                    arr.push(index)
+                    this.active = arr
+                }
+            }else{//非手风琴模式
+                if(this.active.indexOf(index) !== -1) {
+                    for(var i=0;i<this.active.length;i++){
+                        if(index === this.active[i]){
+                            this.active.splice(i, 1)
+                            break
+                        }
+                    }
+                }else{
+                    this.active.push(index)
+                }
+            }
+        }
+    };
+</script>

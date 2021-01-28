@@ -1,0 +1,74 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="h4" src="../text/c_h4"></import>
+<import name="p" src="../text/c_p"></import>
+<import name="audio-player" src="..//media/c_audio_player"></import>
+<template>
+    <!-- 新闻详情组件 -->
+    <div class="container" style="{{hStyle}}">
+
+        <h4 h-style="color: #1A1A1A;" text="{{title}}"></h4>
+
+        <div>
+            <text class="news-creator">{{creator}}</text>
+            <text class="news-creationTime">{{creationTime}}</text>
+        </div>
+
+        <block for="{{data}}">
+            <p h-style="color: #000000;font-size: 35.4px;line-height: 60.4px;" if="{{$item.type==='text'}}" text="{{$item.value}}"></p>
+            <image if="{{$item.type==='image'}}" src="{{$item.value}}"></image>
+            <video if="{{$item.type==='video'}}" src="{{$item.value}}" poster="{{$item.poster}}"></video>
+            <audio-player if="{{$item.type==='audio'}}" src="{{$item.value}}"></audio-player>
+        </block>
+    </div>
+
+</template>
+
+<style lang="less">
+    .container {
+        width: 684px;
+        flex-direction: column;
+    }
+
+    .news-creator {
+        font-size: 25px;
+        color: #BABABA;
+        margin-right: 20px;
+        margin-bottom: 20px;
+    }
+    .news-creationTime {
+        font-size: 25px;
+        color: #a2a2a2;
+        margin-bottom: 20px;
+    }
+    video {
+        height:384px;
+    }
+</style>
+
+<script>
+  export default {
+    props: {
+        title: {},
+        creator: {},
+        creationTime: {},
+        data: {},
+        hStyle:{
+            default: ''
+        }
+    }
+  }
+</script>

@@ -1,0 +1,103 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="message" src="../feedback/c_message"></import>
+<import name="mobile" src="../form/c_mobile"></import>
+<import name="h-button" src="../basic/c_button"></import>
+<template>
+    <div class="sms" style="{{hStyle}}">
+        <mobile id="address" title="目标号码" placeholder="请输入短信接收人号码" value="{{address}}" params="{{params}}"></mobile>
+        <textarea class="sms-content" placeholder="{{contentPlaceholder}}" maxlength="70" onchange="handleChange">{{content}}</textarea>
+        <h-button id="btn" text="发送短信" type="{{type}}" block="true" onclick="handleSend"></h-button>
+        <message id="message"></message>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .sms{
+        width: 100%;
+        flex-direction: column;
+        &-content{
+            padding: 10px;
+            font-size: 31px;
+            width: 100%;
+            height: 180px;
+            border-width: 2px;
+            border-radius: 8px;
+            border-color: @color-border;
+        }
+    }
+</style>
+
+<script>
+    import sms from '@system.sms'
+
+    export default {
+        props: {
+            data: {},
+            type: {
+                default: 'primary'
+            },
+            contentPlaceholder: {
+                default: '短信内容'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data: {
+            params: {},
+            content: '',
+            address: ''
+        },
+
+        onInit(){
+            this.address = !!this.data.address ? this.data.address : ''
+            this.content = !!this.data.content ? this.data.content : ''
+
+            this.$on('address_dispatchEvt',this.dispatchEvt)
+        },
+
+        dispatchEvt(evt) {
+            this.address = evt.detail.value
+        },
+
+        handleChange(e){
+            this.content = e.text
+        },
+        handleSend(){
+            let _this = this
+            sms.send({
+                address: _this.address,
+                content: _this.content,
+                success: function () {
+                    _this.$child('message').showMessage({
+                        text: '短信发送成功',
+                        type: 'success'
+                    });
+                },
+                fail: function (data, code) {
+                    _this.$child('message').showMessage({
+                        text: '短信发送失败',
+                        type: 'danger'
+                    });
+                }
+            })
+        }
+    }
+</script>

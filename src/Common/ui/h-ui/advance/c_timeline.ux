@@ -1,0 +1,77 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<import name="icon" src="../basic/c_icon"></import>
+<import name="b" src="../text/c_tag_b"></import>
+<import name="small" src="../text/c_tag_small"></import>
+<template>
+    <flex-row wrap="wrap" align="top" h-style="{{hStyle}}">
+        <block for="item in compData">
+            <flex-col width="1" class="icon">
+                <icon type="{{item.type}}" color="{{item.color}}" size="40"></icon>
+            </flex-col>
+            <flex-col width="11">
+                <b text="{{item.title}}"></b>
+            </flex-col>
+            <flex-col width="1" class="icon">
+                <div style="{{item.style}}"></div>
+            </flex-col>
+            <flex-col width="11" style="flex-direction: column;">
+                <block for="{{contentitem in item.content}}">
+                    <small text="{{contentitem}}"></small>
+                </block>
+            </flex-col>
+        </block>
+    </flex-row>
+</template>
+
+<style lang="less">
+    .icon {
+        padding-top:10px;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            data: {},
+            current: {
+                default: 999
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+        computed: {
+            compData() {
+                var arr = []
+                for(var i=0;i<this.data.length;i++) {
+                    var len = i<this.data.length-1 ? (!this.data[i]['content'] ? 1 : this.data[i]['content'].length) : 0
+                    var item = {
+                        title: this.data[i]['title'],
+                        type: !this.data[i]['type'] ? 'time' : this.data[i]['type'],
+                        color: (i >= this.current) ? 'sub' : (!this.data[i]['color'] ? 'info' : this.data[i]['color']),
+                        content: !this.data[i]['content']  ? [] : this.data[i]['content'],
+                        style: 'width:16px;height:' + len * 30 + 'px;border-color: #e4ecf3;border-style: ' + ((i >= this.current) ? 'dashed' :  'solid') + ';border-right-width: 1px;'
+                    }
+                    arr.push(item)
+                }
+                return arr;
+            }
+        }
+    }
+</script>

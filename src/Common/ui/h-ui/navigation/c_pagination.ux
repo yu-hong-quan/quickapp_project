@@ -1,0 +1,153 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="pagination" style="{{hStyle}}">
+        <div class="pagination-button {{current === 1 ? 'pagination-button-disabled' : ''}}" onclick="handlePrev">
+            <text show = "{{paginationMode !== '2'}}" class="icon {{current === 1 ? 'pagination-text-disabled' : ''}}">&#xe6f4; </text>
+            <text show = "{{paginationMode !== '3'}}" class="{{current === 1 ? 'pagination-text-disabled' : ''}}">{{prevText}}</text>
+        </div>
+
+        <div class="pagination-info">
+            <text class="pagination-info-current">{{current}}</text>
+            <text> / {{totalPages}}</text>
+        </div>
+
+        <div class="pagination-button {{current === totalPages ? 'pagination-button-disabled' : ''}}" onclick="handleNext">
+            <text show = "{{paginationMode !== '3'}}" class="{{current === totalPages ? 'pagination-text-disabled' : ''}}">{{nextText}}</text>
+            <text show = "{{paginationMode !== '2'}}" class="icon {{current === totalPages ? 'pagination-text-disabled' : ''}}"> &#xe6f3;</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon {
+        font-family: hui;
+    }
+
+    .pagination {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin: 10px 0;
+        &-button{
+            padding: 10px;
+            border-width: 2px;
+            border-radius: 8px;
+            border-color: @color-border;
+            &-disabled{
+                background-color: @color-disabled;
+            }
+        }
+        &-text{
+            &-disabled{
+                color: @color-sub;
+            }
+        }
+        &-info{
+            &-current{
+                color: @color-info;
+            }
+        }
+    }
+</style>
+
+<script>
+    import vibrator from '@system.vibrator'
+
+    export default {
+        props: {
+            id: {},
+            total: {
+                default: 0
+            },
+            page:{
+                default: 0
+            },
+            size: {
+                default: 10
+            },
+            prevText: {
+                default: '上一页'
+            },
+            nextText: {
+                default: '下一页'
+            },
+            paginationMode: {
+                default: '1' //模式1：显示头标加文字；模式2：仅显示文字；模式3：仅显示头标；
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                current: Number(1)
+            }
+        },
+
+        onInit() {
+            if(this.page <= 0){
+                this.current = 1
+            }else if(this.page >= this.totalPages){
+                this.current = this.totalPages()
+            }else{
+                this.current = Number(this.page) + 1
+            }
+        },
+
+        computed: {
+            totalPages() {
+                if(this.size <= 0){
+                    return 1
+                }
+                var pages = Math.ceil(this.total/this.size)
+                return pages === 0 ? 1 : pages
+            }
+        },
+
+        handlePrev() {
+            if(this.current > 1){
+                // 手机震动反馈
+                vibrator.vibrate({ mode: "short" })
+
+                this.current--
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: this.current - 1
+                })
+            }
+        },
+
+        handleNext() {
+            if(this.current < this.totalPages){
+                // 手机震动反馈
+                vibrator.vibrate({ mode: "short" })
+
+                this.current++
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: this.current - 1
+                })
+            }
+        }
+    }
+</script>

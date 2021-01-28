@@ -1,0 +1,229 @@
+/**
+ * Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License.  You may obtain a copy of the
+ * License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ */
+
+<import name="card" src="../data/c_card"></import>
+<template>
+    <div>
+        <div if="{{maskShow}}" class="modal" onclick="handleClick">
+            <div class="{{compStyle}}">
+                <card id="{{id}}" title="{{title}}"  extra="{{extra}}" icon="{{icon}}" bg-color="{{bgColor}}" avatar="{{avatar}}" image="{{image}}">
+                    <text>{{memo}}</text>
+                </card>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .modal {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .card-low{
+        position: fixed;
+        bottom:-400px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:400px;
+    }
+
+    .show-low{
+        animation-name: showlow;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide-low{
+        animation-name: hidelow;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes showlow {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-400px);
+        }
+    }
+
+    @keyframes hidelow {
+        from {
+            transform: translateY(-400px);
+        }
+        to {
+            transform: translateY(0px);
+        }
+    }
+
+    .card-normal{
+        position: fixed;
+        bottom:-700px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:700px;
+    }
+
+    .show-normal{
+        animation-name: shownormal;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide-normal{
+        animation-name: hidenormal;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes shownormal {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-700px);
+        }
+    }
+
+    @keyframes hidenormal {
+        from {
+            transform: translateY(-700px);
+        }
+        to {
+            transform: translateY(0px);
+        }
+    }
+
+    .card-high{
+        position: fixed;
+        bottom:-1000px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:1000px;
+    }
+
+    .show-high{
+        animation-name: showhigh;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide-high{
+        animation-name: hidehigh;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes showhigh {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-1000px);
+        }
+    }
+
+    @keyframes hidehigh {
+        from {
+            transform: translateY(-1000px);
+        }
+        to {
+            transform: translateY(0px);
+        }
+    }
+</style>
+
+<script>
+    export default {
+        data() {
+            return {
+                id:'',
+                title: '',
+                extra: '',
+                icon: '',
+                bgColor: '',
+                avatar: '',
+                image: '',
+                memo: '',
+                height: 'low',
+                isShow: false,
+                maskShow: false
+            }
+        },
+        computed: {
+            compStyle() {
+                var style = ''
+                switch (this.height){
+                    case 'normal':
+                        style = this.isShow ? 'card-normal show-normal' : 'card-normal hide-normal'
+                        break
+                    case 'high':
+                        style = this.isShow ? 'card-high show-high' : 'card-high hide-high'
+                        break
+                    case 'low':
+                    default:
+                        style = this.isShow ? 'card-low show-low' : 'card-low hide-low'
+                        break
+                }
+                return style
+            }
+        },
+
+        showFloatLayout(options) {
+            const {id = '', title = '', extra = '', icon = '', bgColor = '', avatar = '', image = '', memo = '', height = 'low'} = options;
+            Object.assign(this._data, {
+                ...options,
+                id: id,
+                title: title,
+                extra: extra,
+                icon: icon,
+                bgColor: bgColor,
+                avatar: avatar,
+                image: image,
+                memo: memo,
+                height: height,
+                isShow: true,
+                maskShow: true
+            });
+        },
+
+        handleClick() {
+            this.isShow = false
+            setTimeout(() => {
+                this.maskShow = false
+            }, 300);
+        }
+    }
+</script>

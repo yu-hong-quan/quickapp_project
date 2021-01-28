@@ -1,0 +1,456 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="message" src="../feedback/c_message"></import>
+<import name="h-input" src="../form/c_input"></import>
+<import name="date" src="../form/c_date"></import>
+<import name="time-range" src="../form/c_time_range"></import>
+<import name="h-switch" src="../form/c_switch"></import>
+<import name="transfer" src="../form/c_transfer"></import>
+<import name="h-select" src="../form/c_select"></import>
+<import name="short" src="../form/c_short"></import>
+<import name="h-button" src="../basic/c_button"></import>
+<template>
+    <div class="calendar" style="{{hStyle}}">
+        <div class="calendar-container">
+            <h-input id="title" params="{{params}}" value="{{data.title}}" title="标题" placeholder="请设置事件的标题" valid="none"></h-input>
+            <textarea class="calendar-description" placeholder="事件描述" maxlength="70" onchange="handleChange">{{data.content}}</textarea>
+            <date id="date" form-horizontal="true" title="开始日期" params="{{params}}" value="{{params.date}}" not-blank="false" valid="none"></date>
+            <time-range id="timeRange" form-horizontal="true" title="起止时间" params="{{params}}" value="{{params.timeRange}}" not-blank="false" valid="none"></time-range>
+            <h-switch id="allDay" params="{{params}}" active="{{params.allDay}}" form-horizontal="true" active-type="{{type}}" title="是否整天" inactive-text="否" active-text="是" not-blank="false" valid="none"></h-switch>
+            <transfer if="{{!simple}}" id="remind" params="{{params}}" data="{{remindOptions}}" value="{{params.remind}}" title="添加提醒" collapse="{{collapse}}" type-icon="bell" valid="none" not-blank="false"></transfer>
+            <h-select if="{{!simple}}" id="repeat" params="{{params}}" value="{{params.repeat}}" title="重复类型" data="{{repeatOptions}}" form-horizontal="true" not-blank="false" valid="none"></h-select>
+        </div>
+
+        <div if="{{showPanel}}" class="calendar-container">
+            <transfer if="{{showByDay}}" id="byday" params="{{params}}" data="{{bydayOptions}}" value="{{params.byday}}"></transfer>
+            <h-select id="expiration" params="{{params}}" value="{{params.expiration}}" title="有效日期" data="{{expirationOptions}}" form-horizontal="true" not-blank="false" valid="none"></h-select>
+            <div if="{{expirationType === 'UNTIL'}}">
+                <date id="until" form-horizontal="true" title="截止日期" params="{{params}}" value="{{params.until}}" not-blank="false" valid="none"></date>
+            </div>
+            <div if="{{expirationType === 'COUNT'}}">
+                <short id="count" params="{{params}}" form-horizontal="true" title="重复次数" value="{{params.count}}" min="1" max="10000" valid="none" step-button="true"></short>
+            </div>
+
+            <short id="interval" params="{{params}}" form-horizontal="true" title="{{intervalTitle}}" value="{{params.interval}}" min="1" max="100" valid="none" step-button="true"></short>
+        </div>
+
+        <div class="calendar-container">
+            <h-button id="btn" text="插入日历" type="{{type}}" block="true" onclick="handleClick"></h-button>
+            <message id="message"></message>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .calendar{
+        width: 100%;
+        flex-direction: column;
+        justify-content: center;
+        &-description{
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 31px;
+            width: 100%;
+            height: 180px;
+            border-width: 2px;
+            border-radius: 8px;
+            border-color: @color-border;
+        }
+        &-container{
+            width: 684px;
+            margin: 0 33px;
+            flex-direction: column;
+        }
+    }
+    .panel{
+        flex-direction: column;
+        width: 100%;
+        height: 500px;
+        &-container{
+            flex-direction: column;
+            width: 684px;
+            margin: 0 33px;
+        }
+    }
+    .default{
+        color: @color-black;
+    }
+    .primary{
+        color: @color-primary;
+    }
+    .info{
+        color: @color-info;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .success{
+        color: @color-success;
+    }
+</style>
+
+<script>
+    import calendar from '@system.calendar'
+    import { fill2 } from '../../../utils/string'
+    import { rrule } from '../../../utils/date'
+
+    export default {
+        props: {
+            data: {},
+            params: {},
+            type: {
+                default: 'primary'
+            },
+            simple: {//简单模式，不可设提醒和重复
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data: {
+            content: '',
+            collapse: true,
+            showPanel: false,
+            showByDay: false,
+            timeRange: '',
+            intervalTitle: '间隔天数',
+            expirationType: '',
+            remindOptions: [
+                {label: "准时", value: '1'},
+                {label: "5分钟前", value: '5'},
+                {label: "10分钟前", value: '10'},
+                {label: "15分钟前", value: '15'},
+                {label: "30分钟前", value: '30'},
+                {label: "1小时前", value: '60'},
+                {label: "2小时前", value: '120'}
+            ],
+            repeatOptions: [
+                {label: "不重复", value: "NOT"},
+                {label: "每天", value: "DAILY"},
+                {label: "每周", value: "WEEKLY"},
+                {label: "每月", value: "MONTHLY"},
+                {label: "每年", value: "YEARLY"}
+            ],
+            expirationOptions: [
+                {label: "一直", value: "FOREVER"},
+                {label: "截止到", value: "UNTIL"},
+                {label: "限定次数", value: "COUNT"}
+            ],
+            bydayOptions: [
+                {label: "星期日", value: "SU"},
+                {label: "星期一", value: "MO"},
+                {label: "星期二", value: "TU"},
+                {label: "星期三", value: "WE"},
+                {label: "星期四", value: "TH"},
+                {label: "星期五", value: "FR"},
+                {label: "星期六", value: "SA"}
+            ]
+        },
+
+        onInit() {
+            //日历事件标题
+            this.params.title = !!this.data.title ? this.data.title : '日历'
+
+            var date = new Date()
+
+            //开始日期
+            if(!!this.data.date) {
+                this.params.date = this.data.date
+            }else {
+                //初始化开始日期为当前日期
+                var Y = date.getFullYear()
+                var M = date.getMonth() + 1
+                var D = date.getDate()
+                this.params.date = Y + '-' + fill2(M.toString()) + '-' + fill2(D.toString())
+            }
+
+            //起止时间
+            if(!!this.data.timeRange) {
+                this.params.timeRange = this.data.timeRange
+            }else {
+                //初始化时间范围为现在开始半小时
+                var H = date.getHours()
+                var m = date.getMinutes()
+                var startTime = fill2(H.toString()) + ':' + fill2(m.toString())
+
+                date.setTime(date.setMinutes(date.getMinutes() + 30));
+                var endTime = fill2(date.getHours().toString()) + ':' + fill2(date.getMinutes().toString())
+
+                this.params.timeRange = startTime + '至' + endTime
+            }
+
+            //是否整天
+            this.params.allDay = this.data.allDay !== undefined ? this.data.allDay : false
+
+            //添加提醒
+            if(!!this.data.remind){
+                this.params.remind = this.data.remind
+                this.collapse = (this.params.remind.length === 0)
+            }else{
+                this.params.remind = []
+                this.collapse = true
+            }
+
+            //星期设置
+            if(!!this.data.byday){
+                this.params.byday = this.data.byday
+            }else{
+                this.params.byday = []
+            }
+            this.showByDay = true
+
+            this.params.expiration = !!this.data.expiration ? this.data.expiration : 'FOREVER'
+            this.expirationType = this.params.expiration
+
+            //重复周期
+            if(!!this.data.repeat){
+                var repeat = this.data.repeat
+                this.params.repeat = repeat
+                this.showPanel = (repeat === 'DAILY' || repeat === 'WEEKLY' || repeat === 'MONTHLY' || repeat === 'YEARLY')
+
+                this.refreshIntervalTitle(repeat)
+
+                //启用重复周期设置
+                if(this.showPanel){
+                    //重复类型
+                    this.params.freq = repeat
+
+                    //间隔数
+                    this.params.interval = !!this.data.interval ? this.data.interval : '1'
+
+                    //限定次数
+                    this.params.count = !!this.data.count ? this.data.count : ''
+
+                    //截止日期
+                    if(!!this.data.until) {
+                        this.params.until = this.data.until
+                    }else {
+                        if(this.params.expiration === 'UNTIL') {
+                            this.refreshUntil()
+                        }else{
+                            this.params.until = ''
+                        }
+                    }
+
+                    //高级限制规则
+                    this.params.limit = this.data.limit !== undefined ? this.data.limit : {}
+                }else{
+                    this.params.freq = ''
+                    this.params.interval = '1'
+                    this.params.count = ''
+                    this.params.until = ''
+                    this.params.limit = {}
+                }
+            }else{
+                this.params.repeat = 'NOT'
+                this.showPanel = false
+                this.params.freq = ''
+                this.params.interval = '1'
+                this.params.count = ''
+                this.params.until = ''
+                this.params.limit = {}
+            }
+
+            //监听各组件的值变化
+            this.$on('repeat_dispatchEvt',this.dispatchRepeatEvt)
+            this.$on('expiration_dispatchEvt',this.dispatchExpirationEvt)
+            this.$on('count_dispatchEvt',this.dispatchCountEvt)
+            this.$on('interval_dispatchEvt',this.dispatchIntervalEvt)
+        },
+
+        computed: {
+            startTime() {
+                var arr = this.params.timeRange.split('至')
+                return new Date(this.params.date + ' ' + arr[0] + ':00').getTime()
+            },
+            endTime() {
+                var arr = this.params.timeRange.split('至')
+                return new Date(this.params.date + ' ' + arr[1] + ':59').getTime()
+            },
+            hexColor() {
+                var color = '#337ab7'
+                switch (this.type) {
+                    case 'default':
+                        color = '#000000'
+                        break
+                    case 'info':
+                        color = '#5bc0de'
+                        break
+                    case 'warning':
+                        color = '#e6a23c'
+                        break
+                    case 'danger':
+                        color = '#f56c6c'
+                        break
+                    case 'success':
+                        color = '#67c23a'
+                        break
+                    default:
+                        color = '#337ab7'
+                        break
+                }
+                return color
+            }
+        },
+
+        handleChange(e){
+            this.content = e.text
+        },
+
+        dispatchRepeatEvt(evt){//事件重复
+            var repeat = evt.detail.value
+            this.params.repeat = repeat
+            switch (repeat) {
+                case 'DAILY':
+                case 'WEEKLY':
+                case 'MONTHLY':
+                case 'YEARLY':
+                    this.params.freq  = repeat
+                    this.showPanel = true
+                    this.refreshIntervalTitle(repeat)
+                    this.showByDay = (repeat === 'WEEKLY')
+                    break;
+                default:
+                    this.params.freq = ''
+                    this.showPanel = false
+                    break;
+            }
+        },
+
+        dispatchCountEvt(evt){
+            this.params.count = evt.detail.value
+        },
+        dispatchIntervalEvt(evt){
+            this.params.interval = evt.detail.value
+        },
+
+        //刷新间隔数标题
+        refreshIntervalTitle(repeat){
+            switch (repeat) {
+                case 'DAILY':
+                    this.intervalTitle = '间隔天数'
+                    break;
+                case 'WEEKLY':
+                    this.intervalTitle = '间隔周数'
+                    break;
+                case 'MONTHLY':
+                    this.intervalTitle = '间隔月数'
+                    break;
+                case 'YEARLY':
+                    this.intervalTitle = '间隔年数'
+                    break;
+                default:
+                    break;
+            }
+        },
+
+        refreshUntil(){
+            var date = new Date()
+            switch (this.params.freq) {
+                case 'DAILY':
+                default:
+                    date.setTime(date.setMinutes(date.getMinutes() + 1440 * (Number(this.params.interval) + 1)));
+                    break
+                case 'WEEKLY':
+                    date.setTime(date.setMinutes(date.getMinutes() + 8 * 1440 * Number(this.params.interval)));
+                    break
+                case 'MONTHLY':
+                    date.setTime(date.setMinutes(date.getMinutes() + 31 * 1440 * Number(this.params.interval)));
+                    break
+                case 'YEARLY':
+                    date.setTime(date.setMinutes(date.getMinutes() + 366 * 1440 * Number(this.params.interval)));
+                    break
+            }
+
+            var Y = date.getFullYear()
+            var M = date.getMonth() + 1
+            var D = date.getDate()
+
+            this.params.until = Y + '-' + fill2(M.toString()) + '-' + fill2(D.toString())
+        },
+
+        dispatchExpirationEvt(evt){
+            this.expirationType = evt.detail.value
+
+            switch (this.expirationType){
+                case 'UNTIL':
+                    if(this.params.until === '' || this.params.until === undefined){
+                        this.refreshUntil()
+                    }
+                    this.params.count = ''
+                    break
+                case 'COUNT':
+                    if(this.params.count === ''){
+                        this.params.count = '1'
+                    }
+                    this.params.until = ''
+                    break
+                case 'FOREVER':
+                default:
+                    this.params.until = ''
+                    this.params.count = ''
+                    break
+            }
+        },
+
+        handleClick() {//插入日历按钮事件
+            let _this = this
+            var repeatRule = ''
+            if(_this.params.freq === 'DAILY' || _this.params.freq === 'WEEKLY' || _this.params.freq === 'MONTHLY' || _this.params.freq === 'YEARLY'){
+                var until = ''
+                if(_this.params.until !== ''){
+                    var dateArr = _this.params.until.split('-')
+                    var timeArr = _this.params.timeRange.split('至')[1].split(':')
+                    until = dateArr[0] + dateArr[1] + dateArr[2] + 'T' + timeArr[0] + timeArr[1] + '00Z'
+                }
+                var limit = {}
+                if(_this.params.freq === 'WEEKLY' && _this.params.byday.length > 0){
+                    limit.BYDAY = _this.params.byday
+                }
+                repeatRule = rrule(_this.params.freq, _this.params.interval, _this.params.count, until, limit)
+            }
+
+            calendar.insert({
+                title: _this.params.title,
+                description: _this.content,
+                startDate: _this.startTime,
+                endDate: _this.endTime,
+                allDay: _this.params.allDay,
+                rrule: repeatRule,
+                remindMinutes: _this.params.remind.length > 0 ? _this.params.remind : undefined,
+                success:function(){
+                    _this.$child('message').showMessage({
+                        text: '日历设置成功',
+                        type: 'success'
+                    });
+                },
+                fail: function() {
+                    _this.$child('message').showMessage({
+                        text: '日历设置失败',
+                        type: 'danger'
+                    });
+                }
+            })
+        }
+    }
+</script>

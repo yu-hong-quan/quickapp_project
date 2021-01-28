@@ -1,0 +1,129 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<template>
+    <div>
+        <div if="{{compShow}}" class="toast {{compStyle}}">
+            <icon class="toast-icon" if="{{!!icon}}" type="{{icon}}" size="150" color="white"></icon>
+            <image class="toast-image" if="{{!!image}}" src="{{image}}"></image>
+            <progress class="toast-loading" if="{{loading}}" type="circular"></progress>
+            <text class="toast-text">{{text}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .toast{
+        position: fixed;
+        left: 235px;
+        right: 235px;
+        top: 580px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 280px;
+        height: 200px;
+        border-radius: 8px;
+        padding: 30px;
+        background-color: rgba(0, 0, 0, 0.8);
+        &-text{
+            color: #ffffff;
+        }
+        &-icon{
+            margin-bottom: 20px;
+        }
+        &-image{
+            margin-bottom: 20px;
+            width: 100px;
+            height: 100px;
+        }
+        &-loading{
+            margin-bottom: 20px;
+            width: 100px;
+            height: 100px;
+            color: #eeeeee;
+        }
+    }
+
+    .show{
+        animation-name: show;
+        animation-duration: 500ms;
+    }
+
+    .hide{
+        animation-name: hide;
+        animation-duration: 500ms;
+    }
+
+    @keyframes show {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 0.9;
+        }
+    }
+
+    @keyframes hide {
+        from {
+            opacity: 0.9;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+</style>
+
+<script>
+    export default {
+        data() {
+            return {
+                text: '',
+                icon: '',
+                image: '',
+                loading: false,
+                duration: 2,
+                isShow: false
+            }
+        },
+        computed: {
+            compShow() {
+                return this.isShow
+            },
+            compStyle() {
+                return this.isShow ? 'show' : 'hide'
+            }
+        },
+        showToast(options) {
+            const {text = '', icon = '', image = '', loading = false, duration = 2} = options;
+            Object.assign(this._data, {
+                ...options,
+                text: text,
+                icon: icon,
+                image: image,
+                loading: loading,
+                duration: duration,
+                isShow: true
+            });
+
+            setTimeout(() => {
+                this.isShow = false
+            }, this.duration * 1000);
+        }
+    }
+</script>

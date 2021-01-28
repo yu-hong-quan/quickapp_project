@@ -1,0 +1,125 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="message" src="../feedback/c_message"></import>
+<import name="time" src="../form/c_time"></import>
+<import name="h-input" src="../form/c_input"></import>
+<import name="h-switch" src="../form/c_switch"></import>
+<import name="h-select" src="../form/c_select"></import>
+<import name="h-button" src="../basic/c_button"></import>
+<template>
+    <div class="alarm" style="{{hStyle}}">
+        <h-input id="title" params="{{params}}" value="{{data.title}}" title="闹钟名" type-icon="bell" form-horizontal="true" placeholder="请设置闹钟名称" maxlength="10" valid="none"></h-input>
+        <time id="time" form-horizontal="true" params="{{params}}" value="{{params.time}}" not-blank="false" valid="none"></time>
+        <h-switch id="vibrate" params="{{params}}" active="{{params.vibrate}}" form-horizontal="true" active-type="{{type}}" title="震动" inactive-text="关" active-text="开" not-blank="false" valid="none"></h-switch>
+        <h-select id="repeat" params="{{params}}" value="{{params.repeat}}" title="重复周期" data="{{options}}" form-horizontal="true" not-blank="false" valid="none"></h-select>
+        <h-button id="btn" text="设置闹钟" type="{{type}}" block="true" onclick="handleClick"></h-button>
+        <message id="message"></message>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .alarm{
+        width: 100%;
+        flex-direction: column;
+    }
+</style>
+
+<script>
+    import alarm from '@system.alarm'
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            data: {},
+            type: {
+                default: 'primary'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data: {
+            params: {},
+            options: [
+                {label: "一次性闹钟", value: "once"},
+                {label: "每天", value: "everyday"},
+                {label: "周一到周五", value: "workday"}
+            ]
+        },
+
+        onInit() {
+            this.params.title = !!this.data.title ? this.data.title : '闹钟'
+            if(!!this.data.time) {
+                this.params.time = this.data.time
+            }else {
+                var date = new Date()
+                date.setTime(date.setMinutes(date.getMinutes() + 5));
+                var hour = date.getHours()
+                var minute = date.getMinutes()
+                this.params.time = fill2(hour.toString()) + ':' + fill2(minute.toString())
+            }
+            this.params.vibrate = this.data.vibrate !== undefined ? this.data.vibrate : true //是否震动
+            this.params.repeat = !!this.data.repeat ? this.data.repeat : 'once'
+        },
+
+        dispatchSwitchEvt(evt){
+            this.vibrate = evt.detail.value === 'true'
+        },
+
+        handleClick() {
+            let _this = this
+
+            var arr = _this.params.time.split(':')
+            var hour = Number(arr[0])
+            var minute = Number(arr[1])
+
+            var days = []
+            switch (_this.params.repeat) {
+                case 'everyday':
+                    days = [0,1,2,3,4,5,6]
+                    break
+                case 'workday':
+                    days = [0,1,2,3,4]
+                    break
+                default:
+                    break
+            }
+
+            alarm.setAlarm({
+                hour: hour,
+                minute: minute,
+                message: _this.params.title,
+                vibrate: _this.params.vibrate,
+                days: days.length > 0 ? days : undefined,
+                success: function() {
+                    _this.$child('message').showMessage({
+                        text: '闹钟设置成功',
+                        type: 'success'
+                    });
+                },
+                fail: function() {
+                    _this.$child('message').showMessage({
+                        text: '闹钟设置失败',
+                        type: 'danger'
+                    });
+                }
+            })
+        }
+    }
+</script>

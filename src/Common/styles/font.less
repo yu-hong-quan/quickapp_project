@@ -1,0 +1,49 @@
+/**
+ * Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+ * this file except in compliance with the License.  You may obtain a copy of the
+ * License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ */
+
+@import "./variables";
+@import "./color";
+@import "./fontsize";
+
+// 内联文本元素
+.mark {
+    padding: @font-size-base * 0.2;
+    background-color: @color-mark;
+}
+.del{
+    text-decoration: line-through;
+}
+.underline{
+    text-decoration: underline;
+}
+.small {
+    font-size: @font-size-small;
+    font-weight: @font-weight-lead;
+}
+.b{
+    font-weight: bolder;
+}
+.i{
+    font-style: italic;
+    padding-right: @font-size-base * 0.5;
+}
+
+// 文字对齐
+.right{
+    text-align: right;
+}
+.center{
+    text-align: center;
+}

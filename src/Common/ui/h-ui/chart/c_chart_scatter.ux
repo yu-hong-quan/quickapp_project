@@ -1,0 +1,674 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" ontouchstart="handleTouchstart"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        width: 750px;
+        height: 750px;
+    }
+</style>
+
+<script>
+    import prompt from '@system.prompt'
+    import vibrator from '@system.vibrator'
+    import { getStepValue } from '../../../utils/chart'
+
+    export default {
+        props: {
+            id :{},
+            data: {},
+            hexColor: {
+                default: '#ff0000'
+            },
+            size: {
+                default: 10
+            },
+            bubble: {
+                default: false
+            },
+            clock: {
+                default: false
+            },
+            group: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                // 时钟图数据处理
+                if(this.clock){
+                    this.drawClockChart()
+                }else {
+                    this.drawChart()
+                }
+            }, 100);
+        },
+
+        drawChart(){
+            //获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            //绘制坐标
+            const left = 75
+            const right = 675
+            const top = 75
+            const bottom = 675
+
+            ctx.beginPath()
+
+            var i = 0
+            var len = 0
+
+            // x,y轴
+            ctx.moveTo(left , top)
+            ctx.lineTo(left,  bottom)
+            ctx.lineTo(right,  bottom)
+
+            // y轴刻度线
+            var x = left - 5
+            var y = top
+            for(i = 0; i <= 5; i++){
+                ctx.moveTo(x , y)
+                ctx.lineTo(left , y)
+                y += 120
+            }
+
+            // x轴刻度线
+            x = left
+            y = bottom + 5
+            for(i = 0; i <= 5; i++){
+                ctx.moveTo(x , bottom)
+                ctx.lineTo(x , y)
+                x += 120
+            }
+            ctx.moveTo(right , bottom)
+            ctx.lineTo(right , y)
+            ctx.stroke()
+            ctx.closePath()
+
+            ctx.beginPath()
+
+            // y轴参考线
+            y = top
+            for(i = 0; i < 5; i++){
+                ctx.moveTo(left , y)
+                ctx.lineTo(right , y)
+                y += 120
+            }
+            ctx.strokeStyle = '#ccc'
+            ctx.setLineDash([6, 3])
+            ctx.stroke()
+            ctx.closePath()
+
+            ctx.beginPath()
+
+            // x轴参考线
+            x = left + 120
+            for(i = 0; i < 5; i++){
+                ctx.moveTo(x , top)
+                ctx.lineTo(x , bottom)
+                x += 120
+            }
+            ctx.strokeStyle = '#ccc'
+            ctx.setLineDash([6, 3])
+            ctx.stroke()
+            ctx.closePath()
+
+            // y轴文字
+            x = left - 8
+            y = bottom
+            ctx.textAlign = 'right'
+            ctx.font = '16px sans-serif'
+            ctx.textBaseline = 'middle'
+            for(i = 0; i <= 5; i++){
+                ctx.fillText(this.yStepValue * i, x, y)
+                y -= 120
+            }
+
+            x = left
+            y = top -24
+            ctx.textAlign = 'center'
+            ctx.font = '16px sans-serif'
+            ctx.fillText(this.yAxisName, x, y)
+
+
+            // x轴文字
+            x = left
+            y = bottom + 24
+            ctx.textAlign = 'center'
+            ctx.font = '16px sans-serif'
+            for(i = 0; i <= 5; i++){
+                ctx.fillText(this.xStepValue * i, x, y)
+                x += 120
+            }
+
+            x = right + 10
+            y = bottom
+            ctx.textAlign = 'left'
+            ctx.font = '16px sans-serif'
+            ctx.fillText(this.xAxisName, x, y)
+
+
+            // 绘制点
+            const p = Math.PI
+            for(i = 0, len = this.compData.length; i < len; i++){
+                ctx.beginPath()
+                ctx.arc(this.compData[i]['x'], this.compData[i]['y'], this.compData[i]['size'], 0,p * 2, false)
+                ctx.fillStyle = this.compData[i]['color']
+                ctx.fill()
+                ctx.closePath()
+            }
+
+        },
+
+        drawClockChart() {
+            //获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            const centerX = 375
+            const centerY = 375
+            const p = Math.PI
+
+            // 绘制圆心
+            ctx.beginPath()
+            ctx.arc(centerX, centerY, 10, 0,p * 2, false)
+            ctx.fillStyle = '#999999'
+            ctx.fill()
+            ctx.closePath()
+
+            ctx.translate(centerX,centerY)
+            ctx.rotate(1.5 * p)
+
+            // 绘制时钟线
+            ctx.beginPath()
+            for(var i=0;i<24;i++){
+
+                ctx.moveTo(0 , 0)
+                ctx.lineTo(350 , 0)
+                ctx.strokeStyle = '#ccc'
+                ctx.setLineDash([6, 3])
+                ctx.stroke()
+
+                var x = 25
+                var arr = this.compClockData[i]
+
+                for(var j=0,len=arr.length;j<len;j++){
+                    ctx.beginPath()
+                    ctx.moveTo(x + this.dayIndex(arr[j][this.compStructure[0]]) * 50 , 0)
+                    ctx.arc(x + this.dayIndex(arr[j][this.compStructure[0]]) * 50 , 0, 12 * (arr[j][this.compStructure[2]] / this.compMaxValue), 0,p * 2, false)
+                    ctx.fillStyle = this.hexColor
+                    ctx.fill()
+                    ctx.closePath()
+                }
+
+
+                ctx.rotate(p / 12)
+            }
+            ctx.closePath()
+
+        },
+
+        // 触摸提示
+        handleTouchstart(event) {
+            var touchX = event.touches[0].offsetX
+            var touchY = event.touches[0].offsetY
+            var i=0
+            if(touchX >= 25 && touchX <= 725 && touchY >= 25 && touchY <= 725){
+                if(this.clock){
+                    // 直角的边长
+                    var x1 = Math.abs(touchX - 375)
+                    var y1 = Math.abs(touchY - 375)
+                    // 斜边长
+                    var z1 = Math.sqrt(Math.pow(x1, 2) + Math.pow(y1, 2))
+                    // 余弦
+                    var cos = y1 / z1
+                    // 弧度
+                    var radina = Math.acos(cos)
+
+                    var angle = 0
+
+                    if(touchX > 375){
+                        if(touchY < 375){
+                            angle =  radina
+                        }else{
+                            angle =  Math.PI - radina
+                        }
+                    }else{
+                        if(touchY > 375){
+                            angle =  Math.PI + radina
+                        }else{
+                            angle =  2 * Math.PI - radina
+                        }
+                    }
+
+                    for(i=0;i<24;i++){
+                        if(angle >= (i * Math.PI/12 - Math.PI/24) && angle < (i * Math.PI/12 + Math.PI/24)){
+
+                            var arr = this.compClockData[i]
+                            var dayIndex = Math.ceil(z1/50)
+                            if(dayIndex > 7) {
+                                dayIndex = 7
+                            }
+                            dayIndex--
+
+                            var hour = ''
+                            if(i===0){
+                                hour = '12a'
+                            }else if(i > 0 && i <12){
+                                hour = i + 'a'
+                            }else if(i===12){
+                                hour = '12p'
+                            }else{
+                                hour = (i-12) + 'p'
+                            }
+
+                            var day = ''
+                            switch (dayIndex){
+                                case 0:
+                                    day = '星期六'
+                                    break
+                                case 1:
+                                    day = '星期五'
+                                    break
+                                case 2:
+                                    day = '星期四'
+                                    break
+                                case 3:
+                                    day = '星期三'
+                                    break
+                                case 4:
+                                    day = '星期二'
+                                    break
+                                case 5:
+                                    day = '星期一'
+                                    break
+                                default:
+                                    day = '星期天'
+                                    break
+
+                            }
+
+                            for(var j=0,len=arr.length;j< len;j++){
+                                if(arr[j][this.compStructure[0]] === day){
+                                    vibrator.vibrate({ mode: "short" })
+
+                                    // 弹窗显示缩略语的详细说明
+                                    prompt.showToast({
+                                        message: day + ' ' + hour + '\n' + this.compStructure[2] + ':' + arr[j][this.compStructure[2]],
+                                        gravity: 'center'
+                                    })
+                                    break
+                                }
+                            }
+                        }
+                    }
+
+                }else {
+                    for (i = 0; i < this.data.length; i++) {
+                        var x = (this.data[i][this.xAxisName] / (this.xStepValue * 5)) * 600 + 75
+                        var y = (1 - this.data[i][this.yAxisName] / (this.yStepValue * 5)) * 600 + 75
+
+                        if (touchX >= x - this.size && touchX <= x + this.size && touchY >= y - this.size && touchY <= y + this.size) {
+                            // 手机震动反馈
+                            vibrator.vibrate({mode: "short"})
+
+                            var message = ''
+                            if (this.compBubble) {
+                                if (this.compStructure.length === 5) {
+                                    message += this.data[i][this.compStructure[3]] + '(' + this.data[i]['group'] + ')\n'
+                                }
+                                message += this.compStructure[2] + ':' + this.data[i][this.compStructure[2]] + '\n'
+                                message += this.xAxisName + ': ' + this.data[i][this.xAxisName] + '\n' + this.yAxisName + ': ' + this.data[i][this.yAxisName]
+                            } else {
+                                if (this.group) {
+                                    message += this.data[i]['group'] + '\n'
+                                }
+                                message += this.xAxisName + ': ' + this.data[i][this.xAxisName] + '\n' + this.yAxisName + ': ' + this.data[i][this.yAxisName]
+                            }
+
+                            // 弹窗显示缩略语的详细说明
+                            prompt.showToast({
+                                message: message,
+                                gravity: 'center'
+                            })
+                        }
+                    }
+                }
+            }
+
+        },
+        dayIndex(day) {
+            switch (day){
+                case '星期六':
+                    return 0
+                case '星期五':
+                    return 1
+                case '星期四':
+                    return 2
+                case '星期三':
+                    return 3
+                case '星期二':
+                    return 4
+                case '星期一':
+                    return 5
+                default:
+                    return 6
+            }
+        },
+
+        computed: {
+            compStructure(){
+                var arr = []
+                for(var key in this.data[0]){
+                    arr.push(key)
+                }
+                return arr
+            },
+            compData(){
+                var arr = []
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    var size = Number(this.size)
+                    if(this.compBubble){
+                        size = Math.ceil((Number(this.data[i][this.compStructure[2]]) / this.compMaxValue)*50)
+                    }
+                    var color = this.hexColor
+
+                    if(this.group){
+                        for(var j=0;j<this.compGroupColor.length;j++){
+                            if(this.compGroupColor[j]['group'] === this.data[i]['group']){
+                                color = this.compGroupColor[j]['color']
+                            }
+                        }
+                    }
+
+                    var item = {
+                        x: (this.data[i][this.xAxisName]/(this.xStepValue * 5))*600 + 75,
+                        y: (1-this.data[i][this.yAxisName]/(this.yStepValue * 5))*600 + 75,
+                        size: size,
+                        color: color
+                    }
+                    arr.push(item)
+                }
+                return arr
+            },
+            compClockData() {
+                var arr = []
+                // 根据小时分组整理数据
+                var arr0 = []
+                var arr1 = []
+                var arr2 = []
+                var arr3 = []
+                var arr4 = []
+                var arr5 = []
+                var arr6 = []
+                var arr7= []
+                var arr8 = []
+                var arr9 = []
+                var arr10 = []
+                var arr11 = []
+                var arr12 = []
+                var arr13 = []
+                var arr14 = []
+                var arr15 = []
+                var arr16 = []
+                var arr17 = []
+                var arr18 = []
+                var arr19 = []
+                var arr20 = []
+                var arr21 = []
+                var arr22 = []
+                var arr23 = []
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    switch (this.data[i][this.compStructure[1]]) {
+                        case 0:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr0.push(this.data[i])
+                            }
+                            break
+                        case 1:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr1.push(this.data[i])
+                            }
+                            break
+                        case 2:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr2.push(this.data[i])
+                            }
+                            break
+                        case 3:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr3.push(this.data[i])
+                            }
+                            break
+                        case 4:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr4.push(this.data[i])
+                            }
+                            break
+                        case 5:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr5.push(this.data[i])
+                            }
+                            break
+                        case 6:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr6.push(this.data[i])
+                            }
+                            break
+                        case 7:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr7.push(this.data[i])
+                            }
+                            break
+                        case 8:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr8.push(this.data[i])
+                            }
+                            break
+                        case 9:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr9.push(this.data[i])
+                            }
+                            break
+                        case 10:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr10.push(this.data[i])
+                            }
+                            break
+                        case 11:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr11.push(this.data[i])
+                            }
+                            break
+                        case 12:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr12.push(this.data[i])
+                            }
+                            break
+                        case 13:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr13.push(this.data[i])
+                            }
+                            break
+                        case 14:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr14.push(this.data[i])
+                            }
+                            break
+                        case 15:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr15.push(this.data[i])
+                            }
+                            break
+                        case 16:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr16.push(this.data[i])
+                            }
+                            break
+                        case 17:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr17.push(this.data[i])
+                            }
+                            break
+                        case 18:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr18.push(this.data[i])
+                            }
+                            break
+                        case 19:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr19.push(this.data[i])
+                            }
+                            break
+                        case 20:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr20.push(this.data[i])
+                            }
+                            break
+                        case 21:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr21.push(this.data[i])
+                            }
+                            break
+                        case 22:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr22.push(this.data[i])
+                            }
+                            break
+                        default:
+                            if(this.data[i][this.compStructure[2]] > 0) {
+                                arr23.push(this.data[i])
+                            }
+                            break
+                    }
+
+                    arr.push(arr0)
+                    arr.push(arr1)
+                    arr.push(arr2)
+                    arr.push(arr3)
+                    arr.push(arr4)
+                    arr.push(arr5)
+                    arr.push(arr6)
+                    arr.push(arr7)
+                    arr.push(arr8)
+                    arr.push(arr9)
+                    arr.push(arr10)
+                    arr.push(arr11)
+                    arr.push(arr12)
+                    arr.push(arr13)
+                    arr.push(arr14)
+                    arr.push(arr15)
+                    arr.push(arr16)
+                    arr.push(arr17)
+                    arr.push(arr18)
+                    arr.push(arr19)
+                    arr.push(arr20)
+                    arr.push(arr21)
+                    arr.push(arr22)
+                    arr.push(arr23)
+                }
+                return arr
+            },
+            compMaxValue(){
+                var max = 0
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    if (this.data[i][this.compStructure[2]] > max) {
+                        max = this.data[i][this.compStructure[2]]
+                    }
+                }
+                return max
+            },
+            compBubble(){
+                return this.clock ? true : this.bubble
+            },
+            xAxisName(){
+                return this.compStructure[0]
+            },
+            yAxisName(){
+                return this.compStructure[1]
+            },
+            xStepValue() {
+                var max = 0
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    if (this.data[i][this.xAxisName] > max) {
+                        max = this.data[i][this.xAxisName]
+                    }
+                }
+                return getStepValue(max)
+            },
+            yStepValue() {
+                var max = 0
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    if (this.data[i][this.yAxisName] > max) {
+                        max = this.data[i][this.yAxisName]
+                    }
+                }
+                return getStepValue(max)
+            },
+            columnWidth() {
+                return Math.ceil(600 / this.data.length)
+            },
+            compGroupColor() {
+                var arr = []
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    if(!arr.includes(this.data[i]['group'])){
+                        arr.push(this.data[i]['group'])
+                    }
+                }
+
+                var arr1 = []
+                for(var j=0;j<arr.length;j++){//rgba(120, 36, 50, 0.5)
+                    var a = Math.floor(Math.random() * 256)
+                    var b = Math.floor(Math.random() * 256)
+                    var c = Math.floor(Math.random() * 256)
+                    var color = ''
+
+                    if(j === 0){
+                        color = 'rgba(255, 0, 0, 0.5)'
+                    }else if(j === 1){
+                        color = 'rgba(14, 221, 215, 0.5)'
+                    }else{
+                        color = 'rgba(' + a + ',' + b + ',' + c + ',0.7)'
+                    }
+
+                    var item = {
+                        group: arr[j],
+                        color: color
+                    }
+
+                    arr1.push(item)
+                }
+
+                return arr1
+            }
+        }
+    }
+</script>

@@ -1,0 +1,72 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="flex-row" src="../basic/c_flex_row"></import>
+<import name="flex-col" src="../basic/c_flex_col"></import>
+<template>
+    <flex-row wrap="wrap" justify="{{justify}}" align="{{align}}" h-style="{{hStyle}}">
+        <block for="{{data}}">
+            <flex-col  width="{{width}}">
+                <div style="align-items: flex-start;">
+                    <text if="{{!unstyled}}" class="li-dot"></text>
+                    <text class="{{font}}">{{$item.text}}</text>
+                </div>
+            </flex-col>
+        </block>
+        <slot></slot>
+    </flex-row>
+</template>
+
+<style lang="less">
+    @import '../../../styles/font.less';
+
+    .li-dot {
+        margin-right: @font-size-base * 0.5;
+        margin-top: @font-size-base * 0.5;
+        width: @font-size-base * 0.5;
+        height: @font-size-base * 0.5;
+        border-radius: @font-size-base * 0.25;
+        background-color: @color-muted;
+        line-height: @font-size-base;
+    }
+</style>
+
+
+<script>
+  export default {
+    props: {
+        data: {
+        },
+        unstyled: {
+            default: false
+        },
+        width: {
+            default: 12
+        },
+        justify: {
+            default: 'left'        //项目在主轴上的对齐方式。支持：left(默认),center,right,between,around
+        },
+        align: {
+            default: 'stretch'     //项目在交叉轴上如何对齐。支持：stretch(默认),top,middle,bottom,baseline
+        },
+        font:{
+            default: ''
+        },
+        hStyle:{
+            default: ''
+        }
+    }
+  }
+</script>

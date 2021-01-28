@@ -1,0 +1,172 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="toast" src="../feedback/c_toast"></import>
+<template>
+    <div class="countdown" style="{{hStyle}}">
+        <text if="{{showDay}}" class="{{compStyle}}">{{compDays}}</text>
+        <text if="{{showDay}}"> 天 </text>
+
+        <text if="{{showHour}}" class="{{compStyle}}">{{compHours}}</text>
+        <text if="{{!format && showHour}}"> 时 </text>
+        <text if="{{!!format && showHour}}" class="format"> {{format}} </text>
+
+        <text if="{{showMinute}}" class="{{compStyle}}">{{compMinutes}}</text>
+        <text if="{{!format && showMinute}}"> 分 </text>
+        <text if="{{!!format && showMinute}}" class="format"> {{format}} </text>
+
+        <text class="{{compStyle}}">{{compSeconds}}</text>
+        <text if="{{!format && compSeconds !== ''}}"> 秒</text>
+        <toast id="{{id + '_toast'}}"></toast>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+
+    .countdown{
+        margin-bottom: 10px;
+    }
+    .card{
+        padding: 5px 10px;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+        color: #ff0000;
+        background: linear-gradient(0deg, #FFFFFF 0, #FFFFFF 49%,  rgba(0, 0, 0, 0.8) 50%, #FFFFFF 51%, #FFFFFF)
+    }
+    .format {
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+</style>
+
+<script>
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id: {},
+            expiration: {
+                default: 10
+            },
+            showType: {
+                default: 'second'
+            },
+            format: {},
+            card: {
+                default: false
+            },
+            showToast: {
+                default: false
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compExpiration: this.expiration,
+                compDays: '',
+                compHours: '',
+                compMinutes: '',
+                compSeconds: '',
+                showDay: false,
+                showHour: false,
+                showMinute: false
+            }
+        },
+
+        onInit() {
+            this.refresh()
+        },
+
+        refresh() {
+            setTimeout(() => {
+                var day = 0
+                var hour = 0
+                var minute = 0
+                var second = 0
+                switch (this.showType){
+                    case 'day':
+                        this.showDay = true
+                        this.showHour = true
+                        this.showMinute = true
+
+                        day = Math.floor(this.compExpiration/(3600 * 24))
+                        hour = Math.floor((this.compExpiration - day * 3600 * 24)/3600)
+                        minute = Math.floor((this.compExpiration - day * 3600 * 24 - hour * 3600)/60)
+                        second = this.compExpiration - day * 3600 * 24 - hour * 3600 - minute * 60
+
+                        break
+                    case 'hour':
+                        this.showDay = false
+                        this.showHour = true
+                        this.showMinute = true
+                        day = 0
+                        hour = Math.floor(this.compExpiration/3600)
+                        minute = Math.floor((this.compExpiration - hour * 3600)/60)
+                        second = this.compExpiration - hour * 3600 - minute * 60
+                        break
+                    case 'minute':
+                        this.showDay = false
+                        this.showHour = false
+                        this.showMinute = true
+                        day = 0
+                        hour = 0
+                        minute = Math.floor(this.compExpiration/60)
+                        second = this.compExpiration - minute * 60
+                        break
+                    default:
+                        this.showDay = false
+                        this.showHour = false
+                        this.showMinute = false
+                        day = 0
+                        hour = 0
+                        minute = 0
+                        second = this.compExpiration
+                        break
+                }
+
+                this.compDays = fill2(day.toString())
+                this.compHours = fill2(hour.toString())
+                this.compMinutes = fill2(minute.toString())
+                this.compSeconds = fill2(second.toString())
+                this.compExpiration -= 1
+                if(this.compExpiration >= 0) {
+                    this.refresh()
+                }else{
+                    this.$dispatch(this.id + '_dispatchEvt', {
+                        value: '时间到'
+                    })
+
+                    if(this.showToast){
+                        this.$child(this.id + '_toast').showToast({
+                            text: '时间到',
+                            icon: 'ok'
+                        });
+                    }
+                }
+            }, 1000);
+        },
+
+        computed: {
+            compStyle() {
+                return this.card ? "card" : ""
+            }
+        }
+    }
+</script>

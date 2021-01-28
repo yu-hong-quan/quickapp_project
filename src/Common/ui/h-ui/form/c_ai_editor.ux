@@ -1,0 +1,1399 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="p" src="../text/c_p"></import>
+<import name="message" src="../feedback/c_message"></import>
+<import name="audio-player" src="../media/c_audio_player"></import>
+<import name="ai-voice" src="../ai/c_ai_voice"></import>
+<import name="ai-doc" src="../ai/c_ai_doc"></import>
+<import name="ai-image" src="../ai/c_ai_image"></import>
+<template>
+    <div class="form-group" id="{{id}}">
+        <div style="justify-content: space-between;">
+            <div>
+                <text if="{{compNotBlank && compTitle!==''}}" class="red">* </text>
+                <text class="form-group-label-default {{validStyle}}">{{compTitle}}</text>
+            </div>
+            <div>
+                <text if="{{preview}}" class="icon icon-sm" onclick="handlePreview">&#xe7c5;</text>
+            </div>
+        </div>
+
+        <block for="{{compData}}">
+            <div class="{{compStyle}}" if="{{$item.type==='text'}}">
+                <div if="{{!preview}}" class="icon-tool">
+                    <div>
+                        <text id="{{id + '_text_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe7a4;</text>
+                        <text id="{{id + '_image_' + $idx}}" class="icon icon-lg" onclick="handleAppend">&#xe813;</text>
+                        <text id="{{id + '_video_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe850;</text>
+                        <text id="{{id + '_audio_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe84d;</text>
+                    </div>
+                    <div>
+                        <ai-voice size="60" color="default" active-color="primary" copy-with-hide="true"></ai-voice>
+                        <ai-doc size="60" color="default" active-color="primary" copy-with-hide="true"></ai-doc>
+                    </div>
+                    <div>
+                        <text id="{{id + '_trash_' + $idx}}" class="icon icon-normal" onclick="handleTrash">&#xe7b8;</text>
+                        <text if="{{!preview}}" class="icon icon-normal" onclick="handlePreview">&#xe80c;</text>
+                    </div>
+                </div>
+                <textarea if="{{!preview}}" id="{{id + '_textarea_' + $idx}}" onfocus="handleFocus" onblur="handleBlur" onchange="handleChange">{{$item.value}}</textarea>
+                <p class="news-text" if="{{preview}}" text="{{$item.value}}"></p>
+            </div>
+
+            <div class="{{compStyle}}" if="{{$item.type==='image'}}">
+                <div if="{{!preview}}" class="icon-tool">
+                    <div>
+                        <text id="{{id + '_text_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe7a4;</text>
+                        <text id="{{id + '_image_' + $idx}}" class="icon icon-lg" onclick="handleAppend">&#xe813;</text>
+                        <text id="{{id + '_video_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe850;</text>
+                        <text id="{{id + '_audio_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe84d;</text>
+                    </div>
+                    <div>
+                        <ai-image target-id="{{id + '_aiimage_' + $idx}}" size="60" color="default" uri="{{$item.value}}"></ai-image>
+                    </div>
+                    <div>
+                        <text id="{{id + '_trash_' + $idx}}" class="icon icon-normal" onclick="handleTrash">&#xe7b8;</text>
+                        <text if="{{!preview}}" class="icon icon-normal" onclick="handlePreview">&#xe80c;</text>
+                    </div>
+                </div>
+                <div class="center">
+                    <image src="{{$item.value}}"></image>
+                </div>
+            </div>
+
+            <div class="{{compStyle}}" if="{{$item.type==='video'}}">
+                <div if="{{!preview}}" class="icon-tool">
+                    <div>
+                        <text id="{{id + '_text_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe7a4;</text>
+                        <text id="{{id + '_image_' + $idx}}" class="icon icon-lg" onclick="handleAppend">&#xe813;</text>
+                        <text id="{{id + '_video_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe850;</text>
+                        <text id="{{id + '_audio_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe84d;</text>
+                    </div>
+                    <div>
+                        <text id="{{id + '_poster_' + $idx}}" class="icon icon-normal default" onclick="handleAppend">&#xe7ef;</text>
+                    </div>
+                    <div>
+                        <text id="{{id + '_trash_' + $idx}}" class="icon icon-normal" onclick="handleTrash">&#xe7b8;</text>
+                        <text if="{{!preview}}" class="icon icon-normal" onclick="handlePreview">&#xe80c;</text>
+                    </div>
+                </div>
+                <video src="{{$item.value}}" poster="{{$item.poster}}"></video>
+            </div>
+
+            <div class="{{compStyle}}" if="{{$item.type==='audio'}}">
+                <div if="{{!preview}}" class="icon-tool">
+                    <div>
+                        <text id="{{id + '_text_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe7a4;</text>
+                        <text id="{{id + '_image_' + $idx}}" class="icon icon-lg" onclick="handleAppend">&#xe813;</text>
+                        <text id="{{id + '_video_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe850;</text>
+                        <text id="{{id + '_audio_' + $idx}}" class="icon icon-normal" onclick="handleAppend">&#xe84d;</text>
+                    </div>
+                    <div>
+                        <text id="{{id + '_trash_' + $idx}}" class="icon icon-normal" onclick="handleTrash">&#xe7b8;</text>
+                        <text if="{{!preview}}" class="icon icon-normal" onclick="handlePreview">&#xe80c;</text>
+                    </div>
+                </div>
+                <audio-player class="audio" src="{{$item.value}}"></audio-player>
+            </div>
+
+            <stack class="wait {{compStyle}}" if="{{$item.type==='waitImage'}}">
+                <text class="icon icon-image warning">&#xe84b;</text>
+                <progress class="upload-wait" type="circular"></progress>
+            </stack>
+
+            <stack class="wait {{compStyle}}" if="{{$item.type==='waitVideo'}}">
+                <text class="icon icon-image warning">&#xe850;</text>
+                <progress class="upload-wait" type="circular"></progress>
+            </stack>
+
+            <stack class="wait {{compStyle}}" if="{{$item.type==='waitAudio'}}">
+                <text class="icon icon-image warning">&#xe84d;</text>
+                <progress class="upload-wait" type="circular"></progress>
+            </stack>
+
+        </block>
+
+        <message id="{{id + '_message'}}"></message>
+
+        <div if="{{!!formError}}" class="form-error" style="align-items: flex-start;">
+            <text class="icon icon-sm danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon{
+        font-family: hui;
+        &-sm{
+            font-size: 33px;
+             padding: 10px;
+        }
+        &-normal{
+             font-size: 40px;
+             padding: 10px;
+        }
+        &-lg{
+            font-size: 55px;
+            padding: 10px;
+        }
+        &-tool{
+             width: 100%;
+             justify-content: space-between;
+             height:60px;
+             margin-bottom: 20px;
+             background-color: #eeeeee;
+        }
+        &-image{
+            font-size: 200px;
+        }
+    }
+
+    .container{
+        flex-direction: column;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .center{
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .news-text {
+        color: #000000;
+        width: 100%;
+        font-size: 35.4px;
+        line-height: 60.4px;
+    }
+    textarea{
+        padding: 10px;
+    }
+    textarea:focus {
+        height: 560px;
+    }
+    video {
+        height:384px;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    image {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .audio{
+        margin-bottom: 20px;
+    }
+    progress{
+        width: 60px;
+        height: 60px;
+    }
+    .wait{
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 384px;
+    }
+    .default{
+        color: @color-black;
+    }
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    import image from '@system.image'
+    import media from '@system.media'
+    import request from '@system.request'
+    import { obsConfig } from '../../../utils/config'
+    import { getUuid, base64Encode, cryptoBytesToBase64, cryptoHMAC } from '../../../utils/security'
+
+    export default {
+        props: {
+            id:{},
+            params: {},
+            title: {
+                default: '文章详情'
+            },
+            data: {
+                default: []
+            },
+            expiration: {
+                default: 5 //超时，默认5分钟
+            },
+            videoLimit: {
+                default: 5 * 1024 * 1024 * 1024  //5G
+            },
+            audioLimit: {
+                default: 30 * 1024 * 1024  //30M
+            },
+            disabled:{
+                default: false
+            },
+            notBlank: {
+                default: ''
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compData: [],
+                compValid: this.valid,
+                compInit: true,
+                preview: false,
+                current: -1
+            }
+        },
+
+        onInit() {
+            for(var i=0;i<this.data.length;i++){
+                this.compData.push(this.data[i])
+            }
+
+            if(this.compData.length===0){
+                var item = {
+                    type: 'text',
+                    value: ''
+                }
+                this.compData.push(item)
+            }
+
+            if(this.disabled){
+                this.preview = true
+            }
+
+            this.$on('aiImageSave_dispatchEvt',this.dispatchAiImageSaveEvt)
+        },
+
+        //更新图片
+        dispatchAiImageSaveEvt(evt) {
+            var data = evt.detail.value
+            var targetId = data.targetId
+            var uri = data.uri
+
+            var index = Number(targetId.substr(targetId.lastIndexOf('_')+1, targetId.length-(targetId.lastIndexOf('_')+1)))
+
+            //上传到云OBS
+            let _this = this
+
+            // 超时
+            var current = new Date()
+            current.setTime(current.setMinutes(current.getMinutes() + 5));
+
+            //防止多客户端文件名同名冲突,改用uuid命名
+            var uuid = getUuid(true)
+            uuid = uuid + uri.substr(uri.lastIndexOf('.'), uri.length)
+
+            const OBSPolicy = {                   //设定policy内容
+                "expiration": current,
+                "conditions": [
+                    {"bucket": obsConfig.BucketName},
+                    {'key': uuid}
+                ]
+            }
+            const policyEncoded = base64Encode(JSON.stringify(OBSPolicy))                                                //计算policy编码值
+            const signature = cryptoBytesToBase64(cryptoHMAC(policyEncoded, obsConfig.SecretKey, {asBytes: true}))       //计算signature
+
+            _this.$child(_this.id + '_message').showMessage({
+                text: '正在上传图片，请稍侯。',
+                type: 'warning'
+            });
+
+            // 上传下载好的本地文件．其中，data为请求的参数，files为需要上传的文件列表
+            request.upload({
+                url: obsConfig.EndPoint,
+                header: {
+                    "Accept-Encoding": "gzip, deflate",
+                    "Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"
+                },
+                files: [
+                    {
+                        uri: uri,
+                        name: uuid,
+                        type: "multipart/form-data"
+                    }
+                ],
+                data: [
+                    {
+                        name: 'AccessKeyID',
+                        value: obsConfig.AccessKeyId
+                    },
+                    {
+                        name: 'policy',
+                        value: policyEncoded
+                    },
+                    {
+                        name: 'signature',
+                        value: signature
+                    },
+                    {
+                        name: 'key',
+                        value: uuid
+                    }
+                ],
+                success: function (ret) {
+                    var remoteUri = ret.headers.Location
+                    if(remoteUri !== undefined) {
+                        var remoteUuid = remoteUri.substr(remoteUri.lastIndexOf('/') + 1, remoteUri.length)
+                        remoteUri = obsConfig.EndPoint + '/' + remoteUuid
+
+                        _this.$child(_this.id + '_message').showMessage({
+                            text: '图片上传成功。',
+                            type: 'success'
+                        });
+
+                        //更新数据
+                        var arr = []
+                        for(var i=0;i<_this.compData.length;i++){
+                            if(i === index){
+                                var item = {
+                                    type: "image",
+                                    value: remoteUri
+                                }
+                                arr.push(item)
+                            }else{
+                                arr.push(_this.compData[i])
+                            }
+                        }
+                        _this.compData = arr
+                    }else{
+                        _this.$child(_this.id + '_message').showMessage({
+                            text: '图片上传失败。',
+                            type: 'danger'
+                        });
+                    }
+                },
+                fail: function (msg, code) {
+                    _this.$child(_this.id + '_message').showMessage({
+                        text: '图片上传失败。',
+                        type: 'danger'
+                    });
+                }
+            })
+
+        },
+
+        computed: {
+            compNotBlank() {
+                return this.disabled ? false : (this.notBlank==='false' ? false : true)
+            },
+            compTitle() {
+                return this.title==='none' ? "" : this.title
+            },
+            compStyle(){
+                return this.preview ? 'center' : 'container'
+            },
+            validStyle() {
+                if (this.compValid === 'has-success') {
+                    return "success"
+                } else if (this.compValid === 'has-warning') {
+                    return "warning"
+                } else if (this.compValid === 'has-error') {
+                    return "danger"
+                } else {
+                    return this.disabled ? "" : (this.compInit ? "" : "success")
+                }
+            }
+        },
+
+        handlePreview() {
+            if(!this.disabled) {
+                this.preview = !this.preview
+                this.compInit = false
+            }
+        },
+
+        handleAppend(e){
+            var id = e.target.id
+            var arrType = id.split('_')
+            var type = arrType[arrType.length-2]
+            var name = ''
+            var size = 0
+            var uri = ''
+            var arr = []
+            var i = 0
+
+            let _this = this
+            _this.compInit = false
+            _this.current = Number(id.substr(id.lastIndexOf('_')+1,id.length))
+
+            switch (type){
+                case 'image':
+                    media.pickImage({
+                        success:function(data){
+                            name = data.name
+                            size = data.size
+                            uri = data.uri
+
+                            //图片瘦身
+                            image.getImageInfo({
+                                uri: uri,
+                                success: function(data) {
+                                    if(data.width>700){
+                                        var scale = 684/data.width
+                                        image.applyOperations({
+                                            uri: uri,
+                                            operations: [
+                                                {
+                                                    action: 'scale',
+                                                    scaleX: scale,
+                                                    scaleY: scale
+                                                }
+                                            ],
+                                            quality: 90,
+                                            format: 'webp',
+                                            success: function(data) {
+
+                                                var item = {
+                                                    type: 'waitImage'
+                                                }
+
+                                                _this.$child(_this.id + '_message').showMessage({
+                                                    text: '正在上传图片，请稍侯。',
+                                                    type: 'warning'
+                                                });
+
+                                                var arr = []
+                                                for(i=0;i<=_this.current;i++){
+                                                    arr.push(_this.compData[i])
+                                                }
+
+                                                arr.push(item)
+
+                                                for(i=_this.current+1;i<_this.compData.length;i++){
+                                                    arr.push(_this.compData[i])
+                                                }
+
+                                                _this.compData = arr
+
+                                                // 超时
+                                                var current = new Date()
+                                                current.setTime(current.getTime() + (_this.expiration * 60 * 1000))
+
+                                                //防止多客户端文件名同名冲突,改用uuid命名
+                                                var uuid = getUuid(true)
+                                                uuid = uuid + name.substr(name.lastIndexOf('.'), name.length)
+
+                                                const OBSPolicy = {                   //设定policy内容
+                                                    "expiration": current,
+                                                    "conditions": [
+                                                        {"bucket": obsConfig.BucketName},
+                                                        {'key': uuid}
+                                                    ]
+                                                }
+
+                                                const policyEncoded = base64Encode(JSON.stringify(OBSPolicy))                                                //计算policy编码值
+                                                const signature = cryptoBytesToBase64(cryptoHMAC(policyEncoded, obsConfig.SecretKey, {asBytes: true}))       //计算signature
+
+                                                // 上传下载好的本地文件．其中，data为请求的参数，files为需要上传的文件列表
+                                                request.upload({
+                                                    url: obsConfig.EndPoint,
+                                                    header: {
+                                                        "Accept-Encoding": "gzip, deflate",
+                                                        "Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"
+                                                    },
+                                                    files: [
+                                                        {
+                                                            uri: data.uri,
+                                                            name: uuid,
+                                                            type: "multipart/form-data"
+                                                        }
+                                                    ],
+                                                    data: [
+                                                        {
+                                                            name: 'AccessKeyID',
+                                                            value: obsConfig.AccessKeyId
+                                                        },
+                                                        {
+                                                            name: 'policy',
+                                                            value: policyEncoded
+                                                        },
+                                                        {
+                                                            name: 'signature',
+                                                            value: signature
+                                                        },
+                                                        {
+                                                            name: 'key',
+                                                            value: uuid
+                                                        }
+                                                    ],
+                                                    success: function (ret) {
+                                                        var remoteUri = ret.headers.Location
+                                                        if(remoteUri !== undefined) {
+                                                            var remoteUuid = remoteUri.substr(remoteUri.lastIndexOf('/') + 1, remoteUri.length)
+                                                            remoteUri = obsConfig.EndPoint + '/' + remoteUuid
+
+                                                            var item = {
+                                                                type: 'image',
+                                                                value: remoteUri
+                                                            }
+
+                                                            arr = []
+                                                            for(i=0;i<_this.compData.length;i++){
+                                                                if(i === _this.current+1){
+                                                                    arr.push(item)
+                                                                }else {
+                                                                    arr.push(_this.compData[i])
+                                                                }
+                                                            }
+
+                                                            _this.compData = arr
+
+                                                            _this.$dispatch(_this.id + '_dispatchEvt', {
+                                                                value: _this.compData
+                                                            })
+                                                            _this.params[_this.id] = _this.compData
+
+
+                                                            _this.compValid = "has-success"
+                                                            _this.formError = ""
+
+                                                            _this.$child(_this.id + '_message').showMessage({
+                                                                text: '图片上传成功。',
+                                                                type: 'success'
+                                                            });
+                                                        }else{
+                                                            _this.compValid = "has-error"
+                                                            _this.formError = '图片上传失败。'
+
+                                                            _this.$child(_this.id + '_message').showMessage({
+                                                                text: '图片上传失败。',
+                                                                type: 'danger'
+                                                            });
+
+                                                            //数据还原
+                                                            arr = []
+                                                            for(i=0;i<_this.compData.length;i++){
+                                                                if(i !== _this.current+1){
+                                                                    arr.push(_this.compData[i])
+                                                                }
+                                                            }
+                                                            _this.compData = arr
+                                                        }
+
+
+                                                    },
+                                                    fail: function (msg, code) {
+                                                        console.info(msg)
+                                                        console.info(code)
+
+                                                        _this.compValid = "has-error"
+                                                        _this.formError = '图片上传失败。'
+
+                                                        _this.$child(_this.id + '_message').showMessage({
+                                                            text: '图片上传失败。',
+                                                            type: 'danger'
+                                                        });
+                                                        //数据还原
+                                                        arr = []
+                                                        for(i=0;i<_this.compData.length;i++){
+                                                            if(i !== _this.current+1){
+                                                                arr.push(_this.compData[i])
+                                                            }
+                                                        }
+                                                        _this.compData = arr
+                                                    }
+                                                })
+
+                                            },
+                                            fail: function(data, code) {
+                                                _this.compValid = "has-error"
+                                                _this.formError = '图片瘦身操作失败。'
+
+                                                _this.$child(_this.id + '_message').showMessage({
+                                                    text: '图片瘦身操作失败。',
+                                                    type: 'danger'
+                                                });
+                                            }
+                                        })
+                                    }
+                                },
+                                fail: function(data, code) {
+                                    _this.compValid = "has-error"
+                                    _this.formError = '未能获得图片尺寸信息，操作失败。'
+
+                                    _this.$child(_this.id + '_message').showMessage({
+                                        text: '未能获得图片尺寸信息。',
+                                        type: 'danger'
+                                    });
+                                }
+                            })
+
+
+                        },
+                        fail: function(data, code) {
+                            _this.compValid = "has-error"
+                            _this.formError = '图片选择操作失败。'
+
+                            _this.$child(_this.id + '_message').showMessage({
+                                text: '图片选择操作失败。',
+                                type: 'danger'
+                            });
+                        }
+                    })
+                    break
+                case 'video':
+                    media.pickVideo({
+                        success:function(data){
+                            name = data.name
+                            size = data.size
+                            uri = data.uri
+
+                            // 文件超大记录
+                            if (size > _this.videoLimit) {
+                                _this.compValid = "has-error"
+
+                                var videoLimit = ''
+
+                                if (_this.videoLimit < 1024 * 1024) {
+                                    videoLimit = Math.floor(_this.videoLimit / 1024) + 'K'
+                                } else if (_this.videoLimit >= 1024 * 1024 && _this.videoLimit < 1024 * 1024 * 1024) {
+                                    videoLimit = Math.floor(_this.videoLimit / (1024 * 1024)) + 'M'
+                                } else {
+                                    videoLimit = (_this.videoLimit / (1024 * 1024 * 1024).toFixed(1)) + 'G'
+                                }
+                                _this.formError = '视频文件太大。最大允许' + videoLimit + '。'
+                            }else{
+
+                                var item = {
+                                    type: 'waitVideo'
+                                }
+
+                                _this.$child(_this.id + '_message').showMessage({
+                                    text: '正在上传视频，请稍侯。',
+                                    type: 'warning'
+                                });
+
+                                arr = []
+                                for(i=0;i<=_this.current;i++){
+                                    arr.push(_this.compData[i])
+                                }
+
+                                arr.push(item)
+
+                                for(i=_this.current+1;i<_this.compData.length;i++){
+                                    arr.push(_this.compData[i])
+                                }
+
+                                _this.compData = arr
+
+                                // 超时
+                                var current = new Date()
+                                current.setTime(current.setMinutes(current.getMinutes() + _this.expiration));
+
+                                //防止多客户端文件名同名冲突,改用uuid命名
+                                var uuid = getUuid(true)
+                                uuid = uuid + name.substr(name.lastIndexOf('.'), name.length)
+
+                                const OBSPolicy = {                   //设定policy内容
+                                    "expiration": current,
+                                    "conditions": [
+                                        {"bucket": obsConfig.BucketName},
+                                        {'key': uuid}
+                                    ]
+                                }
+
+                                const policyEncoded = base64Encode(JSON.stringify(OBSPolicy))                                                //计算policy编码值
+                                const signature = cryptoBytesToBase64(cryptoHMAC(policyEncoded, obsConfig.SecretKey, {asBytes: true}))       //计算signature
+
+                                // 上传下载好的本地文件．其中，data为请求的参数，files为需要上传的文件列表
+                                request.upload({
+                                    url: obsConfig.EndPoint,
+                                    header: {
+                                        "Accept-Encoding": "gzip, deflate",
+                                        "Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"
+                                    },
+                                    files: [
+                                        {
+                                            uri: uri,
+                                            name: uuid,
+                                            type: "multipart/form-data"
+                                        }
+                                    ],
+                                    data: [
+                                        {
+                                            name: 'AccessKeyID',
+                                            value: obsConfig.AccessKeyId
+                                        },
+                                        {
+                                            name: 'policy',
+                                            value: policyEncoded
+                                        },
+                                        {
+                                            name: 'signature',
+                                            value: signature
+                                        },
+                                        {
+                                            name: 'key',
+                                            value: uuid
+                                        }
+                                    ],
+                                    success: function (ret) {
+                                        var remoteUri = ret.headers.Location
+                                        if(remoteUri !== undefined) {
+                                            var remoteUuid = remoteUri.substr(remoteUri.lastIndexOf('/') + 1, remoteUri.length)
+                                            remoteUri = obsConfig.EndPoint + '/' + remoteUuid
+
+                                            var item = {
+                                                type: 'video',
+                                                value: remoteUri,
+                                                poster: '../../../icons/poster.png'
+                                            }
+
+                                            arr = []
+                                            for(i=0;i<_this.compData.length;i++){
+                                                if(i === _this.current+1){
+                                                    arr.push(item)
+                                                }else {
+                                                    arr.push(_this.compData[i])
+                                                }
+                                            }
+
+                                            _this.compData = arr
+
+                                            _this.$dispatch(_this.id + '_dispatchEvt', {
+                                                value: _this.compData
+                                            })
+                                            _this.params[_this.id] = _this.compData
+
+
+                                            _this.compValid = "has-success"
+                                            _this.formError = ""
+
+                                            _this.$child(_this.id + '_message').showMessage({
+                                                text: '视频上传成功。',
+                                                type: 'success'
+                                            });
+
+                                        }else{
+                                            _this.compValid = "has-error"
+                                            _this.formError = '视频上传失败。'
+
+                                            _this.$child(_this.id + '_message').showMessage({
+                                                text: '视频上传失败。',
+                                                type: 'danger'
+                                            });
+
+                                            //数据还原
+                                            arr = []
+                                            for(i=0;i<_this.compData.length;i++){
+                                                if(i !== _this.current+1){
+                                                    arr.push(_this.compData[i])
+                                                }
+                                            }
+                                            _this.compData = arr
+                                        }
+
+
+                                    },
+                                    fail: function (msg, code) {
+                                        console.info(msg)
+                                        console.info(code)
+
+                                        _this.compValid = "has-error"
+                                        _this.formError = '视频上传失败。'
+
+                                        _this.$child(_this.id + '_message').showMessage({
+                                            text: '视频上传失败。',
+                                            type: 'danger'
+                                        });
+
+                                        //数据还原
+                                        arr = []
+                                        for(i=0;i<_this.compData.length;i++){
+                                            if(i !== _this.current+1){
+                                                arr.push(_this.compData[i])
+                                            }
+                                        }
+                                        _this.compData = arr
+                                    }
+                                })
+                            }
+                        },
+                        fail: function(data, code) {
+                            _this.compValid = "has-error"
+                            _this.formError = '视频选择操作失败。'
+
+                            _this.$child(_this.id + '_message').showMessage({
+                                text: '视频选择操作失败。',
+                                type: 'danger'
+                            });
+
+                        }
+                    })
+                    break
+                case 'audio':
+                    media.pickFile({
+                        success:function(data){
+                            name = data.name
+                            size = data.size
+                            uri = data.uri
+
+                            // 文件超大记录
+                            if (size > _this.audioLimit) {
+                                _this.compValid = "has-error"
+
+                                var audioLimit = ''
+
+                                if (_this.audioLimit < 1024 * 1024) {
+                                    audioLimit = Math.floor(_this.audioLimit / 1024) + 'K'
+                                } else if (_this.audioLimit >= 1024 * 1024 && _this.audioLimit < 1024 * 1024 * 1024) {
+                                    audioLimit = Math.floor(_this.audioLimit / (1024 * 1024)) + 'M'
+                                } else {
+                                    audioLimit = (_this.audioLimit / (1024 * 1024 * 1024).toFixed(1)) + 'G'
+                                }
+                                _this.formError = '音频文件太大。最大允许' + audioLimit + '。'
+                            }else{
+                                // 音频格式校验
+                                var exs = name.substr(name.lastIndexOf('.')+1, name.length)
+                                switch (exs.toUpperCase()){
+                                    case 'MP4':
+                                    case 'M4A':
+                                    case 'MKV':
+                                    case 'MP3':
+                                    case 'Ogg':
+                                    case 'WAV':
+                                    case 'MPEG-TS':
+                                    case 'ADTS':
+                                        //执行上传
+
+                                        var item = {
+                                            type: 'waitAudio'
+                                        }
+
+                                        _this.$child(_this.id + '_message').showMessage({
+                                            text: '正在上传音频，请稍侯。',
+                                            type: 'warning'
+                                        });
+
+                                        var arr = []
+                                        for(i=0;i<=_this.current;i++){
+                                            arr.push(_this.compData[i])
+                                        }
+
+                                        arr.push(item)
+
+                                        for(i=_this.current+1;i<_this.compData.length;i++){
+                                            arr.push(_this.compData[i])
+                                        }
+
+                                        _this.compData = arr
+
+                                        // 超时
+                                        var current = new Date()
+                                        current.setTime(current.setMinutes(current.getMinutes() + _this.expiration));
+
+                                        //防止多客户端文件名同名冲突,改用uuid命名
+                                        var uuid = getUuid(true)
+                                        uuid = uuid + name.substr(name.lastIndexOf('.'), name.length)
+
+                                        const OBSPolicy = {                   //设定policy内容
+                                            "expiration": current,
+                                            "conditions": [
+                                                {"bucket": obsConfig.BucketName},
+                                                {'key': uuid}
+                                            ]
+                                        }
+
+                                        const policyEncoded = base64Encode(JSON.stringify(OBSPolicy))                                                //计算policy编码值
+                                        const signature = cryptoBytesToBase64(cryptoHMAC(policyEncoded, obsConfig.SecretKey, {asBytes: true}))       //计算signature
+
+                                        // 上传下载好的本地文件．其中，data为请求的参数，files为需要上传的文件列表
+                                        request.upload({
+                                            url: obsConfig.EndPoint,
+                                            header: {
+                                                "Accept-Encoding": "gzip, deflate",
+                                                "Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"
+                                            },
+                                            files: [
+                                                {
+                                                    uri: uri,
+                                                    name: uuid,
+                                                    type: "multipart/form-data"
+                                                }
+                                            ],
+                                            data: [
+                                                {
+                                                    name: 'AccessKeyID',
+                                                    value: obsConfig.AccessKeyId
+                                                },
+                                                {
+                                                    name: 'policy',
+                                                    value: policyEncoded
+                                                },
+                                                {
+                                                    name: 'signature',
+                                                    value: signature
+                                                },
+                                                {
+                                                    name: 'key',
+                                                    value: uuid
+                                                }
+                                            ],
+                                            success: function (ret) {
+                                                var remoteUri = ret.headers.Location
+                                                if(remoteUri !== undefined) {
+                                                    var remoteUuid = remoteUri.substr(remoteUri.lastIndexOf('/') + 1, remoteUri.length)
+                                                    remoteUri = obsConfig.EndPoint + '/' + remoteUuid
+
+                                                    var item = {
+                                                        type: 'audio',
+                                                        value: remoteUri
+                                                    }
+
+                                                    arr = []
+                                                    for(i=0;i<_this.compData.length;i++){
+                                                        if(i === _this.current+1){
+                                                            arr.push(item)
+                                                        }else {
+                                                            arr.push(_this.compData[i])
+                                                        }
+                                                    }
+
+                                                    _this.compData = arr
+
+                                                    _this.$dispatch(_this.id + '_dispatchEvt', {
+                                                        value: _this.compData
+                                                    })
+                                                    _this.params[_this.id] = _this.compData
+
+
+                                                    _this.compValid = "has-success"
+                                                    _this.formError = ""
+
+                                                    _this.$child(_this.id + '_message').showMessage({
+                                                        text: '音频上传成功。',
+                                                        type: 'success'
+                                                    });
+
+                                                }else{
+                                                    _this.compValid = "has-error"
+                                                    _this.formError = '音频上传失败。'
+
+                                                    _this.$child(_this.id + '_message').showMessage({
+                                                        text: '音频上传失败。',
+                                                        type: 'danger'
+                                                    });
+
+                                                    //数据还原
+                                                    arr = []
+                                                    for(i=0;i<_this.compData.length;i++){
+                                                        if(i !== _this.current+1){
+                                                            arr.push(_this.compData[i])
+                                                        }
+                                                    }
+                                                    _this.compData = arr
+                                                }
+                                            },
+                                            fail: function (msg, code) {
+                                                console.info(msg)
+                                                console.info(code)
+
+                                                _this.compValid = "has-error"
+                                                _this.formError = '音频上传失败。'
+
+                                                _this.$child(_this.id + '_message').showMessage({
+                                                    text: '音频上传失败。',
+                                                    type: 'danger'
+                                                });
+
+                                                //数据还原
+                                                arr = []
+                                                for(i=0;i<_this.compData.length;i++){
+                                                    if(i !== _this.current+1){
+                                                        arr.push(_this.compData[i])
+                                                    }
+                                                }
+                                                _this.compData = arr
+                                            }
+                                        })
+
+                                        break
+                                    default:
+                                        _this.compValid = "has-error"
+                                        _this.formError = '错误的文件类型。当前支持的格式包括：MP4、M4A、MKV、MP3、Ogg、WAV、MPEG-TS、ADTS格式。'
+
+                                        _this.$child(_this.id + '_message').showMessage({
+                                            text: '错误的文件类型。',
+                                            type: 'danger'
+                                        });
+
+                                        break
+                                }
+                            }
+                        },
+                        fail: function(data, code) {
+                            _this.compValid = "has-error"
+                            _this.formError = '音频选择操作失败。'
+
+                            _this.$child(_this.id + '_message').showMessage({
+                                text: '音频选择操作失败。',
+                                type: 'danger'
+                            });
+                        }
+                    })
+                    break
+                case 'poster':
+                    media.pickImage({
+                        success:function(data){
+                            name = data.name
+                            size = data.size
+                            uri = data.uri
+
+                            //图片瘦身
+                            image.getImageInfo({
+                                uri: uri,
+                                success: function(data) {
+                                    if(data.width>700){
+                                        var scale = 684/data.width
+                                        image.applyOperations({
+                                            uri: uri,
+                                            operations: [
+                                                {
+                                                    action: 'scale',
+                                                    scaleX: scale,
+                                                    scaleY: scale
+                                                }
+                                            ],
+                                            quality: 90,
+                                            format: 'webp',
+                                            success: function(data) {
+
+                                                _this.$child(_this.id + '_message').showMessage({
+                                                    text: '正在上传视频封面，请稍侯。',
+                                                    type: 'warning'
+                                                });
+
+                                                // 超时
+                                                var current = new Date()
+                                                current.setTime(current.setMinutes(current.getMinutes() + _this.expiration));
+
+                                                //防止多客户端文件名同名冲突,改用uuid命名
+                                                var uuid = getUuid(true)
+                                                uuid = uuid + name.substr(name.lastIndexOf('.'), name.length)
+
+                                                const OBSPolicy = {                   //设定policy内容
+                                                    "expiration": current,
+                                                    "conditions": [
+                                                        {"bucket": obsConfig.BucketName},
+                                                        {'key': uuid}
+                                                    ]
+                                                }
+
+                                                const policyEncoded = base64Encode(JSON.stringify(OBSPolicy))                                                //计算policy编码值
+                                                const signature = cryptoBytesToBase64(cryptoHMAC(policyEncoded, obsConfig.SecretKey, {asBytes: true}))       //计算signature
+
+                                                // 上传下载好的本地文件．其中，data为请求的参数，files为需要上传的文件列表
+                                                request.upload({
+                                                    url: obsConfig.EndPoint,
+                                                    header: {
+                                                        "Accept-Encoding": "gzip, deflate",
+                                                        "Accept-Language": "zh-CN,en-US;q=0.8,en;q=0.6"
+                                                    },
+                                                    files: [
+                                                        {
+                                                            uri: data.uri,
+                                                            name: uuid,
+                                                            type: "multipart/form-data"
+                                                        }
+                                                    ],
+                                                    data: [
+                                                        {
+                                                            name: 'AccessKeyID',
+                                                            value: obsConfig.AccessKeyId
+                                                        },
+                                                        {
+                                                            name: 'policy',
+                                                            value: policyEncoded
+                                                        },
+                                                        {
+                                                            name: 'signature',
+                                                            value: signature
+                                                        },
+                                                        {
+                                                            name: 'key',
+                                                            value: uuid
+                                                        }
+                                                    ],
+                                                    success: function (ret) {
+                                                        var remoteUri = ret.headers.Location
+                                                        if(remoteUri !== undefined) {
+                                                            var remoteUuid = remoteUri.substr(remoteUri.lastIndexOf('/') + 1, remoteUri.length)
+                                                            remoteUri = obsConfig.EndPoint + '/' + remoteUuid
+
+                                                            arr = []
+                                                            for(i=0;i<_this.compData.length;i++){
+                                                                if(i === _this.current){
+                                                                    var item = {
+                                                                        type: 'video',
+                                                                        value: _this.compData[i].value,
+                                                                        poster: remoteUri
+                                                                    }
+                                                                    arr.push(item)
+                                                                }else {
+                                                                    arr.push(_this.compData[i])
+                                                                }
+                                                            }
+
+                                                            _this.compData = arr
+
+                                                            _this.$dispatch(_this.id + '_dispatchEvt', {
+                                                                value: _this.compData
+                                                            })
+                                                            _this.params[_this.id] = _this.compData
+
+
+                                                            _this.compValid = "has-success"
+                                                            _this.formError = ""
+
+                                                            _this.$child(_this.id + '_message').showMessage({
+                                                                text: '视频封面上传成功。',
+                                                                type: 'success'
+                                                            });
+                                                        }else{
+                                                            _this.compValid = "has-error"
+                                                            _this.formError = '视频封面上传失败。'
+
+                                                            _this.$child(_this.id + '_message').showMessage({
+                                                                text: '视频封面上传失败。',
+                                                                type: 'danger'
+                                                            });
+                                                        }
+
+
+                                                    },
+                                                    fail: function (msg, code) {
+                                                        console.info(msg)
+                                                        console.info(code)
+
+                                                        _this.compValid = "has-error"
+                                                        _this.formError = '视频封面上传失败。'
+
+                                                        _this.$child(_this.id + '_message').showMessage({
+                                                            text: '视频封面上传失败。',
+                                                            type: 'danger'
+                                                        });
+                                                    }
+                                                })
+
+                                            },
+                                            fail: function(data, code) {
+                                                _this.compValid = "has-error"
+                                                _this.formError = '视频封面瘦身操作失败。'
+
+                                                _this.$child(_this.id + '_message').showMessage({
+                                                    text: '视频封面瘦身操作失败。',
+                                                    type: 'danger'
+                                                });
+                                            }
+                                        })
+                                    }
+                                },
+                                fail: function(data, code) {
+                                    _this.compValid = "has-error"
+                                    _this.formError = '未能获得图片尺寸信息，操作失败。'
+
+                                    _this.$child(_this.id + '_message').showMessage({
+                                        text: '未能获得图片尺寸信息。',
+                                        type: 'danger'
+                                    });
+                                }
+                            })
+                        },
+                        fail: function(data, code) {
+                            _this.compValid = "has-error"
+                            _this.formError = '视频封面选择操作失败。'
+
+                            _this.$child(_this.id + '_message').showMessage({
+                                text: '视频封面选择操作失败。',
+                                type: 'danger'
+                            });
+                        }
+                    })
+                    break
+                default:
+                    var item = {
+                        type: 'text',
+                        value: ''
+                    }
+
+                    arr = []
+                    for(i=0;i<=_this.current;i++){
+                        arr.push(_this.compData[i])
+                    }
+
+                    arr.push(item)
+
+                    for(i=_this.current+1;i<_this.compData.length;i++){
+                        arr.push(_this.compData[i])
+                    }
+
+                    _this.compData = arr
+
+                    _this.$dispatch(_this.id + '_dispatchEvt', {
+                        value: _this.compData
+                    })
+                    _this.params[_this.id] = _this.compData
+
+                    //获得焦点
+                    // var focusId = id.substr(id.lastIndexOf('_')+1,id.length) + (_this.current+1)
+                    // _this.$element(focusId).focus();
+
+                    break
+            }
+        },
+
+        // 删除
+        handleTrash(e){
+            this.compInit = false
+            var id = e.target.id
+            var index = Number(id.substr(id.lastIndexOf('_')+1,id.length))
+            var arr = []
+            var i=0
+            for(i=0;i<this.compData.length;i++){
+                if(index !== i){
+                    arr.push(this.compData[i])
+                }
+            }
+
+            if(arr.length === 0){
+                var item = {
+                    type: 'text',
+                    value: e.value
+                }
+                arr.push(item)
+
+                this.compData = arr
+
+                if(this.compNotBlank){
+                    this.compValid = "has-error"
+                    this.formError = "内容不可为空。"
+                }
+            }else{
+                this.compData = arr
+                this.checkBlank()
+            }
+
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compData
+            })
+            this.params[this.id] = this.compData
+        },
+
+        handleFocus(e){
+            this.checkBlank()
+        },
+
+        handleBlur(e){
+            this.checkBlank()
+        },
+
+        checkBlank(){
+            var blank = true
+            for (var i = 0; i < this.compData.length; i++) {
+                var type = this.compData[i].type
+                switch (type) {
+                    case 'image':
+                    case 'video':
+                    case 'audio':
+                        blank = false
+                        break
+                    default: // text
+                        if (this.compData[i].value !== '') {
+                            blank = false
+                        }
+                        break
+                }
+                if (!blank) {
+                    break
+                }
+            }
+
+            if (blank) {
+                if (this.compNotBlank) {
+                    this.compValid = "has-error"
+                    this.formError = "内容不可为空。"
+                } else {
+                    this.compValid = "has-success"
+                    this.formError = ""
+                }
+            } else {
+                this.compValid = "has-success"
+                this.formError = ""
+            }
+            this.compInit = false
+        },
+
+        handleChange(e) {
+            var id = e.target.id
+            var index = Number(id.substr(id.lastIndexOf('_')+1,id.length))
+
+            var arr = []
+            for(var i=0;i<this.compData.length;i++){
+                if(index === i){
+                    var item = {
+                        type: 'text',
+                        value: e.value
+                    }
+                    arr.push(item)
+                }else{
+                    arr.push(this.compData[i])
+                }
+            }
+            this.compData = arr
+
+            if(e.value === ''){
+                this.checkBlank()
+            }else{
+                if(!this.compInit) {
+                    this.compValid = "has-success"
+                    this.formError = ""
+                }
+            }
+
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compData
+            })
+            this.params[this.id] = this.compData
+        }
+    }
+</script>

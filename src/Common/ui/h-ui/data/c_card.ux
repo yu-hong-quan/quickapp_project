@@ -1,0 +1,127 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div class="card" onclick="handleClick" style="{{hStyle}}">
+        <image if="{{image !== ''}}" class="card-image" src="{{image}}"></image>
+
+        <div show="{{title !== ''}}" class="card-top">
+            <div class="card-top-title">
+                <div if="{{icon !== ''}}" class="card-top-title-icon {{bgColor}}">
+                    <icon type="{{icon}}" size="36" color="white"></icon>
+                </div>
+                <avatar if="{{avatar !== ''}}" src="{{avatar}}" size="46" h-style="margin-right:10px;"></avatar>
+                <text if="{{title !== ''}}">{{title}}</text>
+            </div>
+            <div class="card-top-extra" onclick="handleClick">
+                <text if="{{extra !== ''}}">{{extra}}</text>
+            </div>
+        </div>
+
+        <div class="card-memo">
+            <slot></slot>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .card {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+        background-color: #ffffff;
+        &-top{
+            justify-content: space-between;
+            border-color: #cccccc;
+            border-bottom-width: 0.5px;
+            &-title{
+                line-height: @font-size-base * 2.5;
+                align-items: center;
+                padding: 30px;
+                & text{
+                    color: #1a1a1a;
+                    font-size: 31px;
+                }
+                &-icon{
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 23px;
+                    align-items: center;
+                    justify-content: center;
+                    margin-right:10px;
+                }
+            }
+            &-extra{
+                align-items: center;
+                margin-right: 30px;
+            }
+        }
+        &-memo{
+            padding: 30px;
+        }
+        &-image{
+            width: 100%;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{
+                default: ''
+            },
+            title: {
+                default: ''
+            },
+            extra: {
+                default: ''
+            },
+            icon: {
+                default: ''
+            },
+            bgColor: {
+                default: ''
+            },
+            avatar: {
+                default: ''
+            },
+            image: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        handleClick(){
+            if(this.id !== '') {
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: 'card is clicked!'
+                })
+            }
+        }
+    };
+</script>

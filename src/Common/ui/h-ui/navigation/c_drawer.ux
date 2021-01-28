@@ -1,0 +1,877 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<import name="avatar" src="../advance/c_avatar"></import>
+<template>
+    <div>
+        <div if="{{maskShow}}" class="modal" onclick="handleClick">
+            <div class="card {{compStyle}}">
+                <block for="{{data}}">
+                    <div class="card-top" onclick="detail($item.uri)">
+                        <div class="card-top-title">
+                            <div if="{{!!$item.icon}}" class="card-top-title-icon {{$item.bgColor}}">
+                                <icon type="{{$item.icon}}" size="36" color="white"></icon>
+                            </div>
+                            <avatar if="{{!!$item.avatar}}" src="{{$item.avatar}}" size="46" class="card-top-title-avatar"></avatar>
+                            <text>{{$item.title}}</text>
+                        </div>
+                        <div class="card-top-extra" onclick="handleClick">
+                            <image class="c-img" src="../../../icons/arrow.png"></image>
+                        </div>
+                    </div>
+                </block>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+
+    .modal {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+
+    .card {
+        flex-direction: column;
+        width: 100%;
+        margin: 10px 0;
+        border-width: 2px;
+        border-radius: 8px;
+        border-color: @color-border;
+
+        &-top {
+            justify-content: space-between;
+            border-color: #cccccc;
+            border-bottom-width: 0.5px;
+            &-title {
+                line-height: @font-size-base *2.5;
+                align-items: center;
+                padding: 30px;
+                & text {
+                    color: #1a1a1a;
+                    font-size: 31px;
+                }
+                &-icon {
+                    width: 46px;
+                    height: 46px;
+                    border-radius: 23px;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 10px 0 10px;
+                }
+                &-avatar {
+                    margin: 0 10px 0 10px;
+                }
+            }
+            &-extra {
+                align-items: center;
+                margin-right: 30px;
+            }
+        }
+        &-memo {
+            padding: 30px;
+        }
+        &-image {
+            width: 100%;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+    }
+
+    .navleft{
+        position: fixed;
+        top: 0;
+        bottom:0;
+        left: -500px;
+        right: 750px;
+        width: 500px;
+        height:100%;
+        background-color: #ffffff;
+    }
+
+    .showleft{
+        animation-name: showleft;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhideleft{
+        animation-name: hwhideleft;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hideleft{
+        animation-name: hideleft;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes showleft {
+        from {
+            transform: translateX(0px);
+        }
+        to {
+            transform: translateX(500px);
+        }
+    }
+
+    @keyframes hwhideleft {
+        from {
+            transform: translateX(-250px);
+        }
+        to {
+            transform: translateX(-750px);
+        }
+    }
+
+    @keyframes hideleft {
+        from {
+            transform: translateX(500px);
+        }
+        to {
+            transform: translateX(-40px);
+        }
+    }
+
+    .hwnavright{
+        position: fixed;
+        top: 0;
+        bottom:0;
+        left: 750px;
+        right: -500px;
+        width: 500px;
+        height:100%;
+        background-color: #ffffff;
+    }
+
+    .navright{
+        top: 0;
+        bottom:0;
+        left: 750px;
+        right: -500px;
+        width: 500px;
+        height:100%;
+        background-color: #ffffff;
+    }
+
+    .showright{
+        animation-name: showright;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhideright{
+        animation-name: hwhideright;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hideright{
+        animation-name: hideright;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes showright {
+        from {
+            transform: translateX(0px);
+        }
+        to {
+            transform: translateX(-500px);
+        }
+    }
+
+    @keyframes hwhideright {
+        from {
+            transform: translateX(250px);
+        }
+        to {
+            transform: translateX(750px);
+        }
+    }
+
+    @keyframes hideright {
+        from {
+            transform: translateX(-500px);
+        }
+        to {
+            transform: translateX(40px);
+        }
+    }
+
+    .nav1{
+        position: fixed;
+        bottom:-100px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:100px;
+        background-color: #ffffff;
+    }
+
+    .show1{
+        animation-name: show1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide1{
+        animation-name: hwhide1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide1{
+        animation-name: hide1;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show1 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-100px);
+        }
+    }
+
+    @keyframes hwhide1 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(300px);
+        }
+    }
+
+    @keyframes hide1 {
+        from {
+            transform: translateY(-100px);
+        }
+        to {
+            transform: translateY(30px);
+        }
+    }
+
+    .nav2{
+        position: fixed;
+        bottom:-200px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:200px;
+        background-color: #ffffff;
+    }
+
+    .show2{
+        animation-name: show2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide2{
+        animation-name: hwhide2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide2{
+        animation-name: hide2;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show2 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-200px);
+        }
+    }
+
+    @keyframes hwhide2 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(400px);
+        }
+    }
+
+    @keyframes hide2 {
+        from {
+            transform: translateY(-200px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav3{
+        position: fixed;
+        bottom:-300px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:300px;
+        background-color: #ffffff;
+    }
+
+    .show3{
+        animation-name: show3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide3{
+        animation-name: hwhide3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide3{
+        animation-name: hide3;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show3 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-300px);
+        }
+    }
+
+    @keyframes hwhide3 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(500px);
+        }
+    }
+
+    @keyframes hide3 {
+        from {
+            transform: translateY(-300px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav4{
+        position: fixed;
+        bottom:-400px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:400px;
+        background-color: #ffffff;
+    }
+
+    .show4{
+        animation-name: show4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide4{
+        animation-name: hwhide4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide4{
+        animation-name: hide4;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show4 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-400px);
+        }
+    }
+
+    @keyframes hwhide4 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(600px);
+        }
+    }
+
+    @keyframes hide4 {
+        from {
+            transform: translateY(-400px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav5{
+        position: fixed;
+        bottom:-500px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:500px;
+        background-color: #ffffff;
+    }
+
+    .show5{
+        animation-name: show5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide5{
+        animation-name: hwhide5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide5{
+        animation-name: hide5;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show5 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-500px);
+        }
+    }
+
+    @keyframes hwhide5 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(700px);
+        }
+    }
+
+    @keyframes hide5 {
+        from {
+            transform: translateY(-500px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav6{
+        position: fixed;
+        bottom:-600px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:600px;
+        background-color: #ffffff;
+    }
+
+    .show6{
+        animation-name: show6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide6{
+        animation-name: hwhide6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide6{
+        animation-name: hide6;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show6 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-600px);
+        }
+    }
+
+    @keyframes hwhide6 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(800px);
+        }
+    }
+
+    @keyframes hide6 {
+        from {
+            transform: translateY(-600px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav7{
+        position: fixed;
+        bottom:-700px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:700px;
+        background-color: #ffffff;
+    }
+
+    .show7{
+        animation-name: show7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide7{
+        animation-name: hwhide7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide7{
+        animation-name: hide7;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show7 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-700px);
+        }
+    }
+
+    @keyframes hwhide7 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(900px);
+        }
+    }
+
+    @keyframes hide7 {
+        from {
+            transform: translateY(-700px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav8{
+        position: fixed;
+        bottom:-800px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:800px;
+        background-color: #ffffff;
+    }
+
+    .show8{
+        animation-name: show8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide8{
+        animation-name: hwhide8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide8{
+        animation-name: hide8;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show8 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-800px);
+        }
+    }
+
+    @keyframes hwhide8 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1000px);
+        }
+    }
+
+    @keyframes hide8 {
+        from {
+            transform: translateY(-800px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav9{
+        position: fixed;
+        bottom:-900px;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height:900px;
+        background-color: #ffffff;
+    }
+
+    .show9{
+        animation-name: show9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide9{
+        animation-name: hwhide9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide9{
+        animation-name: hide9;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show9 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-900px);
+        }
+    }
+
+    @keyframes hwhide9 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1100px);
+        }
+    }
+
+    @keyframes hide9 {
+        from {
+            transform: translateY(-900px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+
+    .nav10{
+        position: fixed;
+        bottom:-1000px;
+        left: 20px;
+        right: 20px;
+        width: 100%;
+        height:1000px;
+        background-color: #ffffff;
+    }
+
+    .show10{
+        animation-name: show10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hwhide10{
+        animation-name: hwhide10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    .hide10{
+        animation-name: hide10;
+        animation-duration: 200ms;
+        animation-fill-mode: forwards;
+        animation-timing-function: linear;
+    }
+
+    @keyframes show10 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(-1000px);
+        }
+    }
+
+    @keyframes hwhide10 {
+        from {
+            transform: translateY(0px);
+        }
+        to {
+            transform: translateY(1200px);
+        }
+    }
+
+    @keyframes hide10 {
+        from {
+            transform: translateY(-1000px);
+        }
+        to {
+            transform: translateY(40px);
+        }
+    }
+</style>
+
+<script>
+    import router from "@system.router";
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        data() {
+            return {
+                data:[],
+                mode: 'bottom',
+                isShow: false,
+                maskShow: false
+            }
+        },
+        computed: {
+            compStyle() {
+                var style = ''
+                switch (this.mode){
+                    case 'left':
+                        style = this.isShow ? 'navleft showleft' : 'navleft ' + ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'hideleft'
+                        break
+                    case 'right':
+                        style = this.isShow ? ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'navright showright' : ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'navright ' + ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'hideright'
+                        break
+                    case 'bottom':
+                    default:
+                        var len = this.data.length
+                        if (len === 0) {
+                            len = 1
+                        }
+                        if (len > 10) {
+                            len = 10
+                        }
+
+                        style = this.isShow ? ('nav' + len + ' show' + len) : ('nav' + len + ' ' + ((loaderConfig.type.toUpperCase() === 'HUAWEI') ? 'hw' : '') + 'hide' + len)
+                        break
+                }
+
+                return style
+            }
+        },
+
+        showDrawer(options) {
+            const {data, mode = 'bottom'} = options;
+            Object.assign(this._data, {
+                ...options,
+                data: data,
+                mode: mode,
+                isShow: true,
+                maskShow: true
+            });
+        },
+
+        handleClick() {
+            this.isShow = false
+            setTimeout(() => {
+                this.maskShow = false
+            }, 500);
+        },
+
+        detail: function(src) {
+            //跳转相应页面
+            router.push({
+                uri: src
+            });
+        }
+    }
+</script>

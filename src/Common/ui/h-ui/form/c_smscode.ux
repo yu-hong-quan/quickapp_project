@@ -1,0 +1,317 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="count-down" src="../advance/c_count_down"></import>
+<import name="message" src="../feedback/c_message"></import>
+<template>
+    <div class="form-group" style="{{hStyle}}">
+        <message id="{{id + '_message'}}"></message>
+        <div show="{{showTip}}" style="align-items: flex-start;">
+            <text class="icon warning" style="margin-top: 6px;">&#xe7b1;</text>
+            <text class="sub small">{{tip}}</text>
+        </div>
+
+        <div class="{{formHorizontalType}} {{noBorder ? 'form-control-no-border' : ''}}">
+            <div if="{{formLabelType === 'form-group-label-horizontal'}}"  style="width:35%;">
+                <text if="{{title!=='none'}}" class="red"> * </text>
+                <label if="{{title!=='none'}}" target="input" class="form-group-label-horizontal {{validStyle}}">{{title}}：</label>
+            </div>
+            <div if="{{formLabelType === 'form-group-label-default'}}">
+                <text if="{{title!=='none'}}" class="red">* </text>
+                <label if="{{title!=='none'}}" target="input" class="form-group-label-default {{validStyle}}">{{title}}</label>
+            </div>
+
+            <div class="{{borderType}}" style="{{formHorizontalType==='form-group-horizontal' ? 'width:65%;' : ''}}">
+                <text class="icon" style="margin-left: 12px;width:36px;">&#xe80f;</text>
+                <text if="{{title==='none'}}" class="red" style="width: 40px;"> * </text>
+                <input id="{{id}}" type="number" name="{{name}}" class="{{alignRight === 'true' ? 'form-group-control-right': ''}}"
+                       maxlength="6" placeholder="{{compPlaceholder}}" value="{{compValue}}" style="{{formControlType}}"
+                       onchange="handleChange" onfocus="handleFocus" onblur="handleBlur">
+                </input>
+
+                <input if="{{compStatus === 0}}" class="{{noBorder || formHorizontal ? 'btn' : 'btn-primary'}}" type="button" value="发送" onclick="handleClick"></input>
+                <count-down if="{{compStatus === 1}}" id="{{id + '_countdown'}}" expiration="{{expiration}}" h-style="margin-right: 12px;margin-top: 7px;width:120px;"></count-down>
+            </div>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <text class="icon danger">&#xe719;</text>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .icon{
+        font-family: hui;
+        font-size: 30px;
+    }
+    input {
+        height: @font-size-base * 2.5;
+        padding: 12px;
+        font-size: @font-size-base;
+        line-height: @font-size-base * 1.42857143;
+    }
+    .btn-primary{
+        font-weight: 100;
+        text-align: center;
+        border: 1px solid transparent;
+        color: @color-white;
+        background-color: @color-primary;
+        border-color: @color-primary-border;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .btn{
+        font-weight: 100;
+        text-align: center;
+        border: 1px solid transparent;
+        background-color: @color-white;
+    }
+
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            noBorder: {
+                default: false
+            },
+            formHorizontal: {
+                default: false
+            },
+            title: {
+                default: '短信验证码'
+            },
+            name: {
+                default: ''
+            },
+            focus: {
+                default: false
+            },
+            placeholder: {
+                default: '请输入短信验证码'
+            },
+            value: {
+                default: ''
+            },
+            alignRight: {
+                default: false
+            },
+            tip: {
+                default: ''
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            mobileId: {},
+            expiration: {
+                default: 120
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                compValidIcon: false,
+                compNotBlank: true,
+                codeValue: '',
+                compFocus: this.focus,
+                showTip: false,
+                showRemoteError:true,
+                compInit: true,
+                compStatus: 0
+            }
+        },
+
+        onReady() {
+            if (!this.compFocus) {return;}
+            this.$element(this.id).focus({focus: this.compFocus})
+        },
+
+        handleChange(e) {
+            this.compValue = e.value
+            this.validData()
+            if(!this.compInit) {
+                this.$dispatch(this.id + '_dispatchEvt', {
+                    value: this.compValue
+                })
+                this.params[this.id] = this.compValue
+            }
+        },
+
+        handleFocus(e) {
+            this.compFocus = true
+            this.compValid = ""
+            this.showRemoteError=false
+            if(this.tip!==''){
+                this.showTip = true
+            }
+            if(this.compInit){
+                this.compInit = false
+            }
+            this.$dispatch(this.id + '_dispatchFocusEvt', e)
+        },
+
+        handleBlur(e) {
+            this.compFocus = false
+            this.showTip = false
+            this.validData()
+            this.$dispatch(this.id + '_dispatchBlurEvt', e)
+        },
+
+        // 数据校验
+        validData() {
+            if(this.compValue===''){
+                this.compValid = 'has-error'
+                this.formError = '该字段不能为空！'
+            }else{
+                var smsPattern= '^\\d{4,6}$'
+                var patt = new RegExp(smsPattern);
+                var r = this.compValue.match(patt);
+                if(r===null){
+                    this.compValid = 'has-error'
+                    this.formError = '输入的格式不正确！'
+                }else{
+                    if(!this.showRemoteError){
+                        this.compValid = 'has-success'
+                        this.formError = ''
+                    }
+                }
+            }
+        },
+
+        handleClick(){
+            var flag = false
+            var mobile = ''
+            for(let v in this.params) {
+                if(v === this.mobileId){
+                    flag = true
+                    mobile = this.params[v]
+                    break
+                }
+            }
+
+            if(flag){
+                var pattern="^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[0-9])\\d{8}$"
+                var patt = new RegExp(pattern);
+                var r = mobile.match(patt);
+                if(r!==null){
+                    this.compStatus = 1
+
+                    //请求远程发送验证码短信
+                    this.$dispatch(this.id + '_dispatchSmsEvt', {
+                        value: mobile
+                    })
+
+                    setTimeout(() => {
+                        this.compStatus = 0
+                    }, this.expiration * 1000);
+                }else{
+                    this.$child(this.id + '_message').showMessage({
+                        text: '请提供正确的手机号。',
+                        type: 'warning'
+                    });
+                }
+            }else{
+                this.$child(this.id + '_message').showMessage({
+                    text: '请先提供您的手机号。',
+                    type: 'warning'
+                });
+            }
+        },
+
+        computed: {
+            compFormHorizontal() {
+                return this.noBorder ? true : this.formHorizontal
+            },
+            formHorizontalType() {
+                return this.compFormHorizontal ? "form-group-horizontal" : "form-group-default"
+            },
+            formLabelType() {
+                return this.compFormHorizontal ? "form-group-label-horizontal" : "form-group-label-default"
+            },
+            formControlType() {
+                return this.compFormHorizontal ? "width:300px;" : "width:100%;"
+            },
+            compPlaceholder() {
+                return this.placeholder==='none' ? "" : this.placeholder
+            },
+            borderType() {
+                if(this.noBorder){
+                    return ''
+                }else{
+                    if(this.compFocus){
+                        return 'form-control-focus'
+                    }
+
+                    if(this.formError!==''){
+                        return 'has-error'
+                    }else{
+                        if(this.compValid==='has-success'){
+                            return 'has-success'
+                        }else if(this.compValid==='has-warning') {
+                            return 'has-warning'
+                        }else if(this.compValid==='has-error') {
+                            return 'has-error'
+                        }else{
+                            return "form-control-border-default"
+                        }
+                    }
+                }
+            },
+            validStyle() {
+                if(this.compValid==='has-success'){
+                    return "success"
+                }else if (this.compValid==='has-warning') {
+                    return "warning"
+                } else if(this.compValid==='has-error') {
+                    return "danger"
+                } else {
+                    return ""
+                }
+            }
+        }
+    }
+</script>

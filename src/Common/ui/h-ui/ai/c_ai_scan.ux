@@ -1,0 +1,917 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="toast" src="../feedback/c_toast"></import>
+<import name="pickimage" src="../media/c_pickimage"></import>
+<import name="takephoto" src="../media/c_takephoto"></import>
+<import name="share" src="../advance/c_share"></import>
+<import name="h5" src="../text/c_h5"></import>
+<import name="geolocation" src="../advance/c_geolocation"></import>
+<import name="sms" src="../advance/c_sms"></import>
+<import name="calendar" src="../advance/c_calendar"></import>
+<import name="segment" src="../navigation/c_segment"></import>
+<import name="p" src="../text/c_p"></import>
+<template>
+    <div>
+        <text if="{{supportAI}}" class="icon {{color}}" style="{{compSize}}" onclick="handleShow">&#xe73c;</text>
+
+        <div if="{{isShow}}" class="mask" style="{{maskHeight}}">
+            <div class="mask-top {{bgColor}}">
+                <div>
+                    <pickimage id="pick" size="85" color="white" h-style="padding:10px;"></pickimage>
+                    <takephoto id="takephoto" size="75" color="white" h-style="padding:10px;"></takephoto>
+                </div>
+                <div>
+                    <text class="white">扫一扫</text>
+                </div>
+                <div>
+                    <text id="copy" class="icon icon-tool white" onclick="handleCopy">&#xe79c;</text>
+                    <share text="{{barCodeMemo}}" color="white" size="75"></share>
+                </div>
+            </div>
+
+            <div class="mask-panel">
+                <div class="mask-panel-item" if="{{barCodeType === 0}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="未知码类型"></h5>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 1}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                    <div class="mask-panel-item-btn">
+                        <text class="icon icon-tool white">&#xe810;</text>
+                        <a href="tel:{{barCodeData.number}}" class="white">立即拨打</a>
+                    </div>
+                </div>
+
+                <div class="mask-panel-container mask-panel-container-geolocation" if="{{barCodeType === 2}}">
+                    <geolocation id="geolocation" location="{{barCodeData.location}}"></geolocation>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 3}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                    <div class="mask-panel-item-btn">
+                        <text class="icon icon-tool white">&#xe805;</text>
+                        <a href="{{barCodeData.uri}}" class="white">立即访问</a>
+                    </div>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 4}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                    <div class="mask-panel-item-btn">
+                        <text class="icon icon-tool white">&#xe812;</text>
+                        <a href="mailto:{{barCodeData.address}}" class="white">发一封邮件</a>
+                    </div>
+                </div>
+
+                <div class="mask-panel-item" style="height:900px;" if="{{barCodeType === 5}}">
+                    <h5 text="{{barCodeMemo}}"></h5>
+
+                    <block if="{{barCodeData.numbers !== undefined}}" for="barCodeData.numbers">
+                        <div class="mask-panel-item-btn">
+                            <text class="icon icon-tool white">&#xe810;</text>
+                            <a href="tel:{{$item.number}}" class="white">拨打 {{$item.number}}</a>
+                        </div>
+                    </block>
+
+                    <div if="{{barCodeData.email !== undefined}}" class="mask-panel-item-btn">
+                        <text class="icon icon-tool white">&#xe812;</text>
+                        <a href="mailto:{{barCodeData.email}}" class="white">发一封邮件</a>
+                    </div>
+
+                    <div if="{{barCodeData.url !== undefined}}" class="mask-panel-item-btn">
+                        <text class="icon icon-tool white">&#xe805;</text>
+                        <a href="{{barCodeData.url}}" class="white">访问网址</a>
+                    </div>
+                </div>
+
+                <div class="mask-panel-container mask-panel-container-sms" if="{{barCodeType === 6}}">
+                    <sms data="{{barCodeData}}" content-placeholder="{{barCodeData.contentPlaceholder}}"></sms>
+                </div>
+
+                <div class="mask-panel-container mask-panel-container-calendar" if="{{barCodeType === 7}}">
+                    <calendar data="{{barCodeData}}" params="{{params}}" type="success" simple="true"></calendar>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 8}}">
+                    <div class="mask-panel-item-title">
+                        <h5 text="WiFi名称：{{barCodeData.ssid}}"></h5>
+                        <h5 if="barCodeData.encryptionType !== '无密码'" text="WiFi密码：{{barCodeData.password}}"></h5>
+                        <h5 text="加密类型：{{barCodeData.encryptionType}}"></h5>
+                    </div>
+                    <div class="mask-panel-item-btn" onclick="handleWifi">
+                        <text class="icon icon-tool white">&#xe7db;</text>
+                        <text class="white">连接WiFi</text>
+                    </div>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 9}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                </div>
+
+
+                <div class="mask-panel-item" if="{{barCodeType === 10 && !showDetail}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                </div>
+
+                <div class="mask-panel-item" if="{{barCodeType === 11 && !showDetail}}">
+                    <h5 h-style="margin-bottom:50px;flex-direction:column;" text="{{barCodeMemo}}"></h5>
+                </div>
+
+                <div class="mask-panel" style="background-color: #ffffff;" if="{{(barCodeType === 10 ||  barCodeType === 11) && showDetail}}">
+                    <segment data="{{segment}}">
+                        <div class="container">
+                            <div class="detail-info">
+                                <div class="detail-info-image">
+                                    <image src="{{barCodeData.pic}}"></image>
+                                </div>
+                                <div class="detail-info-text">
+                                    <text>{{barCodeData.baseInfo}}</text>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="container">
+                            <p text="{{barCodeData.summary}}"></p>
+                        </div>
+                    </segment>
+                </div>
+            </div>
+
+            <div if="{{!hideBottom}}" class="mask-bottom" onclick="handleShow">
+                <text class="icon icon-tool white">&#xe6ec;</text>
+            </div>
+        </div>
+        <toast id="toast"></toast>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/container.less';
+    @import '../../../styles/color.less';
+    @import '../../../styles/bg-color.less';
+
+    @font-face {
+        font-family: hui;
+        src: url('https://h-ui.obs.cn-south-1.myhuaweicloud.com/font/hui.ttf');
+    }
+
+    .mask{
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.8);
+        &-top{
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 0 21px;
+            justify-content: space-between;
+            height:120px;
+        }
+        &-panel{
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 120px;
+            bottom: 120px;
+            width: 100%;
+            align-items: center;
+            justify-content: center;
+            &-item{
+                width:684px;
+                height: 600px;
+                padding:30px;
+                margin: 0 33px;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background-color: #ffffff;
+                border-width: 2px;
+                border-radius: 8px;
+                border-color: @color-border;
+                &-btn {
+                    width: 550px;
+                    height: 86px;
+                    margin-bottom: 30px;
+                    border-radius: 43px;
+                    background-color: #09ba07;
+                    font-size: 30px;
+                    color: #ffffff;
+                    justify-content: center;
+                    & text{
+                        margin-right: 30px;
+                    }
+                    & a{
+                        font-size: 40px;
+                    }
+                }
+                &-title{
+                    margin-bottom:50px;
+                    flex-direction:column;
+                }
+            }
+            &-container{
+                width: 100%;
+                align-items: center;
+                background-color: #ffffff;
+                border-width: 2px;
+                border-radius: 8px;
+                border-color: @color-border;
+                &-geolocation{
+                    height: 850px;
+                    margin: 0 17px;
+                    padding: 0 16px;
+                }
+                &-sms{
+                    height: 500px;
+                    margin: 0 17px;
+                    padding: 0 16px;
+                }
+                &-calendar{
+                    height: 100%;
+                }
+            }
+        }
+        &-bottom{
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            height: 120px;
+            justify-content: center;
+        }
+    }
+
+    .icon{
+        font-family: hui;
+        padding: 12px;
+        &-tool{
+            font-size: 55px;
+        }
+    }
+
+    image {
+        width: 100%;
+        border-radius: 8px;
+    }
+    .detail-info{
+        width:100%;
+        flex-direction: column;
+        justify-content: center;
+        &-image{
+            width: 100%;
+            justify-content: center;
+            & image{
+                margin: 30px 0;
+                width: 260px;
+            }
+        }
+        &-text{
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    import ai from '@system.ai'
+    import media from '@system.media'
+    import request from '@system.request'
+    import wifi from '@system.wifi'
+    import clipboard from '@system.clipboard'
+    import fetch from '@system.fetch'
+    import { jdcloudConfig } from '../../../utils/config'
+    import { fill2 } from '../../../utils/string'
+
+    export default {
+        props: {
+            id: {},
+            size: {
+                default: '60'
+            },
+            color: {
+                default: 'sub'
+            },
+            bgColor: {
+                default: 'bg-content'
+            },
+            uri: {
+                default: ''
+            },
+            show:{
+                default: false
+            },
+            hideBottom:{
+                default: false
+            },
+            supportProductApi: {
+                default: false
+            },
+            supportIsbnApi: {
+                default: false
+            }
+        },
+
+        data() {
+            return {
+                supportAI: false,
+                isShow: this.show,
+                barCodeData: {},
+                barCodeType: 0,
+                barCodeMemo: '',
+                segment: ['基本信息', '简介'],
+                showDetail: false,
+                params: {}
+            }
+        },
+
+        onInit(){
+            let _this = this
+            ai.canIUse({
+                success: function (data) {
+                    if(!data.canUse){
+                        _this.$child('toast').showToast({
+                            text: '您的设备不支持AI',
+                            icon: 'warning'
+                        })
+                    }else{
+                        _this.supportAI = true
+                    }
+                },
+                fail: function (data, code) {
+                    console.log("handling fail, code: " + code)
+                },
+                complete: function () {
+                    console.log("handling complete")
+                }
+            })
+
+            //如果是远程图片，则先保存到本地
+            if(_this.uri.startsWith('http')){
+                request.download({
+                    url: _this.uri,
+                    success:function(data){
+                        // 下载文件，存储在本地
+                        request.onDownloadComplete({
+                            token:data.token,
+                            success: function (ret) {
+                                _this.doDetectBarCode(ret.uri)
+                                _this.isShow = true
+                            },
+                            fail: function () {
+                                _this.$child('toast').showToast({
+                                    text: '图片下载失败',
+                                    icon: 'warning'
+                                })
+                            }
+                        })
+                    },
+                    fail: function() {
+                        _this.$child('toast').showToast({
+                            text: '图片下载失败',
+                            icon: 'warning'
+                        })
+                    }
+                })
+            }else {
+                if(_this.uri === ''){
+                    media.takePhoto({
+                        success: function(data) {
+                            _this.doDetectBarCode(data.uri)
+                            _this.isShow = true
+                        }
+                    })
+                }
+            }
+
+            _this.$on('pick_dispatchEvt',_this.dispatchPickEvt)
+            _this.$on('takephoto_dispatchEvt',_this.dispatchTakePhotoEvt)
+            _this.$on('geolocation_dispatchEvt',_this.dispatchGeolocationEvt)
+        },
+        dispatchPickEvt(evt) {
+            this.doDetectBarCode(evt.detail.pictureUrl)
+        },
+        dispatchTakePhotoEvt(evt) {
+            this.doDetectBarCode(evt.detail.photoUrl)
+        },
+        dispatchGeolocationEvt(evt) {
+            this.barCodeMemo = evt.detail.value.addressText
+        },
+
+        computed: {
+            compSize() {
+                return 'font-size: ' + this.size + ';'
+            },
+            maskHeight() {
+                return this.hideBottom ? 'bottom:130px;' : 'bottom:0;'
+            }
+        },
+
+        handleShow() {
+            this.isShow = !this.isShow
+        },
+
+        /**
+         * 码检测
+         *
+         * 扫码结果数据示例：
+         *
+         * 1.包含电话信息的二维码
+         * {"barcode":[{"phone":{"number":"13500189618","type":0},"contentTypes":[1]}]}
+         *
+         * 2.包含地理位置信息的二维码。
+         * {"barcode":[{"geoLocation":{"altitude":120,"latitude":-50.737563,"longitude":-79.490016},"contentTypes":[2]}]}
+         *
+         * 3.包含网址信息的二维码
+         * {"barcode":[{"contentTypes":[3],"url":{"url":"https://weixin.qq.com/g/AYVBb_AtGpVvtxiu"}}]}
+         *
+         * 4.包含邮件信息的二维码
+         * {"barcode":[{"contentTypes":[4],"email":{"tos":[{"address":"fastapp@139.com","type":0}]}}]}
+         *
+         * 5.包含联系人信息的二维码
+         * {"barcode":[{"contactInfo":{"emails":[{"address":"fastapp@139.com","type":0}],"note":"这里是备注","addresses":[null],"urls":[{"url":"http://h-ui-mobi.blog.cndn.net"}],"org":"XX公司","person":{"name":"李程华"},"phones":[{"number":"13500189618","type":0}]},"contentTypes":[5]}]}
+         *
+         * 6.包含短信信息的二维码。
+         * {"barcode":[{"sms":{"vias":[null],"phones":[{"number":"13823396460","type":0}],"message":"你好"},"contentTypes":[6]}]}
+         *
+         * 7.包含日程事件信息的二维码
+         * {"barcode":[{"calendarEvent":{"summary":"Back to the Future Day!","allDay":false,"start":{"utcTime":1445429501000},"endAllDay":false,"end":{"utcTime":1445429501000},"geoPoint":{"altitude":0,"latitude":0,"longitude":0}},"contentTypes":[7]}]}
+         *
+         * 8.包含wifi信息的二维码
+         * {"barcode":[{"wiFi":{"password":"\"19960920\"","hidden":false,"encryptionType":2,"ssid":"TP-LINK_8514"},"contentTypes":[8]}]}
+         *
+         * 9.文字
+         * {"barcode":[{"text":{"languageType":1,"text":"k2634826"},"contentTypes":[9]}]}
+         *
+         * 10.包含商品信息的条码
+         * {"barcode":[{"product":{"productID":"9771144875007","normalizedProductID":"9771144875007"},"contentTypes":[10]}]}
+         *
+         * 11.包含书籍ISBN信息的条码
+         * {"barcode":[{"iSBN":{"isbn":"9788175257665"},"contentTypes":[11]}]}
+         */
+        doDetectBarCode(photoUri) {
+            let _this = this
+            ai.detectBarcode({
+                uri: photoUri,
+                success: function (data) {
+                    var memo = ''
+                    var barCode = data.barcode[0]
+                    var type = Number(barCode.contentTypes)
+                    _this.barCodeData = {}
+                    _this.barCodeType = type
+
+                    switch (type){
+                        case 1://包含电话信息的二维码
+                            _this.barCodeData = {
+                                number: barCode.phone.number
+                            }
+                            _this.barCodeMemo = '电话号码：' + _this.barCodeData.number
+                            break
+                        case 2:
+                            _this.barCodeData = {
+                                location: barCode.geoLocation.longitude + ',' + barCode.geoLocation.latitude
+                            }
+                            break
+                        case 3:
+                            _this.barCodeData = {
+                                uri: barCode.url.url
+                            }
+                            _this.barCodeMemo = '网址：' + barCode.url.url
+                            break
+                        case 4:
+                            _this.barCodeData = {
+                                address: barCode.email.tos[0].address
+                            }
+                            _this.barCodeMemo = '邮件地址：' + barCode.email.tos[0].address
+                            break
+                        case 5:
+                            var contactInfo = barCode.contactInfo
+
+                            memo = ''
+                            var i = 0
+                            if(contactInfo.person !== undefined){
+                                memo += '姓名：' + contactInfo.person.name + '\n'
+                            }
+
+                            if(contactInfo.phones !== undefined){
+                                _this.barCodeData.numbers = contactInfo.phones
+
+                                memo += '电话：'
+                                for(i=0;i<contactInfo.phones.length;i++){
+                                    if (i > 0) {
+                                        memo += ','
+                                    }
+
+                                    memo += contactInfo.phones[i].number
+
+                                    if(i===contactInfo.phones.length-1){
+                                        memo += '\n'
+                                    }
+                                }
+                            }
+
+                            if(contactInfo.emails !== undefined){
+                                _this.barCodeData.email = contactInfo.emails[0].address
+                                memo += '邮箱：' + contactInfo.emails[0].address + '\n'
+                            }
+
+                            if(contactInfo.urls !== undefined){
+                                _this.barCodeData.url = contactInfo.urls[0].url
+                                memo += '网址：' + contactInfo.urls[0].url + '\n'
+                            }
+
+                            if(contactInfo.org !== undefined){
+                                memo += '单位：' + contactInfo.org + '\n'
+                            }
+
+                            if(contactInfo.title !== undefined){
+                                memo += '职位：' + contactInfo.title + '\n'
+                            }
+
+                            if(contactInfo.note !== undefined){
+                                memo += '备注：' + contactInfo.note + '\n'
+                            }
+
+                            _this.barCodeMemo = memo
+                            break
+                        case 6:
+                            _this.barCodeMemo = barCode.sms.message + '[来自：' + barCode.sms.phones[0].number + ']'
+                            _this.barCodeData = {
+                                address: barCode.sms.phones[0].number,
+                                contentPlaceholder: '短信内容：' + _this.barCodeMemo
+                            }
+                            break
+                        case 7:
+                            var date = new Date(barCode.calendarEvent.start.utcTime)
+                            var year = date.getFullYear();
+                            var month = date.getMonth()+1;
+                            var day = date.getDate();
+                            var hour = date.getHours();
+                            var minute = date.getMinutes();
+
+                            var date2 = new Date(barCode.calendarEvent.end.utcTime)
+                            var hour2 = date2.getHours();
+                            var minute2 = date2.getMinutes();
+
+                            var callendar = {
+                                title: barCode.calendarEvent.summary,
+                                content: barCode.calendarEvent.summary,
+                                date: year + '-' + fill2(month.toString()) + '-' + fill2(day.toString()),
+                                timeRange: fill2(hour.toString()) + ':' + fill2(minute.toString()) + '至' + fill2(hour2.toString()) + ':' + fill2(minute2.toString()),
+                                allDay: barCode.calendarEvent.allDay
+                            }
+                            _this.barCodeData = callendar
+
+                            memo = '主题：' + callendar.content + '\n'
+                            if(barCode.calendarEvent.allDay){
+                                memo += '起止时间：整天'
+                            }else{
+                                memo += '开始日期：' + callendar.date + '\n'
+                                memo += '起止时间：' + callendar.timeRange
+                            }
+                            _this.barCodeMemo = memo
+                            break
+                        case 8:
+                            _this.barCodeData.ssid = barCode.wiFi.ssid
+                            _this.barCodeData.password = barCode.wiFi.password
+                            var encryptionType = ''
+                            switch (Number(barCode.wiFi.encryptionType)) {
+                                case 1:
+                                    encryptionType = '无密码'
+                                    _this.barCodeData.encryptionType = encryptionType
+                                    _this.barCodeMemo = 'WiFi名称：' + _this.barCodeData.ssid + ';加密类型：无密码'
+                                    break
+                                case 3:
+                                    encryptionType = 'WEP'
+                                    _this.barCodeData.encryptionType = encryptionType
+                                    _this.barCodeMemo = 'WiFi名称：' + _this.barCodeData.ssid + ';WiFi密码：' + _this.barCodeData.password + ';加密类型：WEP'
+                                    break
+                                case 2:
+                                default:
+                                    encryptionType = 'WPA/WPA2'
+                                    _this.barCodeData.encryptionType = encryptionType
+                                    _this.barCodeMemo = 'WiFi名称：' + _this.barCodeData.ssid + ';WiFi密码：' + _this.barCodeData.password + ';加密类型：WPA/WPA2'
+                                    break
+                            }
+                            break
+                        case 9:
+                           _this.barCodeMemo = barCode.text.text
+                            break
+                        case 10:
+                            _this.showDetail = false
+                            _this.barCodeMemo = '条形码：' + barCode.product.productID
+                            _this.$dispatch(_this.id + '_dispatchProductEvt', {
+                                value: barCode.product.productID
+                            })
+                            if(_this.supportProductApi){
+                                _this.getProductInfo(barCode.product.productID)
+                            }
+                            break
+                        case 11:
+                            _this.showDetail = false
+                            _this.barCodeMemo = '条形码：' + barCode.iSBN.isbn
+                            _this.$dispatch(_this.id + '_dispatchIsbnEvt', {
+                                value: barCode.iSBN.isbn
+                            })
+                            if(_this.supportIsbnApi){
+                                _this.getIsbnInfo(barCode.iSBN.isbn)
+                            }
+                            break
+                        case 0:
+                        default:
+                            _this.barCodeType = 0
+                            break
+                    }
+                },
+                fail: function () {
+                    _this.$child('toast').showToast({
+                        text: '码检测失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //连接WiFi
+        handleWifi() {
+            let _this = this
+            _this.$child('toast').showToast({
+                text: '正在连接...',
+                loading: true
+            })
+
+            //扫描wifi列表，获得BSSID
+            wifi.scan({
+                success: function() {
+                    wifi.onscanned = function(data) {
+                        for (var i = 0; i< data.wifiList.length;i++) {
+                            var BSSID = data.wifiList[i].BSSID
+                            if(data.wifiList[i].SSID === _this.barCodeData.ssid){
+                                _this.doWiFiConnect(BSSID)
+                                break
+                            }
+                        }
+                    }
+                },
+                fail: function(data, code) {
+                    _this.$child('toast').showToast({
+                        text: 'WiFi扫描失败',
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        doWiFiConnect(BSSID){
+            let _this = this
+            wifi.connect({
+                SSID: _this.barCodeData.ssid,
+                BSSID: BSSID,
+                password:  _this.barCodeData.password,
+                success: function() {
+                    _this.$child('toast').showToast({
+                        text: 'WiFi连接成功',
+                        icon: 'ok'
+                    })
+                },
+                fail: function(data, code) {
+                    var text = 'WiFi连接失败'
+                    if(data === 'connect timeout'){
+                        text = '连接超时'
+                    }else {
+                        switch (Number(code)){
+                            case 500:
+                                text = '应用在后台无法进行操作'
+                                break
+                            case 1000:
+                                text = 'Wi-Fi密码错误'
+                                break
+                            case 1001:
+                                text = '连接超时'
+                                break
+                            case 1002:
+                                text = '重复连接Wi-Fi'
+                                break
+                            case 1003:
+                                text = '未打开Wi-Fi开关'
+                                break
+                            case 1005:
+                                text = 'WiFi名称无效'
+                                break
+                            default:
+                                break
+                        }
+                    }
+                    _this.$child('toast').showToast({
+                        text: text,
+                        icon: 'warning'
+                    })
+                }
+            })
+        },
+
+        //获得商品详细信息
+        async getProductInfo(barcode){
+            try {
+                const response = await fetch.fetch({
+                    url: 'https://way.jd.com/jisuapi/barcode2',
+                    data: {
+                        barcode: barcode,
+                        appkey: jdcloudConfig.key
+                    },
+                    header: {'Content-Type': 'application/json'},
+                    method: 'GET',
+                    responseType: 'json'
+                })
+
+                if(response.data.data.code === '10000'){//查询成功
+                    var result = response.data.data.result.result
+
+                    if(result !== '') {
+                        var memo = '名称：' + result.name
+                        if (result.packagetype !== undefined) {
+                            memo += '(' + result.packagetype + ')'
+                        }
+                        memo += '\n'
+
+                        if(result.brand !== undefined) {
+                            memo += '品牌：' + result.brand + '\n'
+                        }
+                        if (result.price !== undefined) {
+                            memo += '价格：' + result.price + '\n'
+                        }
+                        if (result.type !== undefined) {
+                            memo += '规格：' + result.type + '\n'
+                        }
+                        if (result.grossweight !== undefined) {
+                            memo += '毛重：' + result.grossweight + '\n'
+                        }
+                        if (result.netweight !== undefined) {
+                            memo += '净重：' + result.netweight + '\n'
+                        }
+                        if (result.width !== undefined) {
+                            memo += '尺寸：' + result.width + '(宽) X ' + result.height + '(高) X ' + result.depth + '(厚) X ' + '\n'
+                        }
+                        if(result.originplace !==undefined) {
+                            memo += '产地：' + result.originplace + ((result.origincountry !== undefined) ? '(' + result.origincountry +  ')' : '') + '\n'
+                        }
+                        if (result.assemblycountry !== undefined) {
+                            memo += '包装：' + result.assemblycountry + '\n'
+                        }
+                        if (result.licensenum !== undefined) {
+                            memo += '许可证编号：' + result.licensenum + '\n'
+                        }
+                        if (result.healthpermitnum !== undefined) {
+                            memo += '健康许可证：' + result.healthpermitnum + '\n'
+                        }
+                        if (result.company !== undefined) {
+                            memo += '厂家：' + result.company + '\n'
+                        }
+                        memo += '条形码：' + ((result.barcode === undefined) ? barcode : result.barcode) + '\n'
+
+                        this.barCodeData = {
+                            baseInfo: memo,
+                            pic: result.pic,
+                            summary: result.description
+                        }
+
+                        this.barCodeMemo = memo + '\n' + ((result.description !== undefined) ? ('商品详情：' + result.description) : '')
+
+                        this.showDetail = true
+
+                        this.$dispatch(this.id + '_dispatchProductDetailEvt', {
+                            value: {
+                                barcode: barcode,
+                                memo: memo,
+                                summary: result.description,
+                                pic: result.pic,
+                                price: result.price
+                            }
+                        })
+                    }
+                }
+            } catch(err) {
+                console.info(JSON.stringify(err))
+            }
+        },
+
+        //获得书籍详细信息
+        async getIsbnInfo(isbn){
+            try {
+                const response = await fetch.fetch({
+                    url: 'https://way.jd.com/jisuapi/isbn',
+                    data: {
+                        isbn: isbn,
+                        appkey: jdcloudConfig.key
+                    },
+                    header: {'Content-Type': 'application/json'},
+                    method: 'GET',
+                    responseType: 'json'
+                })
+
+                if(response.data.data.code === '10000'){//查询成功
+                    var result = response.data.data.result.result
+                    if(result !== '') {
+                        var memo = '书名：' + result.title
+                        if (result.subtitle !== undefined) {
+                            memo += '(' + result.subtitle + ')'
+                        }
+                        memo += '\n'
+
+                        if(result.author !== undefined){
+                            memo += '作者：' + result.author + '\n'
+                        }
+
+                        if(result.price !== undefined) {
+                            memo += '价格：' + result.price + '\n'
+                        }
+
+                        if(result.isbn !== undefined) {
+                            memo += 'ISBN：' + result.isbn + '\n'
+                        }
+
+                        if(result.page !== undefined) {
+                            memo += '页数：' + result.page + '\n'
+                        }
+
+                        if(result.binding !== undefined) {
+                            memo += '装订：' + result.binding
+                            if(result.format !== undefined){
+                                memo += '/' + result.format
+                            }
+                            memo += '\n'
+                        }
+
+                        if(result.keyword !== undefined) {
+                            memo += '归类：' + result.keyword + '\n'
+                        }
+
+                        if(result.pubdate !== undefined) {
+                            memo += '版次：' + result.pubdate
+                            if(result.edition !== undefined){
+                                memo += ' ' + result.edition
+                            }
+                            memo += '\n'
+                        }
+
+                        if(result.pubplace !== undefined) {
+                            memo += '出版：' + result.pubplace
+                        }
+
+                        if(result.publisher !== undefined){
+                            memo += '-' + result.publisher
+                        }
+
+                        this.barCodeData = {
+                            baseInfo: memo,
+                            pic: result.pic,
+                            summary: result.summary
+                        }
+
+                        this.barCodeMemo = memo + '\n' + '简介：' + result.summary
+
+                        this.showDetail = true
+
+                        this.$dispatch(this.id + '_dispatchIsbnDetailEvt', {
+                            value: {
+                                isbn: isbn,
+                                memo: memo,
+                                summary: result.summary,
+                                pic: result.pic,
+                                price: result.price
+                            }
+                        })
+                    }
+                }
+            } catch(err) {
+                console.info(JSON.stringify(err))
+            }
+        },
+
+        //复制文字到剪贴板
+        handleCopy() {
+            clipboard.set({
+                text: this.barCodeMemo
+            })
+
+            this.$child('toast').showToast({
+                text: '已复制到剪贴板',
+                icon: 'ok'
+            })
+        }
+    }
+</script>

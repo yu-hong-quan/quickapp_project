@@ -1,0 +1,108 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <tabs onchange="onChangeTabIndex" index="{{current}}" style="{{hStyle}}">
+        <tab-bar class="segment">
+            <block for="{{compData}}">
+                <div class="segment-item {{$idx === 0 ? 'first' : (($idx === compData.length - 1) ? 'last' : ($idx === 1 ? 'second' : 'center'))}}" style="{{$item.color}}">
+                    <text style="{{$item.textColor}}">{{$item.text}}</text>
+                </div>
+            </block>
+        </tab-bar>
+
+        <tab-content style="{{compStyle}}">
+            <slot></slot>
+        </tab-content>
+    </tabs>
+</template>
+
+<style lang="less">
+
+    .segment{
+        margin: 10px 33px;
+        width: 684px;
+        height: 80px;
+        &-item{
+            height: 100%;
+            & text{
+                width: 100%;
+                text-align: center;
+            }
+        }
+    }
+    .first{
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+        border-width: 2px;
+    }
+    .second{
+        border-top-width: 2px;
+        border-bottom-width: 2px;
+    }
+    .center{
+        border-top-width: 2px;
+        border-bottom-width: 2px;
+        border-left-width: 2px;
+    }
+    .last{
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        border-width: 2px;
+    }
+</style>
+
+<script>
+    import { loaderConfig } from '../../../utils/config'
+
+    export default {
+        props: {
+            data: {
+                default: []
+            },
+            current: {
+                default: 0
+            },
+            hexColor: {
+                default: '#ff0000'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        computed: {
+            compData() {
+                var arr = []
+                for(var i=0;i<this.data.length;i++){
+                    var item = {
+                        text: this.data[i],
+                        textColor: i===this.current ? 'color: #ffffff;' : 'color: #495060;',
+                        color: i===this.current ? 'background-color: ' + this.hexColor + ';border-color: ' + this.hexColor + ';' : 'background-color: #ffffff;border-color: ' + this.hexColor + ';'
+                    }
+                    arr.push(item)
+                }
+                return arr
+            },
+            compStyle() {//修复快应用联盟加载器错误
+                return (loaderConfig.type.toUpperCase() === 'HUAWEI') ? '' : 'padding-left:33px;'
+            }
+        },
+
+        onChangeTabIndex(evt) {
+            this.current = evt.index;
+        }
+    }
+</script>

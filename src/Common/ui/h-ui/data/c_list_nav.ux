@@ -1,0 +1,87 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+	<div class="c-container" style="{{hStyle}}">
+	    <text class="c-banner">{{listTitle}}</text>
+        <div for="{{list}}" class="c-list" onclick="detail($item.src)">
+            <text class="c-title">{{$item.title}}</text>
+            <text class="c-sub-title">{{$item.subTitle}}</text>
+            <image class="c-img" src="../../../icons/arrow.png"></image>
+        </div>
+	</div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/variables.less';
+    
+    .c-container {
+        flex-direction: column;
+    }
+
+    .c-banner {
+        padding-left: @font-size-base;
+        color: @color-white;
+        background-color: @color-content;
+        line-height: @font-size-base * 1.8;
+    }
+
+    .c-list {
+        border-color: #cccccc;
+        border-bottom-width: 0.5px;
+        align-items: center;
+        padding: 0px 33px;
+    }
+
+    .c-title {
+        padding-top: 29px;
+        padding-bottom: 29px;
+        color: #1a1a1a;
+        font-size: 31px;
+        flex: 1;
+    }
+
+    .c-sub-title {
+        color: #8d8d8d;
+        font-size: 27px;
+    }
+
+    .c-img {
+        height: 28px;
+        width: 16px;
+        margin-left: 14px;
+        margin-right: 10px;
+    }
+    
+</style>
+
+<script>
+    import router from "@system.router";
+    export default {
+        props: ['list', 'listTitle','hStyle'],
+        data() {
+            return {
+                list: this.list,
+                listTitle: this.listTitle
+            }
+        },
+        detail: function(src) {
+            //跳转相应页面
+            router.push({
+                uri: src
+            });
+        }
+    };
+</script>

@@ -1,0 +1,263 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="./c_icon"></import>
+<import name="flex-row" src="./c_flex_row"></import>
+<import name="flex-col" src="./c_flex_col"></import>
+<template>
+    <div style="{{hStyle}}">
+        <div show="{{!showPanel}}" class="fab fab-main" style="{{mainMenuStyle}}" ontouchmove="handleTouchMove">
+            <div class="icon icon-lg {{bgColor}}" onclick="handleChangeHide">
+                <icon type="{{icon}}" size="90" color="white"></icon>
+            </div>
+        </div>
+
+        <div show="{{showPanel}}" class="fab fab-panel">
+            <flex-row>
+                <flex-col width="4" justify="right">
+                    <div if="{{icon0 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon0)">
+                        <icon type="{{icon0.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4" justify="center">
+                    <div if="{{icon1 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon1)">
+                        <icon type="{{icon1.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4">
+                    <div if="{{icon2 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon2)">
+                        <icon type="{{icon2.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+            </flex-row>
+
+
+            <flex-row>
+                <flex-col width="4" justify="right" align="middle" h-style="height: 228px;">
+                    <div if="{{icon3 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon3)">
+                        <icon type="{{icon3.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4" justify="center" align="middle" h-style="height: 228px;">
+                    <div class="icon icon-lg {{bgColor}}" onclick="handleChangeHide">
+                        <icon type="remove" size="110" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4" align="middle" h-style="height: 228px;">
+                    <div if="{{icon4 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon4)">
+                        <icon type="{{icon4.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+            </flex-row>
+
+            <flex-row>
+                <flex-col width="4" justify="right">
+                    <div if="{{icon5 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon5)">
+                        <icon type="{{icon5.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4" justify="center">
+                    <div if="{{icon6 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon6)">
+                        <icon type="{{icon6.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+                <flex-col width="4">
+                    <div if="{{icon7 !== undefined}}" class="icon icon-sm {{bgColor}}" onclick="handleClick(icon7)">
+                        <icon type="{{icon7.icon}}" size="70" color="white"></icon>
+                    </div>
+                </flex-col>
+            </flex-row>
+        </div>
+
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/bg-color.less';
+    @import '../../../styles/container.less';
+
+    .fab{
+        position: fixed;
+        &-main{
+             width:100px;
+             height:100px;
+        }
+        &-panel{
+            top:0;
+            left:0;
+            right:0;
+            width:100%;
+            height:100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0,0,0,0.3);
+        }
+    }
+
+    .icon{
+        align-items: center;
+        justify-content: center;
+        &-lg{
+            width: 100px;
+            height: 100px;
+            border-radius: 50px;
+        }
+        &-sm{
+            width: 80px;
+            height: 80px;
+            border-radius: 40px;
+
+        }
+    }
+
+</style>
+
+<script>
+    import router from '@system.router';
+
+    export default {
+        props: {
+            icon: {
+                default: 'plus'
+            },
+            data: {
+                default: []
+            },
+            position: {
+                default: 'bottom-right'
+            },
+            bgColor: {
+                default: 'bg-info'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                showPanel:false,
+                top: 10,
+                left: 640,
+                icon0: {},
+                icon1: {},
+                icon2: {},
+                icon3: {},
+                icon4: {},
+                icon5: {},
+                icon6: {},
+                icon7: {}
+            }
+        },
+
+        onInit() {
+            switch (this.position){
+                case 'top-left':
+                    this.top = 10
+                    this.left = 10
+                    break
+                case 'top-right':
+                    this.top = 10
+                    this.left = 640
+                    break
+                case 'center':
+                    this.top = 616
+                    this.left = 325
+                    break
+                case 'bottom-left':
+                    this.top = 1220
+                    this.left = 10
+                    break
+                case 'bottom-right':
+                default:
+                    this.top = 1220
+                    this.left = 640
+                    break
+            }
+
+            if(this.data.length >=8){
+                this.icon0 = this.data[0]
+                this.icon1 = this.data[1]
+                this.icon2 = this.data[2]
+                this.icon3 = this.data[3]
+                this.icon4 = this.data[4]
+                this.icon5 = this.data[5]
+                this.icon6 = this.data[6]
+                this.icon7 = this.data[7]
+            }else if(this.data.length >=4 && this.data.length <8){
+                this.icon0 = undefined
+                this.icon1 = this.data[0]
+                this.icon2 = undefined
+                this.icon3 = this.data[1]
+                this.icon4 = this.data[2]
+                this.icon5 = undefined
+                this.icon6 = this.data[3]
+                this.icon7 = undefined
+            }
+            else{
+                this.icon0 = undefined
+                this.icon1 = undefined
+                this.icon2 = undefined
+                this.icon3 = undefined
+                this.icon4 = undefined
+                this.icon5 = undefined
+                this.icon6 = undefined
+                this.icon7 = undefined
+            }
+        },
+
+        computed: {
+            mainMenuStyle() {
+                return 'top: ' + this.top + 'px;left:' + this.left + 'px;'
+            }
+        },
+
+        handleChangeHide() {
+            this.showPanel = !this.showPanel
+        },
+
+        handleClick (e) {
+            this.showPanel = !this.showPanel
+            router.push({
+                uri: e.uri,
+                params: e.params !== undefined ? e.params : {}
+            });
+        },
+
+        handleTouchMove(e){
+            var x = e.touches[0].clientX
+            var y = e.touches[0].clientY
+            if(x < 10){
+                x = 10
+            }
+
+            if(x > 640){
+                x = 640
+            }
+
+            if(y < 10){
+                y = 10
+            }
+
+            if(y > 1220){
+                y = 1220
+            }
+
+            this.left = x
+            this.top = y
+        }
+    }
+</script>

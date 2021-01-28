@@ -1,0 +1,169 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<import name="icon" src="../basic/c_icon"></import>
+<template>
+    <div class="form-group" id="{{id}}" style="{{hStyle}}">
+        <div class="title" onclick="handleClick">
+            <div class="title-left">
+                <text if="{{compNotBlank && title!==''}}" class="red">* </text>
+                <text class="form-group-label-default {{validStyle}}">{{title}}</text>
+                <icon if="{{icon!==''}}" color="{{validStyle}}" type="{{icon}}" h-style="margin-left: 12px;margin-bottom:6px;width:36px;"></icon>
+            </div>
+            <div show="{{collapse}}" class="collapse-icon">
+                <icon if="{{hideBody}}" type="chevron-down" size="46"></icon>
+                <icon if="{{!hideBody}}" type="chevron-up" size="46"></icon>
+            </div>
+        </div>
+
+        <div show="{{!hideBody}}" class="panel">
+            <block for="{{compData}}">
+                <div class="form-group-control-horizontal">
+                    <input type="radio" name="{{id}}" value="{{$item.value}}" disabled="{{$item.disabled ? 'true' : 'false'}}" checked="{{$item.checked ? 'true' : 'false'}}" onchange="handleChange" />
+                    <text class="{{$item.disabled ? 'form-control-disabled' : ''}}">{{$item.label}}</text>
+                </div>
+            </block>
+        </div>
+
+        <div show="{{!!formError}}" class="form-error">
+            <icon type="remove-sign" color="danger"></icon>
+            <text style="padding-left: 8px;">{{formError}}</text>
+        </div>
+    </div>
+</template>
+
+<style lang="less">
+    @import '../../../styles/form.less';
+
+    .title{
+        width:100%;
+        justify-content: space-between;
+        &-left{
+            height: 60px;
+            align-items: center;
+        }
+    }
+    .panel{
+        flex-direction: column;
+    }
+    .form-control-disabled{
+        color: @color-disabled;
+    }
+    .success{
+        color: @color-success;
+    }
+    .warning{
+        color: @color-warning;
+    }
+    .danger{
+        color: @color-danger;
+    }
+    .red{
+        color: @color-red;
+    }
+</style>
+
+<script>
+    export default {
+        props: {
+            id:{},
+            params: {},
+            title: {
+                default: ''
+            },
+            value: {
+                default: ''
+            },
+            data: {
+            },
+            icon: {
+                default: ''
+            },
+            collapse: {
+                default: false
+            },
+            notBlank: {
+                default: ''
+            },
+            valid: {
+                default: ''
+            },
+            formError: {
+                default: ''
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        data() {
+            return {
+                compValue: this.value,
+                compValid: this.valid,
+                hideBody: this.collapse,
+                compInit: true
+            }
+        },
+
+        computed: {
+            compData(){
+                var arr = []
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    var item = {
+                        label: this.data[i]['label'],
+                        value: this.data[i]['value'],
+                        disabled: !!this.data[i]['disabled'] ? this.data[i]['disabled'] : false,
+                        checked: this.compValue.includes(this.data[i]['value'])
+                    }
+                    arr.push(item)
+                }
+
+                return arr
+            },
+            compNotBlank() {
+                return this.notBlank==='false' ? false : true
+            },
+            validStyle() {
+                if (this.compValid === 'has-success') {
+                    return "success"
+                } else if (this.compValid === 'has-warning') {
+                    return "warning"
+                } else if (this.compValid === 'has-error') {
+                    return "danger"
+                } else {
+                    return (this.compInit || (this.valid === 'none')) ? "" : "success"
+                }
+            }
+        },
+
+        handleChange (e) {
+            this.compValid = ""
+            this.formError = ""
+            this.compInit = false
+
+            this.compValue = e.value
+            this.$dispatch(this.id + '_dispatchEvt', {
+                value: this.compValue
+            })
+            this.params[this.id] = this.compValue
+        },
+
+        handleClick() {
+            if(this.collapse){
+                this.hideBody = !this.hideBody
+            }
+        }
+    }
+</script>

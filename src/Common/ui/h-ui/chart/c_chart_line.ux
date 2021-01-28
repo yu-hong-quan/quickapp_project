@@ -1,0 +1,201 @@
+/**
+* Copyright 2019 H-UI [ @author Mac.Manon @email fastapp@139.com ]
+* Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+* this file except in compliance with the License.  You may obtain a copy of the
+* License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software distributed
+* under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+* CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+* specific language governing permissions and limitations under the License.
+*
+*/
+
+<template>
+    <div class="canvas-container" style="{{hStyle}}">
+        <canvas id="{{id}}" ontouchstart="handleTouchstart"></canvas>
+    </div>
+</template>
+
+<style>
+    .canvas-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    canvas {
+        width: 750px;
+        height: 750px;
+    }
+</style>
+
+<script>
+    import prompt from '@system.prompt'
+    import vibrator from '@system.vibrator'
+    import { getStepValue } from '../../../utils/chart'
+
+    export default {
+        props: {
+            id :{},
+            data: {},
+            hexColor: {
+                default: '#ff0000'
+            },
+            hStyle:{
+                default: ''
+            }
+        },
+
+        onInit(){
+            setTimeout(() => {
+                this.drawChart()
+            }, 100);
+        },
+
+        drawChart(){
+            //获取上下文
+            var canvas=this.$element(this.id)
+            var ctx=canvas.getContext("2d")
+
+            //绘制坐标
+            const left = 75
+            const right = 675
+            const top = 75
+            const bottom = 675
+
+            ctx.beginPath()
+
+            var i = 0
+            var len = 0
+
+            // x,y轴
+            ctx.moveTo(left , top)
+            ctx.lineTo(left,  bottom)
+            ctx.lineTo(right,  bottom)
+
+            // y轴刻度线
+            var x = left - 5
+            var y = top
+            const colWidth = this.columnWidth
+            for(i = 0; i <= 5; i++){
+                ctx.moveTo(x , y)
+                ctx.lineTo(left , y)
+                y += 120
+            }
+
+            // x轴刻度线
+            x = left
+            y = bottom + 5
+            for(i = 0, len = this.data.length; i < len; i++){
+                ctx.moveTo(x , bottom)
+                ctx.lineTo(x , y)
+                x += colWidth
+            }
+            ctx.moveTo(right , bottom)
+            ctx.lineTo(right , y)
+            ctx.stroke()
+
+            // 参考线
+            y = top
+            for(i = 0; i < 5; i++){
+                ctx.moveTo(left , y)
+                ctx.lineTo(right , y)
+                y += 120
+            }
+            ctx.strokeStyle = '#ccc'
+            ctx.stroke()
+            ctx.closePath()
+
+            // y轴文字
+            x = left - 8
+            y = bottom
+            ctx.textAlign = 'right'
+            ctx.font = '16px sans-serif'
+            ctx.textBaseline = 'middle'
+            for(i = 0; i <= 5; i++){
+                ctx.fillText(this.stepValue * i, x, y)
+                y -= 120
+            }
+
+            // x轴文字
+            x = left + colWidth/2
+            y = bottom + 24
+            ctx.textAlign = 'center'
+            for(i = 0, len = this.data.length; i < len; i++){
+                ctx.fillText(this.data[i]['name'], x, y)
+                x += colWidth
+            }
+
+            // 绘制折线
+            x = left + colWidth/2
+            y = (1-this.data[0]['value']/(this.stepValue * 5))*600 + 75
+            ctx.beginPath()
+            ctx.moveTo(x , y)
+            for(i = 1, len = this.data.length; i < len; i++){
+                x += colWidth
+                y = (1-this.data[i]['value']/(this.stepValue * 5))*600 + 75
+                ctx.lineTo(x , y)
+            }
+            ctx.strokeStyle = this.hexColor
+            ctx.lineWidth = 3
+            ctx.stroke()
+            ctx.closePath()
+
+
+            // 绘制点
+            const p = Math.PI
+            x = left + colWidth/2
+            for(i = 0, len = this.data.length; i < len; i++){
+                y = (1-this.data[i]['value']/(this.stepValue * 5))*600 + 75
+                ctx.beginPath()
+                ctx.arc(x, y, 6, 0,p * 2, false)
+                ctx.fillStyle = this.hexColor
+                ctx.fill()
+                ctx.closePath()
+
+                ctx.beginPath()
+                ctx.arc(x, y, 3, 0,p * 2, false)
+                ctx.fillStyle = 'white'
+                ctx.fill()
+                ctx.closePath()
+                x += colWidth
+            }
+
+        },
+
+        // 触摸提示
+        handleTouchstart(event) {
+            var x = event.touches[0].offsetX
+            var y = event.touches[0].offsetY
+            if(x >= 75 && x <= 675 && y >= 75 && y <= 675){
+                // 手机震动反馈
+                vibrator.vibrate({ mode: "short" })
+
+                x -= 75
+                var index = Math.ceil(x/this.columnWidth)-1
+                // 弹窗显示缩略语的详细说明
+                prompt.showToast({
+                    message: this.data[index]['name'] + ': ' + this.data[index]['value'],
+                    gravity: 'center'
+                })
+            }
+
+        },
+        computed: {
+            stepValue() {
+                var max = 0;
+                for(var i = 0, len = this.data.length; i < len; i++){
+                    if (this.data[i]['value'] > max) {
+                        max = this.data[i]['value']
+                    }
+                }
+
+                return getStepValue(max)
+            },
+            columnWidth() {
+                return Math.ceil(600 / this.data.length)
+            }
+        }
+    }
+</script>
